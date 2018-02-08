@@ -1,5 +1,7 @@
 # Analyzers for VS extensions
 
+[![Build status](https://ci.appveyor.com/api/projects/status/d04ivfn3ad15b902/branch/master?svg=true)](https://ci.appveyor.com/project/AArnott/vssdk-analyzers/branch/master)
+
 This project is meant to provide a set of Roslyn Analyzers that makes it easy to catch, discover and implement a wide array of best practices when building Visual Studio extensions.
 
 Check out our [exhaustive list of analyzers](doc/index.md) defined in this project.
