@@ -42,7 +42,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             context.EnableConcurrentExecution();
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
 
-            context.RegisterSyntaxNodeAction(this.AnalyzeClassDeclaration, SyntaxKind.ClassDeclaration);
+            context.RegisterSyntaxNodeAction(Utils.DebuggableWrapper(this.AnalyzeClassDeclaration), SyntaxKind.ClassDeclaration);
         }
 
         private void AnalyzeClassDeclaration(SyntaxNodeAnalysisContext context)
@@ -54,12 +54,14 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 return;
             }
 
-            var baseTypeSymbol = context.SemanticModel.GetSymbolInfo(baseType, context.CancellationToken);
-
-            // TODO: more code here
-            context.ReportDiagnostic(Diagnostic.Create(
-                Descriptor,
-                declaration.BaseList.Types.FirstOrDefault()?.GetLocation()));
+            var baseTypeSymbol = context.SemanticModel.GetSymbolInfo(baseType.Type, context.CancellationToken);
+            var packageType = context.Compilation.GetTypeByMetadataName(typeof(Package).FullName);
+            if (baseTypeSymbol.Symbol?.OriginalDefinition == packageType.OriginalDefinition)
+            {
+                context.ReportDiagnostic(Diagnostic.Create(
+                    Descriptor,
+                    baseType.GetLocation()));
+            }
         }
     }
 }
