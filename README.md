@@ -1,3 +1,7 @@
+# Analyzers for VS extensions
+This project is meant to provide a set of Roslyn Analyzers that makes it easy to catch, discover and implement a wide array of best practices when building Visual Studio extensions.
+
+If you have an idea for a rule that would constitute a best practice for extension authors to follow, please open an issue with the desciption. 
 
 # Contributing
 
