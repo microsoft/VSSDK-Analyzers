@@ -5,6 +5,8 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
     using System;
     using System.Collections.Immutable;
     using Microsoft.CodeAnalysis;
+    using Microsoft.CodeAnalysis.CSharp;
+    using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Diagnostics;
     using Microsoft.VisualStudio.Shell;
 
@@ -37,6 +39,27 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         /// <inheritdoc />
         public override void Initialize(AnalysisContext context)
         {
+            context.EnableConcurrentExecution();
+            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
+
+            context.RegisterSyntaxNodeAction(this.AnalyzeClassDeclaration, SyntaxKind.ClassDeclaration);
+        }
+
+        private void AnalyzeClassDeclaration(SyntaxNodeAnalysisContext context)
+        {
+            var declaration = (ClassDeclarationSyntax)context.Node;
+            var baseType = declaration.BaseList.Types.FirstOrDefault();
+            if (baseType == null)
+            {
+                return;
+            }
+
+            var baseTypeSymbol = context.SemanticModel.GetSymbolInfo(baseType, context.CancellationToken);
+
+            // TODO: more code here
+            context.ReportDiagnostic(Diagnostic.Create(
+                Descriptor,
+                declaration.BaseList.Types.FirstOrDefault()?.GetLocation()));
         }
     }
 }
