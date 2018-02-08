@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net46</TargetFramework>
+
+    <PackageTags>analyzers visualstudio vssdk sdk</PackageTags>
+    <PackageReleaseNotes>https://go.microsoft.com/fwlink/?LinkID=746387</PackageReleaseNotes>
+
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="1.2.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="15.4.27004" PrivateAssets="all" />
+  </ItemGroup>
+  
+</Project>
