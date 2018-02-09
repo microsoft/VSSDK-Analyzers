@@ -40,6 +40,11 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             /// Gets the <see cref="Microsoft.CodeAnalysis.CSharp.Syntax.TypeSyntax"/> for this type.
             /// </summary>
             internal static TypeSyntax TypeSyntax { get; } = Utils.QualifyName(Namespace, SyntaxFactory.IdentifierName(TypeName));
+
+            /// <summary>
+            /// Gets the fully-qualified name of this type as a string.
+            /// </summary>
+            internal static string FullName => string.Join(".", Namespace) + "." + TypeName;
         }
 
         /// <summary>
@@ -168,6 +173,37 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             /// Gets the <see cref="Microsoft.CodeAnalysis.CSharp.Syntax.TypeSyntax"/> for this type.
             /// </summary>
             internal static TypeSyntax TypeSyntax { get; } = Utils.QualifyName(Namespace, SyntaxFactory.IdentifierName(TypeName));
+        }
+
+        /// <summary>
+        /// Describes the <see cref="Shell.PackageRegistrationAttribute"/> type.
+        /// </summary>
+        internal static class PackageRegistrationAttribute
+        {
+            /// <summary>
+            /// Gets the simple name of the <see cref="Shell.PackageRegistrationAttribute"/> type.
+            /// </summary>
+            internal const string TypeName = nameof(Shell.PackageRegistrationAttribute);
+
+            /// <summary>
+            /// Gets the name of the <see cref="Shell.PackageRegistrationAttribute.AllowsBackgroundLoading"/> property.
+            /// </summary>
+            internal const string AllowsBackgroundLoading = nameof(Shell.PackageRegistrationAttribute.AllowsBackgroundLoading);
+
+            /// <summary>
+            /// Gets an array of the nesting namespaces for this type.
+            /// </summary>
+            internal static readonly IReadOnlyList<string> Namespace = Namespaces.MicrosoftVisualStudioShell;
+
+            /// <summary>
+            /// Gets the <see cref="Microsoft.CodeAnalysis.CSharp.Syntax.TypeSyntax"/> for this type.
+            /// </summary>
+            internal static TypeSyntax TypeSyntax { get; } = Utils.QualifyName(Namespace, SyntaxFactory.IdentifierName(TypeName));
+
+            /// <summary>
+            /// Gets the fully-qualified name of this type as a string.
+            /// </summary>
+            internal static string FullName => string.Join(".", Namespace) + "." + TypeName;
         }
     }
 }

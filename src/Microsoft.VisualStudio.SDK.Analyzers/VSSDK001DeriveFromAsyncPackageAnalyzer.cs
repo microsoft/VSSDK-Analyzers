@@ -29,7 +29,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             title: "Derive from AsyncPackage",
             messageFormat: "Your Package-derived class should derive from AsyncPackage instead.",
             helpLinkUri: Utils.GetHelpLink(Id),
-            category: "Usage",
+            category: "Performance",
             defaultSeverity: DiagnosticSeverity.Info,
             isEnabledByDefault: true);
 

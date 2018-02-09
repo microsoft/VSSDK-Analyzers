@@ -15,7 +15,7 @@
          due to issue https://github.com/dotnet/project-system/issues/2129 -->
     <PackageReference Include="GitLink" Version="3.2.0-unstable0018" PrivateAssets="all" />
     <PackageReference Include="MicroBuild.VisualStudio" Version="2.0.53" PrivateAssets="all" />
-    <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" PrivateAssets="all" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta006" PrivateAssets="all" />
     <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.17" PrivateAssets="all" />
   </ItemGroup>
 
