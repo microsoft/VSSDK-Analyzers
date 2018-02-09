@@ -7,12 +7,26 @@
     <PackageReleaseNotes>https://go.microsoft.com/fwlink/?LinkID=746387</PackageReleaseNotes>
     <Description>A collection of analyzers to help Visual Studio extension developers write quality code.</Description>
 
+    <!-- Analyzers should not be added to the lib folder. -->
+    <IncludeBuildOutput>false</IncludeBuildOutput>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="1.2.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="1.2.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="15.4.27004" PrivateAssets="all" />
     <PackageReference Include="Microsoft.VisualStudio.Threading" Version="15.5.32" PrivateAssets="none" />
   </ItemGroup>
-  
+
+  <ItemGroup>
+    <Content Include="tools\*.ps1" Pack="true" PackagePath="tools\" />
+  </ItemGroup>
+
+  <Target Name="PackBuildOutputs" BeforeTargets="_GetPackageFiles" DependsOnTargets="SatelliteDllsProjectOutputGroup;DebugSymbolsProjectOutputGroup">
+    <ItemGroup>
+      <Content Include="$(TargetPath)" Pack="true" PackagePath="analyzers\cs\" />
+      <!--<Content Include="@(DebugSymbolsProjectOutputGroupOutput)" Pack="true" PackagePath="analyzers\cs\" />-->
+      <Content Include="@(SatelliteDllsProjectOutputGroupOutput)" Pack="true" PackagePath="analyzers\cs\%(SatelliteDllsProjectOutputGroupOutput.Culture)\" />
+    </ItemGroup>
+  </Target>
+
 </Project>

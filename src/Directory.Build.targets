@@ -10,4 +10,10 @@
     <DebugType>pdbonly</DebugType>
   </PropertyGroup>
 
+  <Target Name="SetNuSpecProperties" BeforeTargets="GenerateNuspec" DependsOnTargets="GetBuildVersion">
+    <PropertyGroup>
+      <PackageLicenseUrl>https://raw.githubusercontent.com/Microsoft/vssdk-analyzers/$(GitCommitIdShort)/LICENSE</PackageLicenseUrl>
+    </PropertyGroup>
+  </Target>
+
 </Project>
