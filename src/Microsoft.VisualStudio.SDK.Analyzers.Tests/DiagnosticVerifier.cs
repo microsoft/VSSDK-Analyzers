@@ -30,6 +30,8 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
         {
             Path.Combine("Microsoft.VisualStudio.Shell.Interop", "7.10.6071", "lib", "Microsoft.VisualStudio.Shell.Interop.dll"),
             Path.Combine("Microsoft.VisualStudio.Shell.15.0", "15.4.27004", "lib", "Microsoft.VisualStudio.Shell.15.0.dll"),
+            Path.Combine("Microsoft.VisualStudio.Shell.Framework", "15.4.27004", "lib\\net45", "Microsoft.VisualStudio.Shell.Framework.dll"),
+            Path.Combine("Microsoft.VisualStudio.Threading", "15.4.4", "lib\\net45", "Microsoft.VisualStudio.Threading.dll"),
         });
 
         private static string csharpDefaultFileExt = "cs";

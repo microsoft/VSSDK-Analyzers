@@ -18,5 +18,32 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             nameof(VisualStudio),
             nameof(Shell),
         };
+
+        /// <summary>
+        /// Gets an array for each element in the namespace System.
+        /// </summary>
+        internal static readonly IReadOnlyList<string> System = new[]
+        {
+            nameof(System),
+        };
+
+        /// <summary>
+        /// Gets an array for each element in the namespace System.Threading.
+        /// </summary>
+        internal static readonly IReadOnlyList<string> SystemThreading = new[]
+        {
+            nameof(System),
+            nameof(global::System.Threading),
+        };
+
+        /// <summary>
+        /// Gets an array for each element in the namespace System.Threading.Tasks.
+        /// </summary>
+        internal static readonly IReadOnlyList<string> SystemThreadingTasks = new[]
+        {
+            nameof(System),
+            nameof(global::System.Threading),
+            nameof(global::System.Threading.Tasks),
+        };
     }
 }
