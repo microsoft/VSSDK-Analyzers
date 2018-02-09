@@ -8,16 +8,16 @@ using Microsoft.VisualStudio.SDK.Analyzers.Tests;
 using Xunit;
 using Xunit.Abstractions;
 
-public class VSSDK001DeriveFromAsyncPackageTests : DiagnosticVerifier
+public class VSSDK001DeriveFromAsyncPackageAnalyzerTests : DiagnosticVerifier
 {
     private DiagnosticResult expect = new DiagnosticResult
     {
-        Id = VSSDK001DeriveFromAsyncPackage.Id,
+        Id = VSSDK001DeriveFromAsyncPackageAnalyzer.Id,
         SkipVerifyMessage = true,
         Severity = DiagnosticSeverity.Info,
     };
 
-    public VSSDK001DeriveFromAsyncPackageTests(ITestOutputHelper logger)
+    public VSSDK001DeriveFromAsyncPackageAnalyzerTests(ITestOutputHelper logger)
         : base(logger)
     {
     }
@@ -76,5 +76,5 @@ class Test : Package, IDisposable {
         this.VerifyCSharpDiagnostic(test, this.expect);
     }
 
-    protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() => new VSSDK001DeriveFromAsyncPackage();
+    protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() => new VSSDK001DeriveFromAsyncPackageAnalyzer();
 }

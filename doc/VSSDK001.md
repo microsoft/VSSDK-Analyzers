@@ -33,3 +33,5 @@ class MyCoolPackage : AsyncPackage {
     }
 }
 ```
+
+A code fix is offered for this diagnostic to automatically apply this change.

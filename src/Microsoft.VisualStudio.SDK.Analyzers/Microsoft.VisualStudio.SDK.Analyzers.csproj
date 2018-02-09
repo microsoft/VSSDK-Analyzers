@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net46</TargetFramework>
+    <CodeAnalysisRuleSet>Microsoft.VisualStudio.SDK.Analyzers.ruleset</CodeAnalysisRuleSet>
 
     <PackageTags>analyzers visualstudio vssdk sdk</PackageTags>
     <PackageReleaseNotes>https://go.microsoft.com/fwlink/?LinkID=746387</PackageReleaseNotes>
@@ -15,6 +16,7 @@
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="1.2.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="15.4.27004" PrivateAssets="all" />
     <PackageReference Include="Microsoft.VisualStudio.Threading" Version="15.5.32" PrivateAssets="none" />
+    <PackageReference Include="AsyncUsageAnalyzers" Version="1.0.0-alpha003" PrivateAssets="none" />
   </ItemGroup>
 
   <ItemGroup>

@@ -30,6 +30,8 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
         {
             Path.Combine("Microsoft.VisualStudio.Shell.Interop", "7.10.6071", "lib", "Microsoft.VisualStudio.Shell.Interop.dll"),
             Path.Combine("Microsoft.VisualStudio.Shell.15.0", "15.4.27004", "lib", "Microsoft.VisualStudio.Shell.15.0.dll"),
+            Path.Combine("Microsoft.VisualStudio.Shell.Framework", "15.4.27004", "lib\\net45", "Microsoft.VisualStudio.Shell.Framework.dll"),
+            Path.Combine("Microsoft.VisualStudio.Threading", "15.4.4", "lib\\net45", "Microsoft.VisualStudio.Threading.dll"),
         });
 
         private static string csharpDefaultFileExt = "cs";
@@ -187,6 +189,18 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
             }
 
             return builder.ToString();
+        }
+
+        /// <summary>
+        /// Create a Document from a string through creating a project that contains it.
+        /// </summary>
+        /// <param name="source">Classes in the form of a string</param>
+        /// <param name="language">The language the source code is in</param>
+        /// <param name="hasEntrypoint"><c>true</c> to set the compiler in a mode as if it were compiling an exe (as opposed to a dll).</param>
+        /// <returns>A Document created from the source string</returns>
+        protected static Document CreateDocument(string source, string language = LanguageNames.CSharp, bool hasEntrypoint = false)
+        {
+            return CreateProject(new[] { source }, language, hasEntrypoint).Documents.First();
         }
 
         /// <summary>

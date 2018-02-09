@@ -68,13 +68,7 @@
     <Rule Id="CA2241" Action="Warning" />
     <Rule Id="CA2242" Action="Warning" />
   </Rules>
-  <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
-    <Rule Id="SA1600" Action="Hidden" />
-    <Rule Id="SA1601" Action="Hidden" />
-    <Rule Id="SA1602" Action="Hidden" />
-    <Rule Id="SA1615" Action="Hidden" />
-  </Rules>
   <Rules AnalyzerId="AsyncUsageAnalyzers" RuleNamespace="AsyncUsageAnalyzers">
-    <Rule Id="AvoidAsyncSuffix" Action="Hidden" />
+    <Rule Id="UseConfigureAwait" Action="Warning" />
   </Rules>
 </RuleSet>
