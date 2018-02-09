@@ -14,7 +14,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
     /// Discovers VS packages that derive directly from <see cref="Package"/> instead of <see cref="AsyncPackage"/>.
     /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class VSSDK001DeriveFromAsyncPackage : DiagnosticAnalyzer
+    public class VSSDK001DeriveFromAsyncPackageAnalyzer : DiagnosticAnalyzer
     {
         /// <summary>
         /// The value to use for <see cref="DiagnosticDescriptor.Id"/> in generated diagnostics.
