@@ -3,8 +3,11 @@
 namespace Microsoft.VisualStudio.SDK.Analyzers
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using Microsoft.CodeAnalysis;
+    using Microsoft.CodeAnalysis.CSharp;
+    using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Diagnostics;
 
     /// <summary>
@@ -93,6 +96,39 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Produces the syntax necessary to qualify a simple name.
+        /// </summary>
+        /// <param name="qualifiers">The qualifiers (e.g. the namespace that qualifies a type).</param>
+        /// <param name="simpleName">The simple type name.</param>
+        /// <returns>The qualified type name.</returns>
+        internal static NameSyntax QualifyName(IReadOnlyList<string> qualifiers, SimpleNameSyntax simpleName)
+        {
+            if (qualifiers == null)
+            {
+                throw new ArgumentNullException(nameof(qualifiers));
+            }
+
+            if (simpleName == null)
+            {
+                throw new ArgumentNullException(nameof(simpleName));
+            }
+
+            if (qualifiers.Count == 0)
+            {
+                throw new ArgumentException("At least one qualifier required.");
+            }
+
+            NameSyntax result = SyntaxFactory.IdentifierName(qualifiers[0]);
+            for (int i = 1; i < qualifiers.Count; i++)
+            {
+                var rightSide = SyntaxFactory.IdentifierName(qualifiers[i]);
+                result = SyntaxFactory.QualifiedName(result, rightSide);
+            }
+
+            return SyntaxFactory.QualifiedName(result, simpleName);
         }
 
         private static bool LaunchDebuggerExceptionFilter()

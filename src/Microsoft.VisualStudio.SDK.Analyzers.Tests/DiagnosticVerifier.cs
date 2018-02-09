@@ -190,6 +190,18 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
         }
 
         /// <summary>
+        /// Create a Document from a string through creating a project that contains it.
+        /// </summary>
+        /// <param name="source">Classes in the form of a string</param>
+        /// <param name="language">The language the source code is in</param>
+        /// <param name="hasEntrypoint"><c>true</c> to set the compiler in a mode as if it were compiling an exe (as opposed to a dll).</param>
+        /// <returns>A Document created from the source string</returns>
+        protected static Document CreateDocument(string source, string language = LanguageNames.CSharp, bool hasEntrypoint = false)
+        {
+            return CreateProject(new[] { source }, language, hasEntrypoint).Documents.First();
+        }
+
+        /// <summary>
         /// Get the CSharp analyzer being tested - to be implemented in non-abstract class
         /// </summary>
         protected abstract DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer();
