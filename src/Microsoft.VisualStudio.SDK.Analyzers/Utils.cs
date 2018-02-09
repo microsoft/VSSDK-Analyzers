@@ -119,7 +119,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
 
             if (qualifiers.Count == 0)
             {
-                throw new ArgumentException("At least one qualifier required.");
+                throw new ArgumentException("At least one qualifier required.", nameof(qualifiers));
             }
 
             NameSyntax result = SyntaxFactory.IdentifierName(qualifiers[0]);
