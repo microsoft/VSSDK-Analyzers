@@ -19,20 +19,31 @@ environment:
   TreatWarningsAsErrors: true
   CodeAnalysisTreatWarningsAsErrors: true
 before_build:
-  msbuild src\Microsoft.VisualStudio.SDK.Analyzers.sln /nologo /m /v:quiet /t:restore
+- msbuild src\Microsoft.VisualStudio.SDK.Analyzers.sln /nologo /m /v:quiet /t:restore
+- choco install opencover.portable
+- choco install codecov
 build_script:
 - msbuild src\Microsoft.VisualStudio.SDK.Analyzers.sln /nologo /m /bl /v:minimal /t:build,pack
 test_script:
 - >-
     SET testdir=bin\Microsoft.VisualStudio.SDK.Analyzers.Tests\%configuration%\net46
 
-    "%xunit20%\xunit.console.x86.exe"
-    "%testdir%\Microsoft.VisualStudio.SDK.Analyzers.Tests.dll"
-    -noshadow
-    -html "%testdir%\testresults.html" -xml "%testdir%\testresults.xml"
-    -appveyor
-    -notrait "TestCategory=FailsInCloudTest"
-    -nologo
+    OpenCover.Console.exe
+    -register:user
+    -target:"%xunit20%\xunit.console.x86.exe"
+    -targetargs:"%testdir%\Microsoft.VisualStudio.SDK.Analyzers.Tests.dll -noshadow -html %testdir%\testresults.html -xml %testdir%\testresults.xml -appveyor -nologo"
+    -returntargetcode
+    -excludebyattribute:*.ExcludeFromCodeCoverage*
+    -excludebyfile:*\*Designer.cs
+    -filter:"+[Microsoft.VisualStudio.SDK.Analyzers]*"
+    -hideskipped:All
+    -output:%testdir%code_coverage.xml
+
+    SET PATH=C:\Python34;C:\Python34\Scripts;%PATH%
+
+    pip install codecov
+
+    codecov -f "%testdir%code_coverage.xml"
 
 artifacts:
 - path: bin\**\*.nupkg
