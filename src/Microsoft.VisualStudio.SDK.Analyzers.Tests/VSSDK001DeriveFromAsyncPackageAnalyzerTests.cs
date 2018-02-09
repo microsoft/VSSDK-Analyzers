@@ -36,6 +36,17 @@ class Test : AsyncPackage {
     }
 
     [Fact]
+    public void NoBaseTypeProducesNoDiagnostic()
+    {
+        var test = @"
+class Test {
+}
+";
+
+        this.VerifyCSharpDiagnostic(test);
+    }
+
+    [Fact]
     public void PackageDerivedClassProducesDiagnostic()
     {
         var test = @"

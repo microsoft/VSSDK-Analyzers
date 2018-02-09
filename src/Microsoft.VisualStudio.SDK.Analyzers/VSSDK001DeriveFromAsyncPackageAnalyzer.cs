@@ -26,7 +26,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         /// </summary>
         internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: Id,
-            title: "Derive your VS package from AsyncPackage",
+            title: "Derive from AsyncPackage",
             messageFormat: "Your Package-derived class should derive from AsyncPackage instead.",
             helpLinkUri: Utils.GetHelpLink(Id),
             category: "Usage",
@@ -48,7 +48,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         private void AnalyzeClassDeclaration(SyntaxNodeAnalysisContext context)
         {
             var declaration = (ClassDeclarationSyntax)context.Node;
-            var baseType = declaration.BaseList.Types.FirstOrDefault();
+            var baseType = declaration.BaseList?.Types.FirstOrDefault();
             if (baseType == null)
             {
                 return;
