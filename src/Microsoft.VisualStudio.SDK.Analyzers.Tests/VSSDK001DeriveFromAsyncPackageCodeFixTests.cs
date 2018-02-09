@@ -35,6 +35,28 @@ class Test : AsyncPackage
         this.VerifyCSharpFix(test, withFix);
     }
 
+    [Fact(Skip = "Not yet implemented")]
+    public void PackageRegistrationUpdated()
+    {
+        var test = @"
+using Microsoft.VisualStudio.Shell;
+
+[PackageRegistration(UseManagedResourcesOnly = true)]
+class Test : Package
+{
+}
+";
+        var withFix = @"
+using Microsoft.VisualStudio.Shell;
+
+[PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
+class Test : AsyncPackage
+{
+}
+";
+        this.VerifyCSharpFix(test, withFix);
+    }
+
     [Fact]
     public void BaseTypeChangesToAsyncPackage_WithInterfaces()
     {
@@ -102,7 +124,7 @@ namespace Microsoft.VisualStudio
     }
 
     [Fact]
-    public void InitializeOverrideIsUpdated()
+    public void InitializeOverride_BecomesAsync()
     {
         var test = @"
 using System;
@@ -140,6 +162,53 @@ class Test : Microsoft.VisualStudio.Shell.AsyncPackage
 }
 ";
         this.VerifyCSharpFix(test, withFix);
+    }
+
+    [Fact(Skip = "Not yet implemented")]
+    public void InitializeOverride_GetServiceCallsUpdated()
+    {
+        var test = @"
+using System;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+
+class Test : Package
+{
+    protected override void Initialize()
+    {
+        base.Initialize(); // base invocation
+
+        var shell = this.GetService(typeof(SVsShell)) as IVsShell;
+    }
+}
+";
+        var withFix = @"
+using System;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+
+class Test : AsyncPackage
+{
+    protected override async System.Threading.Tasks.Task InitializeAsync(System.Threading.CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
+    {
+        await base.InitializeAsync(cancellationToken, progress); // base invocation
+
+        // When initialized asynchronously, we *may* be on a background thread at this point.
+        // Do any initialization that requires the UI thread after switching to the UI thread.
+        // Otherwise, remove the switch to the UI thread if you don't need it.
+        await Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+
+        var shell = await this.GetServiceAsync(typeof(SVsShell)) as IVsShell;
+    }
+}
+";
+        this.VerifyCSharpFix(test, withFix);
+    }
+
+    [Fact(Skip = "Not yet implemented")]
+    public void InitializeOverride_AddServiceDelegatesMadeAsync()
+    {
+        // TODO
     }
 
     protected override CodeFixProvider GetCSharpCodeFixProvider() => new VSSDK001DeriveFromAsyncPackageCodeFix();

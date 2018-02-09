@@ -74,4 +74,7 @@
     <Rule Id="SA1602" Action="Hidden" />
     <Rule Id="SA1615" Action="Hidden" />
   </Rules>
+  <Rules AnalyzerId="AsyncUsageAnalyzers" RuleNamespace="AsyncUsageAnalyzers">
+    <Rule Id="AvoidAsyncSuffix" Action="Hidden" />
+  </Rules>
 </RuleSet>
