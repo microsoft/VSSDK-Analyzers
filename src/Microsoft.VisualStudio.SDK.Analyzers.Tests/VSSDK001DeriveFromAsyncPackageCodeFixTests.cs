@@ -155,7 +155,7 @@ class Test : Microsoft.VisualStudio.Shell.AsyncPackage
         // When initialized asynchronously, we *may* be on a background thread at this point.
         // Do any initialization that requires the UI thread after switching to the UI thread.
         // Otherwise, remove the switch to the UI thread if you don't need it.
-        await Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+        await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
         Console.WriteLine(""after"");
     }
@@ -196,7 +196,7 @@ class Test : AsyncPackage
         // When initialized asynchronously, we *may* be on a background thread at this point.
         // Do any initialization that requires the UI thread after switching to the UI thread.
         // Otherwise, remove the switch to the UI thread if you don't need it.
-        await Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+        await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
         var shell = await this.GetServiceAsync(typeof(SVsShell)) as IVsShell;
     }

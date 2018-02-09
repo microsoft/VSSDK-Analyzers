@@ -114,7 +114,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                                     SyntaxKind.SimpleMemberAccessExpression,
                                     SyntaxFactory.MemberAccessExpression(
                                         SyntaxKind.SimpleMemberAccessExpression,
-                                        Types.ThreadHelper.TypeSyntax,
+                                        SyntaxFactory.ThisExpression(),
                                         SyntaxFactory.IdentifierName(Types.ThreadHelper.JoinableTaskFactory)),
                                     SyntaxFactory.IdentifierName(Types.JoinableTaskFactory.SwitchToMainThreadAsync)))
                                 .AddArgumentListArguments(SyntaxFactory.Argument(cancellationTokenLocalVarName))))
