@@ -231,12 +231,6 @@ class Test : AsyncPackage
         this.VerifyCSharpFix(test, withFix);
     }
 
-    [Fact(Skip = "Not yet implemented")]
-    public void InitializeOverride_AddServiceDelegatesMadeAsync()
-    {
-        // TODO
-    }
-
     protected override CodeFixProvider GetCSharpCodeFixProvider() => new VSSDK001DeriveFromAsyncPackageCodeFix();
 
     protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() => new VSSDK001DeriveFromAsyncPackageAnalyzer();
