@@ -50,10 +50,10 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             var classDeclarationSyntax = baseTypeSyntax.FirstAncestorOrSelf<ClassDeclarationSyntax>();
             var initializeMethodSyntax = classDeclarationSyntax.DescendantNodes()
                 .OfType<MethodDeclarationSyntax>()
-                .FirstOrDefault(method => method.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.OverrideKeyword)) && method.Identifier.Text == Types.AsyncPackage.Initialize);
+                .FirstOrDefault(method => method.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.OverrideKeyword)) && method.Identifier.Text == Types.Package.Initialize);
             var baseInitializeInvocationSyntax = initializeMethodSyntax?.Body?.DescendantNodes()
                 .OfType<InvocationExpressionSyntax>()
-                .FirstOrDefault(ies => ies.Expression is MemberAccessExpressionSyntax memberAccess && memberAccess.Name?.Identifier.Text == Types.AsyncPackage.Initialize && memberAccess.Expression is BaseExpressionSyntax);
+                .FirstOrDefault(ies => ies.Expression is MemberAccessExpressionSyntax memberAccess && memberAccess.Name?.Identifier.Text == Types.Package.Initialize && memberAccess.Expression is BaseExpressionSyntax);
 
             // Make it easier to track nodes across changes.
             var nodesToTrack = new List<SyntaxNode>

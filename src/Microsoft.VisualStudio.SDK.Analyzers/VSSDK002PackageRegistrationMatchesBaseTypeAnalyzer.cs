@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
     using System;
     using System.Collections.Immutable;
     using System.Linq;
+    using System.Threading;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -24,6 +25,12 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         public const string Id = "VSSDK002";
 
         /// <summary>
+        /// The name of the property in the <see cref="Diagnostic"/> that we create that contains either <see cref="Types.Package.TypeName"/> or <see cref="Types.AsyncPackage.TypeName"/>
+        /// to reflect the base type of the package.
+        /// </summary>
+        internal const string BaseTypeDiagnosticPropertyName = "BaseType";
+
+        /// <summary>
         /// A reusable descriptor for diagnostics produced by this analyzer.
         /// </summary>
         internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
@@ -35,8 +42,13 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true);
 
+        /// <summary>
+        /// A cached array for the <see cref="SupportedDiagnostics"/> property.
+        /// </summary>
+        private static readonly ImmutableArray<DiagnosticDescriptor> ReusableSupportedDiagnostics = ImmutableArray.Create(Descriptor);
+
         /// <inheritdoc />
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Descriptor);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ReusableSupportedDiagnostics;
 
         /// <inheritdoc />
         public override void Initialize(AnalysisContext context)
@@ -47,8 +59,8 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             // Register for compilation first so that we only activate the analyzer for applicable compilations
             context.RegisterCompilationStartAction(compilationContext =>
             {
-                var packageType = compilationContext.Compilation.GetTypeByMetadataName(typeof(Package).FullName)?.OriginalDefinition;
-                var asyncPackageType = compilationContext.Compilation.GetTypeByMetadataName(typeof(AsyncPackage).FullName)?.OriginalDefinition;
+                var packageType = compilationContext.Compilation.GetTypeByMetadataName(Types.Package.FullName)?.OriginalDefinition;
+                var asyncPackageType = compilationContext.Compilation.GetTypeByMetadataName(Types.AsyncPackage.FullName)?.OriginalDefinition;
                 if (packageType != null && asyncPackageType != null)
                 {
                     // Reuse the type symbols we looked up so that we don't have to look them up for every single class declaration.
@@ -91,11 +103,10 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 {
                     var attributeSyntax = packageRegistrationInstance.ApplicationSyntaxReference.GetSyntax(context.CancellationToken) as AttributeSyntax;
                     var allowBackgroundLoadingSyntax = attributeSyntax?.ArgumentList.Arguments.FirstOrDefault(a => a.NameEquals?.Name?.Identifier.Text == Types.PackageRegistrationAttribute.AllowsBackgroundLoading);
-                    Location relevantLocation = allowBackgroundLoadingSyntax?.GetLocation() ?? baseType.GetLocation();
-
-                    context.ReportDiagnostic(Diagnostic.Create(
-                        Descriptor,
-                        relevantLocation));
+                    Location location = allowBackgroundLoadingSyntax?.GetLocation() ?? attributeSyntax.GetLocation();
+                    var properties = ImmutableDictionary.Create<string, string>()
+                        .Add(BaseTypeDiagnosticPropertyName, isAsyncPackageBaseType ? Types.AsyncPackage.TypeName : Types.Package.TypeName);
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, location, properties));
                 }
             }
         }

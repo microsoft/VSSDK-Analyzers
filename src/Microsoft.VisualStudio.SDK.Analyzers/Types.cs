@@ -22,14 +22,40 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             internal const string TypeName = nameof(Shell.AsyncPackage);
 
             /// <summary>
-            /// The name of the Initialize method.
-            /// </summary>
-            internal const string Initialize = "Initialize";
-
-            /// <summary>
             /// The name of the InitializeAsync method.
             /// </summary>
             internal const string InitializeAsync = "InitializeAsync";
+
+            /// <summary>
+            /// Gets an array of the nesting namespaces for this type.
+            /// </summary>
+            internal static readonly IReadOnlyList<string> Namespace = Namespaces.MicrosoftVisualStudioShell;
+
+            /// <summary>
+            /// Gets the <see cref="Microsoft.CodeAnalysis.CSharp.Syntax.TypeSyntax"/> for this type.
+            /// </summary>
+            internal static TypeSyntax TypeSyntax { get; } = Utils.QualifyName(Namespace, SyntaxFactory.IdentifierName(TypeName));
+
+            /// <summary>
+            /// Gets the fully-qualified name of this type as a string.
+            /// </summary>
+            internal static string FullName => string.Join(".", Namespace) + "." + TypeName;
+        }
+
+        /// <summary>
+        /// Describes the <see cref="Shell.Package"/> type.
+        /// </summary>
+        internal static class Package
+        {
+            /// <summary>
+            /// Gets the simple name of the <see cref="Shell.Package"/> type.
+            /// </summary>
+            internal const string TypeName = nameof(Shell.Package);
+
+            /// <summary>
+            /// The name of the Initialize method.
+            /// </summary>
+            internal const string Initialize = "Initialize";
 
             /// <summary>
             /// Gets an array of the nesting namespaces for this type.

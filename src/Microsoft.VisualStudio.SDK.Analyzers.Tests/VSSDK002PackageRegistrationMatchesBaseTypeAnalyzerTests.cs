@@ -2,13 +2,14 @@
 
 using System;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.SDK.Analyzers;
 using Microsoft.VisualStudio.SDK.Analyzers.Tests;
 using Xunit;
 using Xunit.Abstractions;
 
-public class VSSDK002PackageRegistrationMatchesBaseTypeAnalyzerTests : DiagnosticVerifier
+public class VSSDK002PackageRegistrationMatchesBaseTypeAnalyzerTests : CodeFixVerifier
 {
     private DiagnosticResult expect = new DiagnosticResult
     {
@@ -94,7 +95,7 @@ class MyCoolPackage : Package {
     }
 
     [Fact]
-    public void AsyncPackageMismatchProducesDiagnostic()
+    public void AsyncPackageImplicitMismatchProducesDiagnostic()
     {
         var test = @"
 using Microsoft.VisualStudio.Shell;
@@ -103,9 +104,40 @@ using Microsoft.VisualStudio.Shell;
 class Test : AsyncPackage {
 }
 ";
+        var withFix = @"
+using Microsoft.VisualStudio.Shell;
 
-        this.expect.Locations = new[] { new DiagnosticResultLocation("Test0.cs", 5, 14, 5, 26) };
+[PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
+class Test : AsyncPackage {
+}
+";
+
+        this.expect.Locations = new[] { new DiagnosticResultLocation("Test0.cs", 4, 2, 4, 53) };
         this.VerifyCSharpDiagnostic(test, this.expect);
+        this.VerifyCSharpFix(test, withFix);
+    }
+
+    [Fact]
+    public void AsyncPackageExplicitMismatchProducesDiagnostic()
+    {
+        var test = @"
+using Microsoft.VisualStudio.Shell;
+
+[PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = false)]
+class Test : AsyncPackage {
+}
+";
+        var withFix = @"
+using Microsoft.VisualStudio.Shell;
+
+[PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
+class Test : AsyncPackage {
+}
+";
+
+        this.expect.Locations = new[] { new DiagnosticResultLocation("Test0.cs", 4, 54, 4, 85) };
+        this.VerifyCSharpDiagnostic(test, this.expect);
+        this.VerifyCSharpFix(test, withFix);
     }
 
     [Fact]
@@ -118,10 +150,70 @@ using Microsoft.VisualStudio.Shell;
 class MyCoolPackage : Package {
 }
 ";
+        var withFix = @"
+using Microsoft.VisualStudio.Shell;
+
+[PackageRegistration(UseManagedResourcesOnly = true)]
+class MyCoolPackage : Package {
+}
+";
 
         this.expect.Locations = new[] { new DiagnosticResultLocation("Test0.cs", 4, 54, 4, 84) };
         this.VerifyCSharpDiagnostic(test, this.expect);
+        this.VerifyCSharpFix(test, withFix);
+    }
+
+    [Fact]
+    public void PackageMismatchProducesDiagnostic_ReverseArgumentOrder()
+    {
+        var test = @"
+using Microsoft.VisualStudio.Shell;
+
+[PackageRegistration(AllowsBackgroundLoading = true, UseManagedResourcesOnly = true)]
+class MyCoolPackage : Package {
+}
+";
+        var withFix = @"
+using Microsoft.VisualStudio.Shell;
+
+[PackageRegistration(UseManagedResourcesOnly = true)]
+class MyCoolPackage : Package {
+}
+";
+
+        this.expect.Locations = new[] { new DiagnosticResultLocation("Test0.cs", 4, 22, 4, 52) };
+        this.VerifyCSharpDiagnostic(test, this.expect);
+        this.VerifyCSharpFix(test, withFix);
+    }
+
+    [Fact]
+    public void PackageMismatchProducesDiagnostic_AcrossPartialClass()
+    {
+        var test = @"
+using Microsoft.VisualStudio.Shell;
+
+partial class MyCoolPackage : Package {
+}
+
+[PackageRegistration(AllowsBackgroundLoading = true, UseManagedResourcesOnly = true)]
+partial class MyCoolPackage { }
+";
+        var withFix = @"
+using Microsoft.VisualStudio.Shell;
+
+partial class MyCoolPackage : Package {
+}
+
+[PackageRegistration(UseManagedResourcesOnly = true)]
+partial class MyCoolPackage { }
+";
+
+        this.expect.Locations = new[] { new DiagnosticResultLocation("Test0.cs", 7, 22, 7, 52) };
+        this.VerifyCSharpDiagnostic(test, this.expect);
+        this.VerifyCSharpFix(test, withFix);
     }
 
     protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() => new VSSDK002PackageRegistrationMatchesBaseTypeAnalyzer();
+
+    protected override CodeFixProvider GetCSharpCodeFixProvider() => new VSSDK002PackageRegistrationMatchesBaseTypeCodeFix();
 }

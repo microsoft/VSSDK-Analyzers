@@ -33,8 +33,13 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             defaultSeverity: DiagnosticSeverity.Info,
             isEnabledByDefault: true);
 
+        /// <summary>
+        /// A cached array for the <see cref="SupportedDiagnostics"/> property.
+        /// </summary>
+        private static readonly ImmutableArray<DiagnosticDescriptor> ReusableSupportedDiagnostics = ImmutableArray.Create(Descriptor);
+
         /// <inheritdoc />
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Descriptor);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ReusableSupportedDiagnostics;
 
         /// <inheritdoc />
         public override void Initialize(AnalysisContext context)
