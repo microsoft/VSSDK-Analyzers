@@ -35,13 +35,35 @@ class Test : AsyncPackage
         this.VerifyCSharpFix(test, withFix);
     }
 
-    [Fact(Skip = "Not yet implemented")]
-    public void PackageRegistrationUpdated()
+    [Fact]
+    public void PackageRegistrationUpdated_NewArgument()
     {
         var test = @"
 using Microsoft.VisualStudio.Shell;
 
 [PackageRegistration(UseManagedResourcesOnly = true)]
+class Test : Package
+{
+}
+";
+        var withFix = @"
+using Microsoft.VisualStudio.Shell;
+
+[PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
+class Test : AsyncPackage
+{
+}
+";
+        this.VerifyCSharpFix(test, withFix);
+    }
+
+    [Fact]
+    public void PackageRegistrationUpdated_ExistingArgument()
+    {
+        var test = @"
+using Microsoft.VisualStudio.Shell;
+
+[PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = false)]
 class Test : Package
 {
 }

@@ -36,16 +36,18 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             var classDeclarationSyntax = baseTypeSyntax.FirstAncestorOrSelf<ClassDeclarationSyntax>();
 
             context.RegisterCodeFix(
-                CodeAction.Create("Convert to async package", ct => this.ConvertToAsyncPackageAsync(context.Document, diagnostic, ct), classDeclarationSyntax.Identifier.ToString()),
+                CodeAction.Create("Convert to async package", ct => this.ConvertToAsyncPackageAsync(context, diagnostic, ct), classDeclarationSyntax.Identifier.ToString()),
                 diagnostic);
         }
 
         /// <inheritdoc />
         public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
-        private async Task<Document> ConvertToAsyncPackageAsync(Document document, Diagnostic diagnostic, CancellationToken cancellationToken)
+        private async Task<Document> ConvertToAsyncPackageAsync(CodeFixContext context, Diagnostic diagnostic, CancellationToken cancellationToken)
         {
-            var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
+            var semanticModel = await context.Document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
+            var compilation = await context.Document.Project.GetCompilationAsync(cancellationToken).ConfigureAwait(false);
+            var root = await context.Document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
             var baseTypeSyntax = root.FindNode(diagnostic.Location.SourceSpan).FirstAncestorOrSelf<BaseTypeSyntax>();
             var classDeclarationSyntax = baseTypeSyntax.FirstAncestorOrSelf<ClassDeclarationSyntax>();
             var initializeMethodSyntax = classDeclarationSyntax.DescendantNodes()
@@ -54,6 +56,16 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             var baseInitializeInvocationSyntax = initializeMethodSyntax?.Body?.DescendantNodes()
                 .OfType<InvocationExpressionSyntax>()
                 .FirstOrDefault(ies => ies.Expression is MemberAccessExpressionSyntax memberAccess && memberAccess.Name?.Identifier.Text == Types.Package.Initialize && memberAccess.Expression is BaseExpressionSyntax);
+            AttributeSyntax packageRegistrationSyntax = null;
+            {
+                var userClassSymbol = semanticModel.GetDeclaredSymbol(classDeclarationSyntax, context.CancellationToken);
+                var packageRegistrationType = compilation.GetTypeByMetadataName(Types.PackageRegistrationAttribute.FullName);
+                var packageRegistrationInstance = userClassSymbol?.GetAttributes().FirstOrDefault(a => a.AttributeClass == packageRegistrationType);
+                if (packageRegistrationInstance?.ApplicationSyntaxReference != null)
+                {
+                    packageRegistrationSyntax = (AttributeSyntax)await packageRegistrationInstance.ApplicationSyntaxReference.GetSyntaxAsync(cancellationToken).ConfigureAwait(false);
+                }
+            }
 
             // Make it easier to track nodes across changes.
             var nodesToTrack = new List<SyntaxNode>
@@ -61,6 +73,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 baseTypeSyntax,
                 initializeMethodSyntax,
                 baseInitializeInvocationSyntax,
+                packageRegistrationSyntax,
             };
             nodesToTrack.RemoveAll(n => n == null);
             var updatedRoot = root.TrackNodes(nodesToTrack);
@@ -71,6 +84,27 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 .WithLeadingTrivia(baseTypeSyntax.GetLeadingTrivia())
                 .WithTrailingTrivia(baseTypeSyntax.GetTrailingTrivia());
             updatedRoot = updatedRoot.ReplaceNode(baseTypeSyntax, asyncPackageBaseTypeSyntax);
+
+            // Update the PackageRegistration attribute
+            if (packageRegistrationSyntax != null)
+            {
+                var trueExpression = SyntaxFactory.LiteralExpression(SyntaxKind.TrueLiteralExpression);
+                packageRegistrationSyntax = updatedRoot.GetCurrentNode(packageRegistrationSyntax);
+                var allowsBackgroundLoadingSyntax = packageRegistrationSyntax.ArgumentList.Arguments.FirstOrDefault(a => a.NameEquals?.Name?.Identifier.Text == Types.PackageRegistrationAttribute.AllowsBackgroundLoading);
+                if (allowsBackgroundLoadingSyntax != null)
+                {
+                    updatedRoot = updatedRoot.ReplaceNode(
+                        allowsBackgroundLoadingSyntax,
+                        allowsBackgroundLoadingSyntax.WithExpression(trueExpression));
+                }
+                else
+                {
+                    updatedRoot = updatedRoot.ReplaceNode(
+                        packageRegistrationSyntax,
+                        packageRegistrationSyntax.AddArgumentListArguments(
+                            SyntaxFactory.AttributeArgument(trueExpression).WithNameEquals(SyntaxFactory.NameEquals(Types.PackageRegistrationAttribute.AllowsBackgroundLoading))));
+                }
+            }
 
             // Find the Initialize override, if present, and update it to InitializeAsync
             if (initializeMethodSyntax != null)
@@ -135,7 +169,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 updatedRoot = updatedRoot.ReplaceNode(initializeMethodSyntax, initializeAsyncMethodSyntax);
             }
 
-            return document.WithSyntaxRoot(updatedRoot);
+            return context.Document.WithSyntaxRoot(updatedRoot);
         }
     }
 }
