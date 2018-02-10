@@ -186,7 +186,7 @@ class Test : Microsoft.VisualStudio.Shell.AsyncPackage
         this.VerifyCSharpFix(test, withFix);
     }
 
-    [Fact(Skip = "Not yet implemented")]
+    [Fact]
     public void InitializeOverride_GetServiceCallsUpdated()
     {
         var test = @"
@@ -201,6 +201,8 @@ class Test : Package
         base.Initialize(); // base invocation
 
         var shell = this.GetService(typeof(SVsShell)) as IVsShell;
+        var shell2 = GetService(typeof(SVsShell)) as IVsShell;
+        var shell3 = GetService(typeof(SVsShell)).ToString();
     }
 }
 ";
@@ -221,6 +223,8 @@ class Test : AsyncPackage
         await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
         var shell = await this.GetServiceAsync(typeof(SVsShell)) as IVsShell;
+        var shell2 = await GetServiceAsync(typeof(SVsShell)) as IVsShell;
+        var shell3 = (await GetServiceAsync(typeof(SVsShell))).ToString();
     }
 }
 ";

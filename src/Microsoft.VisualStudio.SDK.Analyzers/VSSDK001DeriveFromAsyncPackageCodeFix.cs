@@ -13,6 +13,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
+    using Microsoft.CodeAnalysis.Simplification;
 
     /// <summary>
     /// Offers code fixes for diagnostics produced by the <see cref="VSSDK001DeriveFromAsyncPackageAnalyzer"/>.
@@ -56,6 +57,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             var baseInitializeInvocationSyntax = initializeMethodSyntax?.Body?.DescendantNodes()
                 .OfType<InvocationExpressionSyntax>()
                 .FirstOrDefault(ies => ies.Expression is MemberAccessExpressionSyntax memberAccess && memberAccess.Name?.Identifier.Text == Types.Package.Initialize && memberAccess.Expression is BaseExpressionSyntax);
+            var getServiceInvocationsSyntax = new List<InvocationExpressionSyntax>();
             AttributeSyntax packageRegistrationSyntax = null;
             {
                 var userClassSymbol = semanticModel.GetDeclaredSymbol(classDeclarationSyntax, context.CancellationToken);
@@ -67,6 +69,17 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 }
             }
 
+            if (initializeMethodSyntax != null)
+            {
+                getServiceInvocationsSyntax.AddRange(
+                    from invocation in initializeMethodSyntax.DescendantNodes().OfType<InvocationExpressionSyntax>()
+                    let memberBinding = invocation.Expression as MemberAccessExpressionSyntax
+                    let identifierName = invocation.Expression as IdentifierNameSyntax
+                    where identifierName?.Identifier.Text == Types.Package.GetService
+                       || (memberBinding.Name.Identifier.Text == Types.Package.GetService && memberBinding.Expression.IsKind(SyntaxKind.ThisExpression))
+                    select invocation);
+            }
+
             // Make it easier to track nodes across changes.
             var nodesToTrack = new List<SyntaxNode>
             {
@@ -75,6 +88,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 baseInitializeInvocationSyntax,
                 packageRegistrationSyntax,
             };
+            nodesToTrack.AddRange(getServiceInvocationsSyntax);
             nodesToTrack.RemoveAll(n => n == null);
             var updatedRoot = root.TrackNodes(nodesToTrack);
 
@@ -167,6 +181,27 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                         SyntaxFactory.Parameter(progressLocalVarName.Identifier).WithType(Types.IProgress.TypeSyntaxOf(Types.ServiceProgressData.TypeSyntax)))
                     .WithBody(newBody);
                 updatedRoot = updatedRoot.ReplaceNode(initializeMethodSyntax, initializeAsyncMethodSyntax);
+
+                // Replace GetService calls with GetServiceAsync
+                getServiceInvocationsSyntax = updatedRoot.GetCurrentNodes<InvocationExpressionSyntax>(getServiceInvocationsSyntax).ToList();
+                updatedRoot = updatedRoot.ReplaceNodes(
+                    getServiceInvocationsSyntax,
+                    (orig, node) =>
+                    {
+                        var invocation = (InvocationExpressionSyntax)node;
+                        if (invocation.Expression is IdentifierNameSyntax methodName)
+                        {
+                            invocation = invocation.WithExpression(SyntaxFactory.IdentifierName(Types.AsyncPackage.GetServiceAsync));
+                        }
+                        else if (invocation.Expression is MemberAccessExpressionSyntax memberAccess)
+                        {
+                            invocation = invocation.WithExpression(
+                                memberAccess.WithName(SyntaxFactory.IdentifierName(Types.AsyncPackage.GetServiceAsync)));
+                        }
+
+                        return SyntaxFactory.ParenthesizedExpression(SyntaxFactory.AwaitExpression(invocation))
+                            .WithAdditionalAnnotations(Simplifier.Annotation);
+                    });
             }
 
             return context.Document.WithSyntaxRoot(updatedRoot);
