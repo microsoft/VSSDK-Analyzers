@@ -118,6 +118,60 @@ class Test : AsyncPackage {
     }
 
     [Fact]
+    public void AsyncPackageImplicitMismatchViaIntermediateClass_ProducesDiagnostic()
+    {
+        var test = @"
+using Microsoft.VisualStudio.Shell;
+
+class Middle : AsyncPackage { }
+
+[PackageRegistration(UseManagedResourcesOnly = true)]
+class Test : Middle {
+}
+";
+        var withFix = @"
+using Microsoft.VisualStudio.Shell;
+
+class Middle : AsyncPackage { }
+
+[PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
+class Test : Middle {
+}
+";
+
+        this.expect.Locations = new[] { new DiagnosticResultLocation("Test0.cs", 6, 2, 6, 53) };
+        this.VerifyCSharpDiagnostic(test, this.expect);
+        this.VerifyCSharpFix(test, withFix);
+    }
+
+    [Fact]
+    public void PackageMismatchViaIntermediateClass_ProducesDiagnostic()
+    {
+        var test = @"
+using Microsoft.VisualStudio.Shell;
+
+class Middle : Package { }
+
+[PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
+class MyCoolPackage : Middle {
+}
+";
+        var withFix = @"
+using Microsoft.VisualStudio.Shell;
+
+class Middle : Package { }
+
+[PackageRegistration(UseManagedResourcesOnly = true)]
+class MyCoolPackage : Middle {
+}
+";
+
+        this.expect.Locations = new[] { new DiagnosticResultLocation("Test0.cs", 6, 54, 6, 84) };
+        this.VerifyCSharpDiagnostic(test, this.expect);
+        this.VerifyCSharpFix(test, withFix);
+    }
+
+    [Fact]
     public void AsyncPackageExplicitMismatchProducesDiagnostic()
     {
         var test = @"
@@ -211,6 +265,36 @@ partial class MyCoolPackage { }
         this.expect.Locations = new[] { new DiagnosticResultLocation("Test0.cs", 7, 22, 7, 52) };
         this.VerifyCSharpDiagnostic(test, this.expect);
         this.VerifyCSharpFix(test, withFix);
+    }
+
+    [Fact]
+    public void PackageMatchViaIntermediateClass_ProducesNoDiagnostic()
+    {
+        var test = @"
+using Microsoft.VisualStudio.Shell;
+
+class Middle : Package { }
+
+[PackageRegistration(UseManagedResourcesOnly = true)]
+class Test : Middle {
+}
+";
+        this.VerifyCSharpDiagnostic(test);
+    }
+
+    [Fact]
+    public void AsyncPackageMatchViaIntermediateClass_ProducesNoDiagnostic()
+    {
+        var test = @"
+using Microsoft.VisualStudio.Shell;
+
+class Middle : AsyncPackage { }
+
+[PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
+class Test : Middle {
+}
+";
+        this.VerifyCSharpDiagnostic(test);
     }
 
     protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() => new VSSDK002PackageRegistrationMatchesBaseTypeAnalyzer();
