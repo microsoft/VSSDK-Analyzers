@@ -18,6 +18,7 @@ environment:
   VisualStudioVersion: 15.0
   TreatWarningsAsErrors: true
   CodeAnalysisTreatWarningsAsErrors: true
+  codecov_token: 27bb1787-08af-48c7-bda5-ca308440f1b6
 before_build:
 - msbuild src\Microsoft.VisualStudio.SDK.Analyzers.sln /nologo /m /v:quiet /t:restore
 - choco install opencover.portable
