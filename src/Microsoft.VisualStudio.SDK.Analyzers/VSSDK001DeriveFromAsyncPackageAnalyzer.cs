@@ -29,12 +29,17 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             title: "Derive from AsyncPackage",
             messageFormat: "Your Package-derived class should derive from AsyncPackage instead.",
             helpLinkUri: Utils.GetHelpLink(Id),
-            category: "Usage",
+            category: "Performance",
             defaultSeverity: DiagnosticSeverity.Info,
             isEnabledByDefault: true);
 
+        /// <summary>
+        /// A cached array for the <see cref="SupportedDiagnostics"/> property.
+        /// </summary>
+        private static readonly ImmutableArray<DiagnosticDescriptor> ReusableSupportedDiagnostics = ImmutableArray.Create(Descriptor);
+
         /// <inheritdoc />
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Descriptor);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ReusableSupportedDiagnostics;
 
         /// <inheritdoc />
         public override void Initialize(AnalysisContext context)
@@ -42,10 +47,20 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             context.EnableConcurrentExecution();
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
 
-            context.RegisterSyntaxNodeAction(Utils.DebuggableWrapper(this.AnalyzeClassDeclaration), SyntaxKind.ClassDeclaration);
+            // Register for compilation first so that we only activate the analyzer for applicable compilations
+            context.RegisterCompilationStartAction(compilationContext =>
+            {
+                var packageType = compilationContext.Compilation.GetTypeByMetadataName(Types.Package.FullName);
+                var asyncPackage = compilationContext.Compilation.GetTypeByMetadataName(Types.AsyncPackage.FullName);
+                if (asyncPackage != null)
+                {
+                    // Reuse the type symbols we looked up so that we don't have to look them up for every single class declaration.
+                    compilationContext.RegisterSyntaxNodeAction(Utils.DebuggableWrapper(ctxt => this.AnalyzeClassDeclaration(ctxt, packageType)), SyntaxKind.ClassDeclaration);
+                }
+            });
         }
 
-        private void AnalyzeClassDeclaration(SyntaxNodeAnalysisContext context)
+        private void AnalyzeClassDeclaration(SyntaxNodeAnalysisContext context, INamedTypeSymbol packageType)
         {
             var declaration = (ClassDeclarationSyntax)context.Node;
             var baseType = declaration.BaseList?.Types.FirstOrDefault();
@@ -55,7 +70,6 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             }
 
             var baseTypeSymbol = context.SemanticModel.GetSymbolInfo(baseType.Type, context.CancellationToken);
-            var packageType = context.Compilation.GetTypeByMetadataName(typeof(Package).FullName);
             if (baseTypeSymbol.Symbol?.OriginalDefinition == packageType.OriginalDefinition)
             {
                 context.ReportDiagnostic(Diagnostic.Create(

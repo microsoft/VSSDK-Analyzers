@@ -3,8 +3,9 @@
 The following are the diagnostic analyzers installed with the [Microsoft.VisualStudio.SDK.Analyzers][1]
 NuGet package.
 
-ID | Title | Severity
+ID | Title | Category
 ---- | --- | --- |
 [VSSDK001](VSSDK001.md) | Derive from AsyncPackage | Performance
+[VSSDK002](VSSDK002.md) | PackageRegistration matches Package | Performance
 
 [1]: https://nuget.org/packages/microsoft.visualstudio.sdk.analyzers
