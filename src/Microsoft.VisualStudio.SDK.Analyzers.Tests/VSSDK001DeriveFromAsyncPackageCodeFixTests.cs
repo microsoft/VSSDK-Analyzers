@@ -35,13 +35,35 @@ class Test : AsyncPackage
         this.VerifyCSharpFix(test, withFix);
     }
 
-    [Fact(Skip = "Not yet implemented")]
-    public void PackageRegistrationUpdated()
+    [Fact]
+    public void PackageRegistrationUpdated_NewArgument()
     {
         var test = @"
 using Microsoft.VisualStudio.Shell;
 
 [PackageRegistration(UseManagedResourcesOnly = true)]
+class Test : Package
+{
+}
+";
+        var withFix = @"
+using Microsoft.VisualStudio.Shell;
+
+[PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
+class Test : AsyncPackage
+{
+}
+";
+        this.VerifyCSharpFix(test, withFix);
+    }
+
+    [Fact]
+    public void PackageRegistrationUpdated_ExistingArgument()
+    {
+        var test = @"
+using Microsoft.VisualStudio.Shell;
+
+[PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = false)]
 class Test : Package
 {
 }
@@ -164,7 +186,7 @@ class Test : Microsoft.VisualStudio.Shell.AsyncPackage
         this.VerifyCSharpFix(test, withFix);
     }
 
-    [Fact(Skip = "Not yet implemented")]
+    [Fact]
     public void InitializeOverride_GetServiceCallsUpdated()
     {
         var test = @"
@@ -179,6 +201,8 @@ class Test : Package
         base.Initialize(); // base invocation
 
         var shell = this.GetService(typeof(SVsShell)) as IVsShell;
+        var shell2 = GetService(typeof(SVsShell)) as IVsShell;
+        var shell3 = GetService(typeof(SVsShell)).ToString();
     }
 }
 ";
@@ -199,16 +223,12 @@ class Test : AsyncPackage
         await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
         var shell = await this.GetServiceAsync(typeof(SVsShell)) as IVsShell;
+        var shell2 = await GetServiceAsync(typeof(SVsShell)) as IVsShell;
+        var shell3 = (await GetServiceAsync(typeof(SVsShell))).ToString();
     }
 }
 ";
         this.VerifyCSharpFix(test, withFix);
-    }
-
-    [Fact(Skip = "Not yet implemented")]
-    public void InitializeOverride_AddServiceDelegatesMadeAsync()
-    {
-        // TODO
     }
 
     protected override CodeFixProvider GetCSharpCodeFixProvider() => new VSSDK001DeriveFromAsyncPackageCodeFix();
