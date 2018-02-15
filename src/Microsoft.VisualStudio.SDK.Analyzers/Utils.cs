@@ -9,7 +9,6 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Diagnostics;
-    using Microsoft.CodeAnalysis.Simplification;
 
     /// <summary>
     /// Internal utilities for use by analyzers.
@@ -129,8 +128,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 result = SyntaxFactory.QualifiedName(result, rightSide);
             }
 
-            return SyntaxFactory.QualifiedName(result, simpleName)
-                .WithAdditionalAnnotations(Simplifier.Annotation);
+            return SyntaxFactory.QualifiedName(result, simpleName);
         }
 
         private static bool LaunchDebuggerExceptionFilter()
