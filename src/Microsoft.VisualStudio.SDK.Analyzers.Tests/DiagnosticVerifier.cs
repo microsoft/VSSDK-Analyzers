@@ -10,6 +10,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using System.Windows.Controls;
     using Microsoft.Build.Utilities;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -24,14 +25,23 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
         private static readonly MetadataReference CorlibReference = MetadataReference.CreateFromFile(typeof(object).Assembly.Location);
         private static readonly MetadataReference SystemCoreReference = MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location);
         private static readonly MetadataReference SystemReference = MetadataReference.CreateFromFile(typeof(Debug).Assembly.Location);
+        private static readonly MetadataReference PresentationFrameworkReference = MetadataReference.CreateFromFile(typeof(UserControl).Assembly.Location);
         private static readonly MetadataReference MPFReference = MetadataReference.CreateFromFile(typeof(Package).Assembly.Location);
 
         private static readonly ImmutableArray<string> VSSDKPackageReferences = ImmutableArray.Create(new string[]
         {
-            Path.Combine("Microsoft.VisualStudio.Shell.Interop", "7.10.6071", "lib", "Microsoft.VisualStudio.Shell.Interop.dll"),
-            Path.Combine("Microsoft.VisualStudio.Shell.15.0", "15.4.27004", "lib", "Microsoft.VisualStudio.Shell.15.0.dll"),
-            Path.Combine("Microsoft.VisualStudio.Shell.Framework", "15.4.27004", "lib\\net45", "Microsoft.VisualStudio.Shell.Framework.dll"),
-            Path.Combine("Microsoft.VisualStudio.Threading", "15.4.4", "lib\\net45", "Microsoft.VisualStudio.Threading.dll"),
+            Path.Combine("Microsoft.VisualStudio.OLE.Interop", "7.10.6071", "lib", "Microsoft.VisualStudio.OLE.Interop.dll"),
+            Path.Combine("Microsoft.VisualStudio.Shell.Interop", "7.10.6072", "lib\\net11", "Microsoft.VisualStudio.Shell.Interop.dll"),
+            Path.Combine("Microsoft.VisualStudio.Shell.Interop.8.0", "8.0.50728", "lib\\net11", "Microsoft.VisualStudio.Shell.Interop.8.0.dll"),
+            Path.Combine("Microsoft.VisualStudio.Shell.Interop.9.0", "9.0.30730", "lib\\net11", "Microsoft.VisualStudio.Shell.Interop.9.0.dll"),
+            Path.Combine("Microsoft.VisualStudio.Shell.Interop.10.0", "10.0.30320", "lib\\net20", "Microsoft.VisualStudio.Shell.Interop.10.0.dll"),
+            Path.Combine("Microsoft.VisualStudio.Shell.Interop.11.0", "11.0.61031", "lib\\net20", "Microsoft.VisualStudio.Shell.Interop.11.0.dll"),
+            Path.Combine("Microsoft.VisualStudio.Shell.Interop.14.0", "14.3.26929", "lib\\net20", "Microsoft.VisualStudio.Shell.Interop.14.0.DesignTime.dll"),
+            Path.Combine("Microsoft.VisualStudio.Shell.Interop.15.3.DesignTime", "15.0.26929", "lib\\net20", "Microsoft.VisualStudio.Shell.Interop.15.3.DesignTime.dll"),
+            Path.Combine("Microsoft.VisualStudio.Shell.Interop.15.6.DesignTime", "15.6.27415", "lib\\net20", "Microsoft.VisualStudio.Shell.Interop.15.6.DesignTime.dll"),
+            Path.Combine("Microsoft.VisualStudio.Shell.15.0", "15.6.27415", "lib\\net45", "Microsoft.VisualStudio.Shell.15.0.dll"),
+            Path.Combine("Microsoft.VisualStudio.Shell.Framework", "15.6.27415", "lib\\net45", "Microsoft.VisualStudio.Shell.Framework.dll"),
+            Path.Combine("Microsoft.VisualStudio.Threading", "15.6.31", "lib\\net45", "Microsoft.VisualStudio.Threading.dll"),
         });
 
         private static string csharpDefaultFileExt = "cs";
@@ -133,6 +143,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
                 .AddProject(projectId, testProjectName, testProjectName, language)
                 .AddMetadataReference(projectId, CorlibReference)
                 .AddMetadataReference(projectId, SystemReference)
+                .AddMetadataReference(projectId, PresentationFrameworkReference)
                 .AddMetadataReference(projectId, SystemCoreReference)
                 .AddMetadataReference(projectId, MPFReference)
                 .WithProjectCompilationOptions(projectId, new CSharpCompilationOptions(hasEntrypoint ? OutputKind.ConsoleApplication : OutputKind.DynamicallyLinkedLibrary))
@@ -225,6 +236,17 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
         protected void VerifyCSharpDiagnostic(string source, params DiagnosticResult[] expected)
         {
             this.VerifyDiagnostics(new[] { source }, LanguageNames.CSharp, this.GetCSharpDiagnosticAnalyzers(), allowErrors: false, expected: expected);
+        }
+
+        /// <summary>
+        /// Called to test a C# DiagnosticAnalyzer when applied on multiple input strings as a source
+        /// Note: input a DiagnosticResult for each Diagnostic expected
+        /// </summary>
+        /// <param name="sources">Classes, each in the form of a string to run the analyzer on</param>
+        /// <param name="expected">An array of <see cref="DiagnosticResult"/> that should appear after the analyzer is run on the source</param>
+        protected void VerifyCSharpDiagnostic(string[] sources, params DiagnosticResult[] expected)
+        {
+            this.VerifyDiagnostics(sources, LanguageNames.CSharp, this.GetCSharpDiagnosticAnalyzers(), allowErrors: false, expected: expected);
         }
 
         protected void LogFileContent(string source)

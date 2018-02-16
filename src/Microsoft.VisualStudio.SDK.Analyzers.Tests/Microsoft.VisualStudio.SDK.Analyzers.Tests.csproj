@@ -24,4 +24,8 @@
     <ProjectReference Include="..\Microsoft.VisualStudio.SDK.Analyzers\Microsoft.VisualStudio.SDK.Analyzers.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+
 </Project>
