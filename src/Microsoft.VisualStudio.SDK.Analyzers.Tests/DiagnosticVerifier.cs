@@ -239,7 +239,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
         }
 
         /// <summary>
-        /// Called to test a C# DiagnosticAnalyzer when applied on multiple inputted string as a source
+        /// Called to test a C# DiagnosticAnalyzer when applied on multiple input strings as a source
         /// Note: input a DiagnosticResult for each Diagnostic expected
         /// </summary>
         /// <param name="sources">Classes, each in the form of a string to run the analyzer on</param>
