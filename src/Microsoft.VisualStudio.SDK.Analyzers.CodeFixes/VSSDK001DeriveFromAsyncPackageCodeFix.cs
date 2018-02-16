@@ -94,7 +94,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
 
             // Replace the Package base type with AsyncPackage
             baseTypeSyntax = updatedRoot.GetCurrentNode(baseTypeSyntax);
-            var asyncPackageBaseTypeSyntax = SyntaxFactory.SimpleBaseType(Types.AsyncPackage.TypeSyntax)
+            var asyncPackageBaseTypeSyntax = SyntaxFactory.SimpleBaseType(Types.AsyncPackage.TypeSyntax.WithAdditionalAnnotations(Simplifier.Annotation))
                 .WithLeadingTrivia(baseTypeSyntax.GetLeadingTrivia())
                 .WithTrailingTrivia(baseTypeSyntax.GetTrailingTrivia());
             updatedRoot = updatedRoot.ReplaceNode(baseTypeSyntax, asyncPackageBaseTypeSyntax);
@@ -174,11 +174,11 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
 
                 var initializeAsyncMethodSyntax = initializeMethodSyntax
                     .WithIdentifier(SyntaxFactory.Identifier(Types.AsyncPackage.InitializeAsync))
-                    .WithReturnType(Types.Task.TypeSyntax)
+                    .WithReturnType(Types.Task.TypeSyntax.WithAdditionalAnnotations(Simplifier.Annotation))
                     .AddModifiers(SyntaxFactory.Token(SyntaxKind.AsyncKeyword))
                     .AddParameterListParameters(
-                        SyntaxFactory.Parameter(cancellationTokenLocalVarName.Identifier).WithType(Types.CancellationToken.TypeSyntax),
-                        SyntaxFactory.Parameter(progressLocalVarName.Identifier).WithType(Types.IProgress.TypeSyntaxOf(Types.ServiceProgressData.TypeSyntax)))
+                        SyntaxFactory.Parameter(cancellationTokenLocalVarName.Identifier).WithType(Types.CancellationToken.TypeSyntax.WithAdditionalAnnotations(Simplifier.Annotation)),
+                        SyntaxFactory.Parameter(progressLocalVarName.Identifier).WithType(Types.IProgress.TypeSyntaxOf(Types.ServiceProgressData.TypeSyntax).WithAdditionalAnnotations(Simplifier.Annotation)))
                     .WithBody(newBody);
                 updatedRoot = updatedRoot.ReplaceNode(initializeMethodSyntax, initializeAsyncMethodSyntax);
 
