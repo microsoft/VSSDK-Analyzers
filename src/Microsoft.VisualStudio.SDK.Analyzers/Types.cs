@@ -27,6 +27,11 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             internal const string InitializeAsync = "InitializeAsync";
 
             /// <summary>
+            /// The name of the GetServiceAsync method.
+            /// </summary>
+            internal const string GetServiceAsync = "GetServiceAsync";
+
+            /// <summary>
             /// Gets an array of the nesting namespaces for this type.
             /// </summary>
             internal static readonly IReadOnlyList<string> Namespace = Namespaces.MicrosoftVisualStudioShell;
@@ -56,6 +61,11 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             /// The name of the Initialize method.
             /// </summary>
             internal const string Initialize = "Initialize";
+
+            /// <summary>
+            /// The name of the GetService method.
+            /// </summary>
+            internal const string GetService = "GetService";
 
             /// <summary>
             /// Gets an array of the nesting namespaces for this type.
