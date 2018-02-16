@@ -17,10 +17,10 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="1.2.0" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="15.4.27004" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Microsoft.VisualStudio.SDK.Analyzers.CodeFixes\Microsoft.VisualStudio.SDK.Analyzers.CodeFixes.csproj" />
     <ProjectReference Include="..\Microsoft.VisualStudio.SDK.Analyzers\Microsoft.VisualStudio.SDK.Analyzers.csproj" />
   </ItemGroup>
 
