@@ -63,6 +63,38 @@ class Test : AsyncPackage {
     }
 
     [Fact]
+    public void MultipleProvideAutoLoadProducesMultipleDiagnostics()
+    {
+        var test = @"
+using Microsoft.VisualStudio.Shell;
+
+[ProvideAutoLoad(""{A184B08F-C81C-45F6-A57F-5ABD9991F28F}"", PackageAutoLoadFlags.None)]
+[ProvideAutoLoad(""{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"", PackageAutoLoadFlags.None)]
+class Test : AsyncPackage {
+}
+";
+        DiagnosticResult[] expected = new[]
+        {
+            new DiagnosticResult()
+            {
+                Id = VSSDK004ProvideAutoLoadAttributeAnalyzer.Id,
+                SkipVerifyMessage = true,
+                Severity = DiagnosticSeverity.Warning,
+                Locations = new[] { new DiagnosticResultLocation("Test0.cs", 4, 2, 4, 86) },
+            },
+            new DiagnosticResult()
+            {
+                Id = VSSDK004ProvideAutoLoadAttributeAnalyzer.Id,
+                SkipVerifyMessage = true,
+                Severity = DiagnosticSeverity.Warning,
+                Locations = new[] { new DiagnosticResultLocation("Test0.cs", 5, 2, 5, 86) },
+            },
+        };
+
+        this.VerifyCSharpDiagnostic(test, expected);
+    }
+
+    [Fact]
     public void ProvideAutoLoadWithNamedFlagsButNoBackgroundLoadProducesDiagnostics()
     {
         var test = @"

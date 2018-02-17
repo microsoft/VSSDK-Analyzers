@@ -12,7 +12,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
     using Microsoft.VisualStudio.Shell;
 
     /// <summary>
-    /// Discovers VS packages that derive directly from <see cref="Package"/> instead of <see cref="AsyncPackage"/>.
+    /// Discovers <see cref="ProvideAutoLoadAttribute"/> usages without BackgroundLoad flag.
     /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class VSSDK004ProvideAutoLoadAttributeAnalyzer : DiagnosticAnalyzer
