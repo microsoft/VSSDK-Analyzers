@@ -169,7 +169,6 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
                 Environment.GetEnvironmentVariable("USERPROFILE"),
                 ".nuget",
                 "packages");
-
             var vssdkReferences = VSSDKPackageReferences.Select(e =>
                 MetadataReference.CreateFromFile(Path.Combine(nugetPackageRoot, e)));
             solution = solution.AddMetadataReferences(projectId, vssdkReferences);
