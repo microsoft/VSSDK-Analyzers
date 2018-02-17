@@ -165,7 +165,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
                 }
             }
 
-            string globalPackagesFolder = Environment.GetEnvironmentVariable("globalPackagesFolder");
+            string globalPackagesFolder = Environment.GetEnvironmentVariable("NuGetGlobalPackagesFolder");
             string nugetPackageRoot = string.IsNullOrEmpty(globalPackagesFolder)
                 ? Path.Combine(
                     Environment.GetEnvironmentVariable("USERPROFILE"),
