@@ -9,7 +9,6 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Diagnostics;
-    using Microsoft.VisualStudio.Shell;
 
     /// <summary>
     /// Discovers <see cref="ProvideAutoLoadAttribute"/> usages without BackgroundLoad flag.
@@ -67,11 +66,11 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             foreach (var autoLoadInstance in userClassSymbol?.GetAttributes().Where(a => a.AttributeClass == autoLoadAttributeType))
             {
                 var flagsArgument = autoLoadInstance.ConstructorArguments.FirstOrDefault(p => p.Type == packageAutoLoadFlagsType);
-                Shell.PackageAutoLoadFlags flagsValue = flagsArgument.IsNull ? PackageAutoLoadFlags.None : (Shell.PackageAutoLoadFlags)flagsArgument.Value;
+                Types.PackageAutoLoadFlags.Values flagsValue = flagsArgument.IsNull ? Types.PackageAutoLoadFlags.Values.None : (Types.PackageAutoLoadFlags.Values)flagsArgument.Value;
 
                 // We are looking for any auto load attribute without the BackgroundLoad flag and SkipWhenUIContextRulesActive flag.
-                if (!flagsValue.HasFlag(Shell.PackageAutoLoadFlags.BackgroundLoad) &&
-                    !flagsValue.HasFlag(Shell.PackageAutoLoadFlags.SkipWhenUIContextRulesActive))
+                if (!flagsValue.HasFlag(Types.PackageAutoLoadFlags.Values.BackgroundLoad) &&
+                    !flagsValue.HasFlag(Types.PackageAutoLoadFlags.Values.SkipWhenUIContextRulesActive))
                 {
                     var attributeSyntax = autoLoadInstance.ApplicationSyntaxReference.GetSyntax(context.CancellationToken) as AttributeSyntax;
                     Location location = attributeSyntax.GetLocation();

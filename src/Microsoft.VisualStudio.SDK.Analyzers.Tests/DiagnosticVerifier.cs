@@ -30,7 +30,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
 
         private static readonly ImmutableArray<string> VSSDKPackageReferences = ImmutableArray.Create(new string[]
         {
-            Path.Combine("Microsoft.VisualStudio.OLE.Interop", "7.10.6071", "lib", "Microsoft.VisualStudio.OLE.Interop.dll"),
+            Path.Combine("Microsoft.VisualStudio.OLE.Interop", "7.10.6071", "lib\\net11", "Microsoft.VisualStudio.OLE.Interop.dll"),
             Path.Combine("Microsoft.VisualStudio.Shell.Interop", "7.10.6072", "lib\\net11", "Microsoft.VisualStudio.Shell.Interop.dll"),
             Path.Combine("Microsoft.VisualStudio.Shell.Interop.8.0", "8.0.50728", "lib\\net11", "Microsoft.VisualStudio.Shell.Interop.8.0.dll"),
             Path.Combine("Microsoft.VisualStudio.Shell.Interop.9.0", "9.0.30730", "lib\\net11", "Microsoft.VisualStudio.Shell.Interop.9.0.dll"),
@@ -169,6 +169,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
                 Environment.GetEnvironmentVariable("USERPROFILE"),
                 ".nuget",
                 "packages");
+            nugetPackageRoot = @"e:\nuget\packages";
             var vssdkReferences = VSSDKPackageReferences.Select(e =>
                 MetadataReference.CreateFromFile(Path.Combine(nugetPackageRoot, e)));
             solution = solution.AddMetadataReferences(projectId, vssdkReferences);
