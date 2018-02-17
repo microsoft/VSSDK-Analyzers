@@ -7,7 +7,8 @@ for your customers.
 
 ```csharp
 [PackageRegistration(UseManagedResourcesOnly = true)]
-class MyCoolPackage : Package {
+class MyCoolPackage : Package
+{
     protected override void Initialize()
     {
         base.Initialize();
@@ -21,7 +22,8 @@ Derive from AsyncPackage instead:
 
 ```csharp
 [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
-class MyCoolPackage : AsyncPackage {
+class MyCoolPackage : AsyncPackage
+{
     protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
     {
         await base.InitializeAsync(cancellationToken, progress);

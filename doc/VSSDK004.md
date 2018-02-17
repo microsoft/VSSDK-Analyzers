@@ -12,7 +12,8 @@ ignore auto load request.
 ```csharp
 [ProvideAutoLoad("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}")]
 [PackageRegistration(UseManagedResourcesOnly = true)]
-class MyCoolPackage : Package {
+class MyCoolPackage : Package
+{
     protected override void Initialize()
     {
         base.Initialize();
@@ -27,7 +28,8 @@ Provide BackgroundLoad flag in your ProvideAutoLoad and also derive from AsyncPa
 ```csharp
 [ProvideAutoLoad("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}", PackageAutoLoadFlags.BackgroundLoad)]
 [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
-class MyCoolPackage : AsyncPackage {
+class MyCoolPackage : AsyncPackage
+{
     protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
     {
         await base.InitializeAsync(cancellationToken, progress);
