@@ -272,5 +272,78 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             /// </summary>
             internal static string FullName => string.Join(".", Namespace) + "." + TypeName;
         }
+
+        /// <summary>
+        /// Describes the <see cref="Shell.ProvideAutoLoadAttribute"/> type.
+        /// </summary>
+        internal static class ProvideAutoLoadAttribute
+        {
+            /// <summary>
+            /// Gets the simple name of the <see cref="Shell.ProvideAutoLoadAttribute"/> type.
+            /// </summary>
+            internal const string TypeName = nameof(Shell.ProvideAutoLoadAttribute);
+
+            /// <summary>
+            /// Gets an array of the nesting namespaces for this type.
+            /// </summary>
+            internal static readonly IReadOnlyList<string> Namespace = Namespaces.MicrosoftVisualStudioShell;
+
+            /// <summary>
+            /// Gets the <see cref="Microsoft.CodeAnalysis.CSharp.Syntax.TypeSyntax"/> for this type.
+            /// </summary>
+            internal static TypeSyntax TypeSyntax { get; } = Utils.QualifyName(Namespace, SyntaxFactory.IdentifierName(TypeName));
+
+            /// <summary>
+            /// Gets the fully-qualified name of this type as a string.
+            /// </summary>
+            internal static string FullName => string.Join(".", Namespace) + "." + TypeName;
+        }
+
+        /// <summary>
+        /// Describes the <see cref="Shell.PackageAutoLoadFlags"/> type.
+        /// </summary>
+        internal static class PackageAutoLoadFlags
+        {
+            /// <summary>
+            /// Gets the simple name of the <see cref="Shell.PackageAutoLoadFlags"/> type.
+            /// </summary>
+            internal const string TypeName = nameof(Shell.PackageAutoLoadFlags);
+
+            /// <summary>
+            /// Gets an array of the nesting namespaces for this type.
+            /// </summary>
+            internal static readonly IReadOnlyList<string> Namespace = Namespaces.MicrosoftVisualStudioShell;
+
+            /// <summary>
+            /// Copy of auto load flag values from <see cref="Shell.PackageAutoLoadFlags"/>
+            /// </summary>
+            internal enum Values
+            {
+                /// <summary>
+                /// Indicates synchronous load in all versions of Visual Studio
+                /// </summary>
+                None = 0,
+
+                /// <summary>
+                /// Indicates auto load request should be ignored when Visual Studio has UIContextRules feature
+                /// </summary>
+                SkipWhenUIContextRulesActive = 1,
+
+                /// <summary>
+                /// Indicates auto load should be requested asynchronously
+                /// </summary>
+                BackgroundLoad = 2,
+            }
+
+            /// <summary>
+            /// Gets the <see cref="Microsoft.CodeAnalysis.CSharp.Syntax.TypeSyntax"/> for this type.
+            /// </summary>
+            internal static TypeSyntax TypeSyntax { get; } = Utils.QualifyName(Namespace, SyntaxFactory.IdentifierName(TypeName));
+
+            /// <summary>
+            /// Gets the fully-qualified name of this type as a string.
+            /// </summary>
+            internal static string FullName => string.Join(".", Namespace) + "." + TypeName;
+        }
     }
 }
