@@ -165,10 +165,13 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
                 }
             }
 
-            string nugetPackageRoot = Path.Combine(
-                Environment.GetEnvironmentVariable("USERPROFILE"),
-                ".nuget",
-                "packages");
+            string globalPackagesFolder = Environment.GetEnvironmentVariable("NuGetGlobalPackagesFolder");
+            string nugetPackageRoot = string.IsNullOrEmpty(globalPackagesFolder)
+                ? Path.Combine(
+                    Environment.GetEnvironmentVariable("USERPROFILE"),
+                    ".nuget",
+                    "packages")
+                : globalPackagesFolder;
             var vssdkReferences = VSSDKPackageReferences.Select(e =>
                 MetadataReference.CreateFromFile(Path.Combine(nugetPackageRoot, e)));
             solution = solution.AddMetadataReferences(projectId, vssdkReferences);
