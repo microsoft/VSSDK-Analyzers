@@ -14,7 +14,7 @@ public class VSSDK004ProvideAutoLoadAttributeAnalyzerTests : DiagnosticVerifier
     {
         Id = VSSDK004ProvideAutoLoadAttributeAnalyzer.Id,
         SkipVerifyMessage = true,
-        Severity = DiagnosticSeverity.Info,
+        Severity = DiagnosticSeverity.Warning,
     };
 
     public VSSDK004ProvideAutoLoadAttributeAnalyzerTests(ITestOutputHelper logger)

@@ -28,7 +28,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: Id,
             title: "Auto loads without background load option will be deprecated in future updates.",
-            messageFormat: "Synchronous auto loads not using BackgroundLoad option paired with AsyncPackage implementations will be deprecated in future updates.",
+            messageFormat: "Synchronous auto loads will be deprecated in future versions, consider using BackgroundLoad flag and AsyncPackage base class.",
             helpLinkUri: Utils.GetHelpLink(Id),
             category: "Usage",
             defaultSeverity: DiagnosticSeverity.Warning,
