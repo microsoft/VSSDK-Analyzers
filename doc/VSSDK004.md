@@ -1,10 +1,10 @@
 # VSSDK004 Use BackgroundLoad flag in ProvideAutoLoad attribute for asynchronous auto load
 
-In order to provide performance guarentees in critical scenarios such as startup and solution load,
+In order to provide performance guarantees in critical scenarios such as startup and solution load,
 Visual Studio will deprecate synchronous auto load requests in a future version.
 
-This analyzer flags all use of ProvideAutoLoad attributes that doesn't provide BackgroundLoad flag or
-SkipWhenUIContextRulesActive flag where latter tells Visual Studio versions supporting AsyncPackage to
+This analyzer flags all use of `ProvideAutoLoad` attributes that doesn't provide a `BackgroundLoad` flag or
+a `SkipWhenUIContextRulesActive` flag where latter tells Visual Studio versions supporting AsyncPackage to
 ignore auto load request.
 
 ## Examples of patterns that are flagged by this analyzer
@@ -40,4 +40,4 @@ class MyCoolPackage : AsyncPackage {
 }
 ```
 
-For more information, please see https://docs.microsoft.com/en-us/visualstudio/extensibility/how-to-use-asyncpackage-to-load-vspackages-in-the-background
+For more information, please see [How to use AsyncPackage to load VS packages in the background](https://docs.microsoft.com/en-us/visualstudio/extensibility/how-to-use-asyncpackage-to-load-vspackages-in-the-background)
