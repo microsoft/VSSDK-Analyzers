@@ -11,7 +11,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
     using Microsoft.CodeAnalysis.Diagnostics;
 
     /// <summary>
-    /// Discovers <see cref="ProvideAutoLoadAttribute"/> usages without BackgroundLoad flag.
+    /// Discovers <see cref="Microsoft.VisualStudio.Shell.ProvideAutoLoadAttribute"/> usages without BackgroundLoad flag.
     /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class VSSDK004ProvideAutoLoadAttributeAnalyzer : DiagnosticAnalyzer
