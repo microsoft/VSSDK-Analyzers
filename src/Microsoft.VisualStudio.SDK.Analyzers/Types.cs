@@ -324,6 +324,5 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             /// </summary>
             internal static string FullName => string.Join(".", Namespace) + "." + TypeName;
         }
-
     }
 }
