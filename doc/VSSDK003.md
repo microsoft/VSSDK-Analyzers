@@ -78,3 +78,23 @@ public class ToolWindow1Package : AsyncPackage
     }
 }
 ```
+
+Then activate your tool window asynchronously using code such as this (which may appear in your `ShowToolWindow` method):
+
+```csharp
+// Get the instance number 0 of this tool window. This window is single instance so this instance
+// is actually the only one.
+// The last flag is set to true so that if the tool window does not exists it will be created.
+this.package.JoinableTaskFactory.RunAsync(async delegate
+{
+    ToolWindowPane window = await this.package.ShowToolWindowAsync(typeof(ToolWindow1), 0, true, this.package.DisposalToken);
+    if ((null == window) || (null == window.Frame))
+    {
+        throw new NotSupportedException("Cannot create tool window");
+    }
+
+    await this.package.JoinableTaskFactory.SwitchToMainThreadAsync();
+    IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
+    Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
+});
+```
