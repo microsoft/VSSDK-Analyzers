@@ -7,6 +7,8 @@ This project is meant to provide a set of Roslyn Analyzers that makes it easy to
 
 Check out our [exhaustive list of analyzers](doc/index.md) defined in this project.
 
+This package is not yet published to nuget.org. To use these analyzers now, add this NuGet v2 feed to your package sources: https://ci.appveyor.com/nuget/vssdk-analyzers.
+
 If you have an idea for a rule that would constitute a best practice for extension authors to follow, please open an issue with the description.
 
 # Contributing
