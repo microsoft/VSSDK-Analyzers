@@ -2,6 +2,7 @@
 
 [![Build status](https://ci.appveyor.com/api/projects/status/d04ivfn3ad15b902/branch/master?svg=true)](https://ci.appveyor.com/project/AArnott/vssdk-analyzers/branch/master)
 [![codecov](https://codecov.io/gh/microsoft/vssdk-analyzers/branch/master/graph/badge.svg)](https://codecov.io/gh/microsoft/vssdk-analyzers)
+[![NuGet](https://img.shields.io/nuget/v/Microsoft.VisualStudio.SDK.Analyzers.svg)](https://nuget.org/packages/Microsoft.VisualStudio.SDK.Analyzers)
 
 This project is meant to provide a set of Roslyn Analyzers that makes it easy to catch, discover and implement a wide array of best practices when building Visual Studio extensions.
 
