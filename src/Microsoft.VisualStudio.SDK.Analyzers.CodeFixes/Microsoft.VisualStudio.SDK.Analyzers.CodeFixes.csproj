@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="..\Microsoft.VisualStudio.SDK.Analyzers\tools\*.ps1" Pack="true" PackagePath="tools\" />
+    <Content Include="tools\*.ps1" Pack="true" PackagePath="tools\" />
   </ItemGroup>
 
   <Target Name="PackBuildOutputs" BeforeTargets="_GetPackageFiles" DependsOnTargets="SatelliteDllsProjectOutputGroup;DebugSymbolsProjectOutputGroup">
