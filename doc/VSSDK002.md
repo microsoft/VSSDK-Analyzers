@@ -7,7 +7,8 @@ should indicate whether your class derives from `AsyncPackage`.
 
 ```csharp
 [PackageRegistration(UseManagedResourcesOnly = true)]
-class MyCoolPackage : AsyncPackage {
+class MyCoolPackage : AsyncPackage
+{
 }
 ```
 
@@ -15,7 +16,8 @@ or
 
 ```csharp
 [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
-class MyCoolPackage : Package {
+class MyCoolPackage : Package
+{
 }
 ```
 
@@ -27,7 +29,8 @@ if and only if your package derives from `AsyncPackage`.
 
 ```csharp
 [PackageRegistration(UseManagedResourcesOnly = true)]
-class MyCoolPackage : Package {
+class MyCoolPackage : Package
+{
 }
 ```
 
@@ -35,7 +38,8 @@ or
 
 ```csharp
 [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
-class MyCoolPackage : AsyncPackage {
+class MyCoolPackage : AsyncPackage
+{
 }
 ```
 

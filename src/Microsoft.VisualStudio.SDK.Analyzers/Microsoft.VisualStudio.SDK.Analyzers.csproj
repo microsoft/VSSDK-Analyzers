@@ -4,32 +4,13 @@
     <TargetFramework>net46</TargetFramework>
     <CodeAnalysisRuleSet>Microsoft.VisualStudio.SDK.Analyzers.ruleset</CodeAnalysisRuleSet>
 
-    <PackageTags>analyzers visualstudio vssdk sdk</PackageTags>
-    <PackageReleaseNotes>https://go.microsoft.com/fwlink/?LinkID=746387</PackageReleaseNotes>
-    <Description>A collection of analyzers to help Visual Studio extension developers write quality code.</Description>
-
-    <!-- Analyzers should not be added to the lib folder. -->
-    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <PackageId>Microsoft.VisualStudio.SDK.Just.Analyzers</PackageId>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="1.2.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="1.2.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="2.6.1-beta1-62706-01" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="15.4.27004" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.VisualStudio.Threading" Version="15.5.32" PrivateAssets="none" />
-    <PackageReference Include="AsyncUsageAnalyzers" Version="1.0.0-alpha003" PrivateAssets="none" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="tools\*.ps1" Pack="true" PackagePath="tools\" />
-  </ItemGroup>
-
-  <Target Name="PackBuildOutputs" BeforeTargets="_GetPackageFiles" DependsOnTargets="SatelliteDllsProjectOutputGroup;DebugSymbolsProjectOutputGroup">
-    <ItemGroup>
-      <Content Include="$(TargetPath)" Pack="true" PackagePath="analyzers\cs\" />
-      <!--<Content Include="@(DebugSymbolsProjectOutputGroupOutput)" Pack="true" PackagePath="analyzers\cs\" />-->
-      <Content Include="@(SatelliteDllsProjectOutputGroupOutput)" Pack="true" PackagePath="analyzers\cs\%(SatelliteDllsProjectOutputGroupOutput.Culture)\" />
-    </ItemGroup>
-  </Target>
 
 </Project>

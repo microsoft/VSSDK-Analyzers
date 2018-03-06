@@ -66,6 +66,7 @@ artifacts/
 *.tmp
 *.tmp_proj
 *.log
+msbuild.binlog
 *.vspscc
 *.vssscc
 .builds
