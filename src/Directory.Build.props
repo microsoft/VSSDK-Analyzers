@@ -7,7 +7,7 @@
 
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
-    <MicroBuildVersion>2.0.53</MicroBuildVersion>
+    <MicroBuildVersion>2.0.54</MicroBuildVersion>
     <MicroBuild_DoNotStrongNameSign>true</MicroBuild_DoNotStrongNameSign>
 
     <PackageProjectUrl>https://github.com/Microsoft/VSSDK-Analyzers</PackageProjectUrl>
@@ -22,11 +22,11 @@
     <!-- Avoid using MSBuild properties as macros for PackageReference/@Version
          due to issue https://github.com/dotnet/project-system/issues/2129 -->
     <PackageReference Include="GitLink" Version="3.2.0-unstable0018" PrivateAssets="all" />
-    <PackageReference Include="MicroBuild.VisualStudio" Version="2.0.53" PrivateAssets="all" />
+    <PackageReference Include="MicroBuild.VisualStudio" Version="2.0.54" PrivateAssets="all" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta006" PrivateAssets="all" />
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" PrivateAssets="all" />
     <PackageReference Include="StreamJsonRpc" Version="1.3.23" PrivateAssets="all" />
-    <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.17" PrivateAssets="all" />
+    <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.23" PrivateAssets="all" />
     <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="15.6.27415" PrivateAssets="all" />
     <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.14.0" Version="14.3.26929" PrivateAssets="all" />
     <PackageReference Include="Microsoft.VisualStudio.Threading" Version="15.6.46" PrivateAssets="all" />
