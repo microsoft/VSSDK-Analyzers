@@ -216,5 +216,16 @@ public class ToolWindow1 : ToolWindowPane
         this.VerifyCSharpDiagnostic(new[] { package, toolWindow });
     }
 
+    [Fact]
+    public void NoPackageAttributes()
+    {
+        var package = @"
+public class ProtocolPackage : Microsoft.VisualStudio.Shell.AsyncPackage
+{
+}
+    ";
+        this.VerifyCSharpDiagnostic(package);
+    }
+
     protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() => new VSSDK003SupportAsyncToolWindowAnalyzer();
 }
