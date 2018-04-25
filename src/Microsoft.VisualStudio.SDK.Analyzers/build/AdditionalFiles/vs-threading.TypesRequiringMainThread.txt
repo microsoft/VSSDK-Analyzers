@@ -1,3 +1,4 @@
+Microsoft.VisualStudio.Shell.ServiceProvider
 Microsoft.VisualStudio.Shell.Interop.*
 Microsoft.VisualStudio.OLE.Interop.*
 Microsoft.Internal.VisualStudio.Shell.Interop.*
