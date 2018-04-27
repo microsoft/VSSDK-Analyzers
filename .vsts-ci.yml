@@ -1,3 +1,9 @@
+trigger:
+  branches:
+    include: ["master", "*"]
+  paths:
+    exclude: ["doc", "*.md"]
+
 steps:
 - task: PowerShell@2
   displayName: Set VSTS variables
