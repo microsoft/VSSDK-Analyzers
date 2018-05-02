@@ -307,7 +307,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             /// <summary>
             /// Gets the simple name of the <see cref="Shell.PackageAutoLoadFlags"/> type.
             /// </summary>
-            internal const string TypeName = nameof(Shell.PackageAutoLoadFlags);
+            internal const string TypeName = "PackageAutoLoadFlags";
 
             /// <summary>
             /// Gets an array of the nesting namespaces for this type.
