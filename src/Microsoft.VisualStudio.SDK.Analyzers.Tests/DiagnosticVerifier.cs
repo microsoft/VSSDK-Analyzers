@@ -22,6 +22,10 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
 
     public abstract class DiagnosticVerifier
     {
+        private const string CSharpDefaultFileExt = "cs";
+        private const string TestProjectName = "TestProject";
+        private const string DefaultFilePathPrefix = "Test";
+
         private static readonly MetadataReference CorlibReference = MetadataReference.CreateFromFile(typeof(object).Assembly.Location);
         private static readonly MetadataReference SystemCoreReference = MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location);
         private static readonly MetadataReference SystemReference = MetadataReference.CreateFromFile(typeof(Debug).Assembly.Location);
@@ -43,10 +47,6 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
             Path.Combine("Microsoft.VisualStudio.Shell.Framework", "15.6.27415", "lib\\net45", "Microsoft.VisualStudio.Shell.Framework.dll"),
             Path.Combine("Microsoft.VisualStudio.Threading", "15.8.47-beta", "lib\\net45", "Microsoft.VisualStudio.Threading.dll"),
         });
-
-        private static string csharpDefaultFileExt = "cs";
-        private static string testProjectName = "TestProject";
-        private static string defaultFilePathPrefix = "Test";
 
         protected DiagnosticVerifier(ITestOutputHelper logger)
         {
@@ -133,14 +133,14 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
         /// <returns>A Project created out of the Documents created from the source strings</returns>
         protected static Project CreateProject(string[] sources, string language = LanguageNames.CSharp, bool hasEntrypoint = false)
         {
-            string fileNamePrefix = defaultFilePathPrefix;
-            string fileExt = language == LanguageNames.CSharp ? csharpDefaultFileExt : throw new NotSupportedException();
+            string fileNamePrefix = DefaultFilePathPrefix;
+            string fileExt = language == LanguageNames.CSharp ? CSharpDefaultFileExt : throw new NotSupportedException();
 
-            var projectId = ProjectId.CreateNewId(debugName: testProjectName);
+            var projectId = ProjectId.CreateNewId(debugName: TestProjectName);
 
             var solution = new AdhocWorkspace()
                 .CurrentSolution
-                .AddProject(projectId, testProjectName, testProjectName, language)
+                .AddProject(projectId, TestProjectName, TestProjectName, language)
                 .AddMetadataReference(projectId, CorlibReference)
                 .AddMetadataReference(projectId, SystemReference)
                 .AddMetadataReference(projectId, PresentationFrameworkReference)
