@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <Content Include="tools\**" Pack="true" PackagePath="tools\" />
+    <Content Include="build\**" Pack="true" PackagePath="build\" />
   </ItemGroup>
 
   <ItemGroup>
