@@ -20,6 +20,16 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         };
 
         /// <summary>
+        /// Gets an array for each element in the namespace Microsoft.VisualStudio.Threading.
+        /// </summary>
+        internal static readonly IReadOnlyList<string> MicrosoftVisualStudioThreading = new[]
+        {
+            nameof(Microsoft),
+            nameof(Microsoft.VisualStudio),
+            nameof(Microsoft.VisualStudio.Threading),
+        };
+
+        /// <summary>
         /// Gets an array for each element in the namespace System.
         /// </summary>
         internal static readonly IReadOnlyList<string> System = new[]
