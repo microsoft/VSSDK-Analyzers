@@ -2,7 +2,7 @@ trigger:
   branches:
     include: ["master", "*"]
   paths:
-    exclude: ["doc", "*.md"]
+    exclude: ["doc", ".github", "*.md"]
 
 steps:
 - task: PowerShell@2
