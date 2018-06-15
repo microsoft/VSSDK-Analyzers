@@ -21,11 +21,10 @@ environment:
   CodeAnalysisTreatWarningsAsErrors: true
   codecov_token: 27bb1787-08af-48c7-bda5-ca308440f1b6
 before_build:
-- msbuild src\Microsoft.VisualStudio.SDK.Analyzers.sln /nologo /m /v:quiet /t:restore
 - choco install opencover.portable
 - choco install codecov
 build_script:
-- msbuild src\Microsoft.VisualStudio.SDK.Analyzers.sln /nologo /m /bl /v:minimal /t:build,pack
+- msbuild src\Microsoft.VisualStudio.SDK.Analyzers.sln /nologo /m /bl /v:minimal /restore /t:build,pack
 test_script:
 - >-
     SET testdir=bin\Microsoft.VisualStudio.SDK.Analyzers.Tests\%configuration%\net46
