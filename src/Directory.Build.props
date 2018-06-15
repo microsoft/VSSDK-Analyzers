@@ -27,10 +27,10 @@
     <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.23" PrivateAssets="all" />
     <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="15.6.27415" PrivateAssets="all" />
     <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.14.0" Version="14.3.26929" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.VisualStudio.Threading" Version="15.8.47-beta" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.VisualStudio.Threading" Version="15.8.99-rc" PrivateAssets="all" />
 
     <!-- We WANT these analyzers to be expressed as dependencies of the final package. -->
-    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="15.8.47-beta" PrivateAssets="none" />
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="15.8.99-rc" PrivateAssets="none" />
   </ItemGroup>
 
   <ItemGroup>
