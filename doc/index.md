@@ -10,5 +10,6 @@ ID | Title | Category
 [VSSDK003](VSSDK003.md) | Support async tool windows | Performance
 [VSSDK004](VSSDK004.md) | Use BackgroundLoad flag in ProvideAutoLoad attribute | Performance
 [VSSDK005](VSSDK005.md) | Use the JoinableTaskContext singleton | Reliability
+[VSSDK006](VSSDK006.md) | Check service exists | Reliability
 
 [1]: https://nuget.org/packages/microsoft.visualstudio.sdk.analyzers

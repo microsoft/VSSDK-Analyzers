@@ -26,7 +26,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         /// </summary>
         internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: Id,
-            title: "Avoid instantiating JoinableTaskContext.",
+            title: "Avoid instantiating JoinableTaskContext",
             messageFormat: "Use the ThreadHelper.JoinableTaskContext singleton rather than instantiating your own to avoid deadlocks.",
             helpLinkUri: Utils.GetHelpLink(Id),
             category: "Reliability",
