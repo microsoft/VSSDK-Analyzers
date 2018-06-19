@@ -37,7 +37,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             var classDeclarationSyntax = baseTypeSyntax.FirstAncestorOrSelf<ClassDeclarationSyntax>();
 
             context.RegisterCodeFix(
-                CodeAction.Create("Convert to async package", ct => this.ConvertToAsyncPackageAsync(context, diagnostic, ct), classDeclarationSyntax.Identifier.ToString()),
+                CodeAction.Create("Convert to async package", ct => this.ConvertToAsyncPackageAsync(context, diagnostic, ct), "only one"),
                 diagnostic);
         }
 
