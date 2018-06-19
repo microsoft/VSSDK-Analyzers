@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Diagnostics;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Text;
@@ -46,6 +47,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
             Path.Combine("Microsoft.VisualStudio.Shell.15.0", "15.6.27415", "lib\\net45", "Microsoft.VisualStudio.Shell.15.0.dll"),
             Path.Combine("Microsoft.VisualStudio.Shell.Framework", "15.6.27415", "lib\\net45", "Microsoft.VisualStudio.Shell.Framework.dll"),
             Path.Combine("Microsoft.VisualStudio.Threading", "15.8.99-rc", "lib\\net45", "Microsoft.VisualStudio.Threading.dll"),
+            Path.Combine("Microsoft.VisualStudio.Validation", "15.3.15", "lib\\net45", "Microsoft.VisualStudio.Validation.dll"),
         });
 
         protected DiagnosticVerifier(ITestOutputHelper logger)
@@ -146,7 +148,12 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
                 .AddMetadataReference(projectId, PresentationFrameworkReference)
                 .AddMetadataReference(projectId, SystemCoreReference)
                 .AddMetadataReference(projectId, MPFReference)
-                .WithProjectCompilationOptions(projectId, new CSharpCompilationOptions(hasEntrypoint ? OutputKind.ConsoleApplication : OutputKind.DynamicallyLinkedLibrary))
+                .WithProjectCompilationOptions(projectId, new CSharpCompilationOptions(
+                    hasEntrypoint ? OutputKind.ConsoleApplication : OutputKind.DynamicallyLinkedLibrary,
+                    specificDiagnosticOptions: new Dictionary<string, ReportDiagnostic>
+                    {
+                        { "CS1701", ReportDiagnostic.Suppress }, // we don't reference mscorlib, which can cause assembly reference ambiguities
+                    }))
                 .WithProjectParseOptions(projectId, new CSharpParseOptions(LanguageVersion.CSharp6));
 
             var pathToLibs = ToolLocationHelper.GetPathToStandardLibraries(".NETFramework", "v4.5.1", string.Empty);
@@ -191,15 +198,24 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
         /// <summary>
         /// Helper method to format a Diagnostic into an easily readable string
         /// </summary>
-        /// <param name="analyzers">The analyzers that this Verifier tests</param>
         /// <param name="diagnostics">The Diagnostics to be formatted</param>
         /// <returns>The Diagnostics formatted as a string</returns>
-        protected static string FormatDiagnostics(ImmutableArray<DiagnosticAnalyzer> analyzers, params Diagnostic[] diagnostics)
+        protected static string FormatDiagnostics(params Diagnostic[] diagnostics)
         {
             var builder = new StringBuilder();
             for (int i = 0; i < diagnostics.Length; ++i)
             {
-                builder.AppendLine(diagnostics[i].ToString());
+                builder.AppendLine($"{GetLocationString(diagnostics[i].Location)}: {diagnostics[i].Severity.ToString().ToLowerInvariant()} {diagnostics[i].Id}: {diagnostics[i].GetMessage(CultureInfo.InvariantCulture)}");
+                foreach (var loc in diagnostics[i].AdditionalLocations)
+                {
+                    builder.AppendLine($"\t{GetLocationString(loc)}");
+                }
+            }
+
+            string GetLocationString(Location loc)
+            {
+                var lineSpan = loc.GetLineSpan();
+                return $"{loc.SourceTree.FilePath}({lineSpan.StartLinePosition.Line + 1},{lineSpan.StartLinePosition.Character + 1})-({lineSpan.EndLinePosition.Line + 1},{lineSpan.EndLinePosition.Character + 1})";
             }
 
             return builder.ToString();
@@ -322,7 +338,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
                     "Expected diagnostic to be in file \"{0}\" was actually in file \"{1}\"\r\n\r\nDiagnostic:\r\n    {2}\r\n",
                     expected.Path,
                     actualSpan.Path,
-                    FormatDiagnostics(analyzers, diagnostic)));
+                    FormatDiagnostics(diagnostic)));
 
             var actualLinePosition = actualSpan.StartLinePosition;
 
@@ -337,7 +353,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
                             "Expected diagnostic to be on line \"{0}\" was actually on line \"{1}\"\r\n\r\nDiagnostic:\r\n    {2}\r\n",
                             expected.Line,
                             actualLinePosition.Line + 1,
-                            FormatDiagnostics(analyzers, diagnostic)));
+                            FormatDiagnostics(diagnostic)));
                 }
 
                 if (expected.EndLine > -1 && actualSpan.EndLinePosition.Line + 1 != expected.EndLine)
@@ -348,7 +364,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
                             "Expected diagnostic to end on line \"{0}\" was actually on line \"{1}\"\r\n\r\nDiagnostic:\r\n    {2}\r\n",
                             expected.EndLine,
                             actualSpan.EndLinePosition.Line + 1,
-                            FormatDiagnostics(analyzers, diagnostic)));
+                            FormatDiagnostics(diagnostic)));
                 }
             }
 
@@ -363,7 +379,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
                             "Expected diagnostic to start at column \"{0}\" was actually at column \"{1}\"\r\n\r\nDiagnostic:\r\n    {2}\r\n",
                             expected.Column,
                             actualLinePosition.Character + 1,
-                            FormatDiagnostics(analyzers, diagnostic)));
+                            FormatDiagnostics(diagnostic)));
                 }
 
                 if (expected.EndColumn > -1 && actualSpan.EndLinePosition.Character + 1 != expected.EndColumn)
@@ -374,7 +390,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
                             "Expected diagnostic to end at column \"{0}\" was actually at column \"{1}\"\r\n\r\nDiagnostic:\r\n    {2}\r\n",
                             expected.EndColumn,
                             actualSpan.EndLinePosition.Character + 1,
-                            FormatDiagnostics(analyzers, diagnostic)));
+                            FormatDiagnostics(diagnostic)));
                 }
             }
         }
@@ -412,7 +428,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
             int expectedCount = expectedResults.Count();
             int actualCount = actualResults.Count();
 
-            string diagnosticsOutput = actualResults.Any() ? FormatDiagnostics(analyzers, actualResults.ToArray()) : "    NONE.";
+            string diagnosticsOutput = actualResults.Any() ? FormatDiagnostics(actualResults.ToArray()) : "    NONE.";
             this.Logger.WriteLine("Actual diagnostics:\n" + diagnosticsOutput);
 
             Assert.Equal(expectedCount, actualCount);
@@ -430,7 +446,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
                             false,
                             string.Format(
                                 "Expected:\nA project diagnostic with No location\nActual:\n{0}",
-                                FormatDiagnostics(analyzers, actual)));
+                                FormatDiagnostics(actual)));
                     }
                 }
                 else
@@ -446,7 +462,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
                                 "Expected {0} additional locations but got {1} for Diagnostic:\r\n    {2}\r\n",
                                 expected.Locations.Length - 1,
                                 additionalLocations.Length,
-                                FormatDiagnostics(analyzers, actual)));
+                                FormatDiagnostics(actual)));
                     }
 
                     for (int j = 0; j < additionalLocations.Length; ++j)
@@ -463,7 +479,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
                             "Expected diagnostic id to be \"{0}\" was \"{1}\"\r\n\r\nDiagnostic:\r\n    {2}\r\n",
                             expected.Id,
                             actual.Id,
-                            FormatDiagnostics(analyzers, actual)));
+                            FormatDiagnostics(actual)));
                 }
 
                 if (actual.Severity != expected.Severity)
@@ -474,7 +490,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
                             "Expected diagnostic severity to be \"{0}\" was \"{1}\"\r\n\r\nDiagnostic:\r\n    {2}\r\n",
                             expected.Severity,
                             actual.Severity,
-                            FormatDiagnostics(analyzers, actual)));
+                            FormatDiagnostics(actual)));
                 }
 
                 if (!expected.SkipVerifyMessage && actual.GetMessage() != expected.Message)
@@ -485,7 +501,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
                             "Expected diagnostic message to be \"{0}\" was \"{1}\"\r\n\r\nDiagnostic:\r\n    {2}\r\n",
                             expected.Message,
                             actual.GetMessage(),
-                            FormatDiagnostics(analyzers, actual)));
+                            FormatDiagnostics(actual)));
                 }
             }
         }

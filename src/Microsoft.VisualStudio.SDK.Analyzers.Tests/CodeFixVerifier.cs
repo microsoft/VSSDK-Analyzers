@@ -26,6 +26,27 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
         }
 
         /// <summary>
+        /// The set of diagnostics expected after applying a code fix.
+        /// </summary>
+        public enum PostFixDiagnostics
+        {
+            /// <summary>
+            /// No diagnostics are expected.
+            /// </summary>
+            None,
+
+            /// <summary>
+            /// Diagnostics are allowed, so long as they existed before the fix was applied as well.
+            /// </summary>
+            Preexisting,
+
+            /// <summary>
+            /// We allow any diagnostics, including new ones.
+            /// </summary>
+            New,
+        }
+
+        /// <summary>
         /// Returns the codefix being tested (C#) - to be implemented in non-abstract class
         /// </summary>
         /// <returns>The CodeFixProvider to be used for CSharp code</returns>
@@ -37,11 +58,11 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
         /// <param name="oldSource">A class in the form of a string before the CodeFix was applied to it</param>
         /// <param name="newSource">A class in the form of a string after the CodeFix was applied to it</param>
         /// <param name="codeFixIndex">Index determining which codefix to apply if there are multiple</param>
-        /// <param name="allowNewCompilerDiagnostics">A bool controlling whether or not the test will fail if the CodeFix introduces other warnings after being applied</param>
+        /// <param name="expectedPostFixDiagnostics">A bool controlling whether or not the test will fail if the CodeFix introduces other warnings after being applied</param>
         /// <param name="hasEntrypoint"><c>true</c> to set the compiler in a mode as if it were compiling an exe (as opposed to a dll).</param>
-        protected void VerifyCSharpFix(string oldSource, string newSource, int? codeFixIndex = null, bool allowNewCompilerDiagnostics = false, bool hasEntrypoint = false)
+        protected void VerifyCSharpFix(string oldSource, string newSource, int? codeFixIndex = null, PostFixDiagnostics expectedPostFixDiagnostics = PostFixDiagnostics.None, bool hasEntrypoint = false)
         {
-            this.VerifyFix(LanguageNames.CSharp, this.GetCSharpDiagnosticAnalyzer(), this.GetCSharpCodeFixProvider(), new[] { oldSource }, new[] { newSource }, codeFixIndex, allowNewCompilerDiagnostics, hasEntrypoint);
+            this.VerifyFix(LanguageNames.CSharp, this.GetCSharpDiagnosticAnalyzer(), this.GetCSharpCodeFixProvider(), new[] { oldSource }, new[] { newSource }, codeFixIndex, expectedPostFixDiagnostics, hasEntrypoint);
         }
 
         /// <summary>
@@ -50,11 +71,11 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
         /// <param name="oldSources">Code files, each in the form of a string before the CodeFix was applied to it</param>
         /// <param name="newSources">Code files, each in the form of a string after the CodeFix was applied to it</param>
         /// <param name="codeFixIndex">Index determining which codefix to apply if there are multiple</param>
-        /// <param name="allowNewCompilerDiagnostics">A bool controlling whether or not the test will fail if the CodeFix introduces other warnings after being applied</param>
+        /// <param name="expectedPostFixDiagnostics">The set of diagnostics that are expected to exist after any fix(es) are applied to the original code.</param>
         /// <param name="hasEntrypoint"><c>true</c> to set the compiler in a mode as if it were compiling an exe (as opposed to a dll).</param>
-        protected void VerifyCSharpFix(string[] oldSources, string[] newSources, int? codeFixIndex = null, bool allowNewCompilerDiagnostics = false, bool hasEntrypoint = false)
+        protected void VerifyCSharpFix(string[] oldSources, string[] newSources, int? codeFixIndex = null, PostFixDiagnostics expectedPostFixDiagnostics = PostFixDiagnostics.None, bool hasEntrypoint = false)
         {
-            this.VerifyFix(LanguageNames.CSharp, this.GetCSharpDiagnosticAnalyzer(), this.GetCSharpCodeFixProvider(), oldSources, newSources, codeFixIndex, allowNewCompilerDiagnostics, hasEntrypoint);
+            this.VerifyFix(LanguageNames.CSharp, this.GetCSharpDiagnosticAnalyzer(), this.GetCSharpCodeFixProvider(), oldSources, newSources, codeFixIndex, expectedPostFixDiagnostics, hasEntrypoint);
         }
 
         protected void VerifyNoCSharpFixOffered(string oldSource, bool hasEntrypoint = false)
@@ -157,16 +178,17 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
         /// <param name="oldSources">Code files, each in the form of a string before the CodeFix was applied to it</param>
         /// <param name="newSources">Code files, each in the form of a string after the CodeFix was applied to it</param>
         /// <param name="codeFixIndex">Index determining which codefix to apply if there are multiple in the same location</param>
-        /// <param name="allowNewCompilerDiagnostics">A bool controlling whether or not the test will fail if the CodeFix introduces other warnings after being applied</param>
+        /// <param name="expectedPostFixDiagnostics">The set of diagnostics that are expected to exist after any fix(es) are applied to the original code.</param>
         /// <param name="hasEntrypoint"><c>true</c> to set the compiler in a mode as if it were compiling an exe (as opposed to a dll).</param>
-        private void VerifyFix(string language, DiagnosticAnalyzer analyzer, CodeFixProvider codeFixProvider, string[] oldSources, string[] newSources, int? codeFixIndex, bool allowNewCompilerDiagnostics, bool hasEntrypoint)
+        private void VerifyFix(string language, DiagnosticAnalyzer analyzer, CodeFixProvider codeFixProvider, string[] oldSources, string[] newSources, int? codeFixIndex, PostFixDiagnostics expectedPostFixDiagnostics, bool hasEntrypoint)
         {
             var project = CreateProject(oldSources, language, hasEntrypoint);
             var analyzerDiagnostics = GetSortedDiagnosticsFromDocuments(ImmutableArray.Create(analyzer), project.Documents.ToArray(), hasEntrypoint);
-            var compilerDiagnostics = project.Documents.SelectMany(doc => GetCompilerDiagnostics(doc));
+            var compilerDiagnostics = project.Documents.SelectMany(doc => GetCompilerDiagnostics(doc)).ToList();
             var attempts = analyzerDiagnostics.Length;
 
             // We'll go through enough for each diagnostic to be caught once
+            bool fixApplied = false;
             for (int i = 0; i < attempts; ++i)
             {
                 var diagnostic = analyzerDiagnostics[0]; // just get the first one -- the list gets smaller with each loop.
@@ -180,38 +202,58 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
                 }
 
                 document = ApplyFix(document, actions[codeFixIndex ?? 0]);
+                fixApplied = true;
                 project = document.Project;
 
-                this.Logger.WriteLine("Code after fix:\n{0}", document.GetSyntaxRootAsync().Result.ToFullString());
+                this.Logger.WriteLine("Code after fix:");
+                this.LogFileContent(document.GetSyntaxRootAsync().Result.ToFullString());
 
                 analyzerDiagnostics = GetSortedDiagnosticsFromDocuments(ImmutableArray.Create(analyzer), project.Documents.ToArray());
-                var newCompilerDiagnostics = GetNewDiagnostics(
-                    compilerDiagnostics,
-                    project.Documents.SelectMany(doc => GetCompilerDiagnostics(doc)));
+            }
 
-                // Check if applying the code fix introduced any new compiler diagnostics
-                if (!allowNewCompilerDiagnostics && newCompilerDiagnostics.Any())
+            if (newSources != null && newSources[0] != null)
+            {
+                Assert.True(fixApplied, "No code fix offered.");
+
+                // After applying all of the code fixes, compare the resulting string to the inputted one
+                int j = 0;
+                foreach (var document in project.Documents)
                 {
-                    // Format and get the compiler diagnostics again so that the locations make sense in the output
-                    document = document.WithSyntaxRoot(Formatter.Format(document.GetSyntaxRootAsync().Result, Formatter.Annotation, document.Project.Solution.Workspace));
-                    newCompilerDiagnostics = GetNewDiagnostics(compilerDiagnostics, GetCompilerDiagnostics(document));
-
-                    Assert.True(
-                        false,
-                        string.Format(
-                            "Fix introduced new compiler diagnostics:\r\n{0}\r\n\r\nNew document:\r\n{1}\r\n",
-                            string.Join("\r\n", newCompilerDiagnostics.Select(d => d.ToString())),
-                            document.GetSyntaxRootAsync().Result.ToFullString()));
+                    var actual = GetStringFromDocument(document);
+                    Assert.Equal(newSources[j++], actual, ignoreLineEndingDifferences: true);
                 }
             }
-
-            // After applying all of the code fixes, compare the resulting string to the inputted one
-            int j = 0;
-            foreach (var document in project.Documents)
+            else
             {
-                var actual = GetStringFromDocument(document);
-                Assert.Equal(newSources[j++], actual, ignoreLineEndingDifferences: true);
+                Assert.False(fixApplied, "No code fix expected, but was offered.");
             }
+
+            var postFixDiagnostics = project.Documents.SelectMany(doc => GetCompilerDiagnostics(doc)).Concat(GetSortedDiagnosticsFromDocuments(ImmutableArray.Create(analyzer), project.Documents.ToArray(), hasEntrypoint)).ToList();
+            var newCompilerDiagnostics = GetNewDiagnostics(compilerDiagnostics, postFixDiagnostics).ToList();
+
+            IEnumerable<Diagnostic> unexpectedDiagnostics;
+            switch (expectedPostFixDiagnostics)
+            {
+                case PostFixDiagnostics.None:
+                    unexpectedDiagnostics = postFixDiagnostics;
+                    break;
+                case PostFixDiagnostics.Preexisting:
+                    unexpectedDiagnostics = newCompilerDiagnostics;
+                    break;
+                case PostFixDiagnostics.New:
+                    unexpectedDiagnostics = Enumerable.Empty<Diagnostic>(); // We don't care what's present.
+                    break;
+                default:
+                    throw new NotSupportedException();
+            }
+
+            var expectedDiagnostics = postFixDiagnostics.Except(unexpectedDiagnostics);
+            this.Logger.WriteLine("Actual diagnostics:");
+            this.Logger.WriteLine("EXPECTED:\r\n{0}", expectedDiagnostics.Any() ? FormatDiagnostics(expectedDiagnostics.ToArray()) : "    NONE.");
+            this.Logger.WriteLine("UNEXPECTED:\r\n{0}", unexpectedDiagnostics.Any() ? FormatDiagnostics(unexpectedDiagnostics.ToArray()) : "    NONE.");
+
+            // Check if applying the code fix introduced any new compiler diagnostics
+            Assert.Empty(unexpectedDiagnostics);
         }
     }
 }

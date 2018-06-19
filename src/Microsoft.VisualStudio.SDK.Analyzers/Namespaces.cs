@@ -10,6 +10,14 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
     internal static class Namespaces
     {
         /// <summary>
+        /// Gets an array for each element in the namespace Microsoft.
+        /// </summary>
+        internal static readonly IReadOnlyList<string> Microsoft = new[]
+        {
+            nameof(Microsoft),
+        };
+
+        /// <summary>
         /// Gets an array for each element in the namespace Microsoft.VisualStudio.Shell.
         /// </summary>
         internal static readonly IReadOnlyList<string> MicrosoftVisualStudioShell = new[]
@@ -20,13 +28,35 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         };
 
         /// <summary>
+        /// Gets an array for each element in the namespace Microsoft.VisualStudio.Shell.Interop.
+        /// </summary>
+        internal static readonly IReadOnlyList<string> MicrosoftVisualStudioShellInterop = new[]
+        {
+            nameof(Microsoft),
+            nameof(VisualStudio),
+            nameof(Shell),
+            nameof(Shell.Interop),
+        };
+
+        /// <summary>
+        /// Gets an array for each element in the namespace Microsoft.VisualStudio.OLE.Interop.
+        /// </summary>
+        internal static readonly IReadOnlyList<string> MicrosoftVisualStudioOLEInterop = new[]
+        {
+            nameof(Microsoft),
+            nameof(VisualStudio),
+            nameof(OLE),
+            nameof(OLE.Interop),
+        };
+
+        /// <summary>
         /// Gets an array for each element in the namespace Microsoft.VisualStudio.Threading.
         /// </summary>
         internal static readonly IReadOnlyList<string> MicrosoftVisualStudioThreading = new[]
         {
             nameof(Microsoft),
-            nameof(Microsoft.VisualStudio),
-            nameof(Microsoft.VisualStudio.Threading),
+            nameof(VisualStudio),
+            nameof(Threading),
         };
 
         /// <summary>

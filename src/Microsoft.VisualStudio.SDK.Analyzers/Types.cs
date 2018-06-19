@@ -12,6 +12,130 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
     internal static class Types
     {
         /// <summary>
+        /// Describes the <see cref="Microsoft.Assumes"/> type.
+        /// </summary>
+        internal static class Assumes
+        {
+            /// <summary>
+            /// Gets the simple name of the <see cref="Microsoft.Assumes"/> type.
+            /// </summary>
+            internal const string TypeName = nameof(Microsoft.Assumes);
+
+            /// <summary>
+            /// The name of the <see cref="Microsoft.Assumes.Present{T}(T)"/> method.
+            /// </summary>
+            internal const string Present = nameof(Microsoft.Assumes.Present);
+
+            /// <summary>
+            /// Gets an array of the nesting namespaces for this type.
+            /// </summary>
+            internal static readonly IReadOnlyList<string> Namespace = Namespaces.Microsoft;
+
+            /// <summary>
+            /// Gets the <see cref="Microsoft.CodeAnalysis.CSharp.Syntax.TypeSyntax"/> for this type.
+            /// </summary>
+            internal static TypeSyntax TypeSyntax { get; } = Utils.QualifyName(Namespace, SyntaxFactory.IdentifierName(TypeName));
+
+            /// <summary>
+            /// Gets the fully-qualified name of this type as a string.
+            /// </summary>
+            internal static string FullName => string.Join(".", Namespace) + "." + TypeName;
+        }
+
+        /// <summary>
+        /// Describes the System.IServiceProvider type.
+        /// </summary>
+        internal static class IServiceProvider
+        {
+            /// <summary>
+            /// Gets the simple name of the System.IServiceProvider type.
+            /// </summary>
+            internal const string TypeName = "IServiceProvider";
+
+            /// <summary>
+            /// The name of the GetService method.
+            /// </summary>
+            internal const string GetService = "GetService";
+
+            /// <summary>
+            /// Gets an array of the nesting namespaces for this type.
+            /// </summary>
+            internal static readonly IReadOnlyList<string> Namespace = Namespaces.System;
+
+            /// <summary>
+            /// Gets the <see cref="Microsoft.CodeAnalysis.CSharp.Syntax.TypeSyntax"/> for this type.
+            /// </summary>
+            internal static TypeSyntax TypeSyntax { get; } = Utils.QualifyName(Namespace, SyntaxFactory.IdentifierName(TypeName));
+
+            /// <summary>
+            /// Gets the fully-qualified name of this type as a string.
+            /// </summary>
+            internal static string FullName => string.Join(".", Namespace) + "." + TypeName;
+        }
+
+        /// <summary>
+        /// Describes the <see cref="Shell.ServiceProvider"/> type.
+        /// </summary>
+        internal static class ServiceProvider
+        {
+            /// <summary>
+            /// Gets the simple name of the <see cref="Shell.ServiceProvider"/> type.
+            /// </summary>
+            internal const string TypeName = nameof(Shell.ServiceProvider);
+
+            /// <summary>
+            /// The name of the GetService method.
+            /// </summary>
+            internal const string GetService = "GetService";
+
+            /// <summary>
+            /// Gets an array of the nesting namespaces for this type.
+            /// </summary>
+            internal static readonly IReadOnlyList<string> Namespace = Namespaces.MicrosoftVisualStudioShell;
+
+            /// <summary>
+            /// Gets the <see cref="Microsoft.CodeAnalysis.CSharp.Syntax.TypeSyntax"/> for this type.
+            /// </summary>
+            internal static TypeSyntax TypeSyntax { get; } = Utils.QualifyName(Namespace, SyntaxFactory.IdentifierName(TypeName));
+
+            /// <summary>
+            /// Gets the fully-qualified name of this type as a string.
+            /// </summary>
+            internal static string FullName => string.Join(".", Namespace) + "." + TypeName;
+        }
+
+        /// <summary>
+        /// Describes the <see cref="Shell.IAsyncServiceProvider"/> type.
+        /// </summary>
+        internal static class IAsyncServiceProvider
+        {
+            /// <summary>
+            /// Gets the simple name of the <see cref="Shell.IAsyncServiceProvider"/> type.
+            /// </summary>
+            internal const string TypeName = nameof(Shell.IAsyncServiceProvider);
+
+            /// <summary>
+            /// The name of the <see cref="Shell.IAsyncServiceProvider.GetServiceAsync"/> method.
+            /// </summary>
+            internal const string GetServiceAsync = nameof(Shell.IAsyncServiceProvider.GetServiceAsync);
+
+            /// <summary>
+            /// Gets an array of the nesting namespaces for this type.
+            /// </summary>
+            internal static readonly IReadOnlyList<string> Namespace = Namespaces.MicrosoftVisualStudioShell;
+
+            /// <summary>
+            /// Gets the <see cref="Microsoft.CodeAnalysis.CSharp.Syntax.TypeSyntax"/> for this type.
+            /// </summary>
+            internal static TypeSyntax TypeSyntax { get; } = Utils.QualifyName(Namespace, SyntaxFactory.IdentifierName(TypeName));
+
+            /// <summary>
+            /// Gets the fully-qualified name of this type as a string.
+            /// </summary>
+            internal static string FullName => string.Join(".", Namespace) + "." + TypeName;
+        }
+
+        /// <summary>
         /// Describes the <see cref="Shell.AsyncPackage"/> type.
         /// </summary>
         internal static class AsyncPackage

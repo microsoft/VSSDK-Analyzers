@@ -131,6 +131,64 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             return SyntaxFactory.QualifiedName(result, simpleName);
         }
 
+        /// <summary>
+        /// Checks whether a given syntax node has an ancestor that matches certain requirements.
+        /// </summary>
+        /// <typeparam name="T">The type of ancestor of interest.</typeparam>
+        /// <param name="syntaxNode">The starting syntax node.</param>
+        /// <param name="continueAscending">A function to determine whether to keep ascending the syntax tree.</param>
+        /// <param name="isMatch">A function to determine whether a given ancestor is the target we're looking for.</param>
+        /// <returns><c>true</c> if the target ancestor was found.</returns>
+        internal static T FindAncestor<T>(SyntaxNode syntaxNode, Func<SyntaxNode, bool> continueAscending, Func<T, SyntaxNode, bool> isMatch)
+            where T : SyntaxNode
+        {
+            if (continueAscending == null)
+            {
+                throw new ArgumentNullException(nameof(continueAscending));
+            }
+
+            if (isMatch == null)
+            {
+                throw new ArgumentNullException(nameof(isMatch));
+            }
+
+            if (syntaxNode == null)
+            {
+                return default;
+            }
+
+            var current = syntaxNode.Parent;
+            var child = syntaxNode;
+            while (current != null)
+            {
+                if (current is T t && isMatch(t, child))
+                {
+                    return t;
+                }
+
+                if (!continueAscending(current))
+                {
+                    return default;
+                }
+
+                child = current;
+                current = current.Parent;
+            }
+
+            return default;
+        }
+
+        /// <summary>
+        /// Finds the first ancestor syntax node that is one of a given set of types.
+        /// </summary>
+        /// <param name="syntaxNode">The syntax node to start the search at.</param>
+        /// <param name="allowedTypes">The set of types that we should stop searching and return when we encounter it.</param>
+        /// <returns>The matching syntax node, if any.</returns>
+        internal static SyntaxNode FindFirstAncestorOfTypes(SyntaxNode syntaxNode, params Type[] allowedTypes)
+        {
+            return FindAncestor<SyntaxNode>(syntaxNode, n => !allowedTypes.Contains(n.GetType()), (n, c) => allowedTypes.Contains(n.GetType()));
+        }
+
         private static bool LaunchDebuggerExceptionFilter()
         {
 #if DEBUG
