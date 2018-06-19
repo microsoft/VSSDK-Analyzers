@@ -36,7 +36,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             if (classDeclarationSyntax != null)
             {
                 context.RegisterCodeFix(
-                    CodeAction.Create("Fix attribute to match package type", ct => this.UpdateAttributeAsync(context, diagnostic, ct), classDeclarationSyntax.Identifier.ToString()),
+                    CodeAction.Create("Fix attribute to match package type", ct => this.UpdateAttributeAsync(context, diagnostic, ct), "only one"),
                     diagnostic);
             }
         }

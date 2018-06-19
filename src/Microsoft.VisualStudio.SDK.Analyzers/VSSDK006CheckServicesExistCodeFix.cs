@@ -48,7 +48,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                     CodeAction.Create(
                         "Add Assumes.Present after assignment",
                         ct => AppendAfterAssignmentAsync(context, node.FirstAncestorOrSelf<StatementSyntax>(), presentArgument, ct),
-                        "After " + presentArgument.GetText()),
+                        "After"),
                     diagnostic);
             }
         }
