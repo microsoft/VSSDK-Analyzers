@@ -5,3 +5,4 @@
 ![Microsoft.VisualStudio.Shell.Interop.IAsyncServiceProvider]
 [Microsoft.VisualStudio.Shell.Package]::GetService
 [Microsoft.VisualStudio.Shell.ServiceProvider]
+[EnvDTE.*]
