@@ -49,11 +49,11 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                         start.Compilation.GetTypeByMetadataName(Types.Package.FullName)?.GetMembers(Types.Package.GetService),
                         start.Compilation.GetTypeByMetadataName(Types.AsyncPackage.FullName)?.GetMembers(Types.AsyncPackage.GetServiceAsync),
                         start.Compilation.GetTypeByMetadataName(Types.AsyncPackage.FullName)?.GetMembers(Types.Package.GetService),
-                        start.Compilation.GetTypeByMetadataName(Types.ServiceProvider.FullName).GetMembers(Types.ServiceProvider.GetService),
-                        start.Compilation.GetTypeByMetadataName(Types.IServiceProvider.FullName).GetMembers(Types.IServiceProvider.GetService),
-                        start.Compilation.GetTypeByMetadataName(Types.IAsyncServiceProvider.FullName).GetMembers(Types.IAsyncServiceProvider.GetServiceAsync)),
+                        start.Compilation.GetTypeByMetadataName(Types.ServiceProvider.FullName)?.GetMembers(Types.ServiceProvider.GetService),
+                        start.Compilation.GetTypeByMetadataName(Types.IServiceProvider.FullName)?.GetMembers(Types.IServiceProvider.GetService),
+                        start.Compilation.GetTypeByMetadataName(Types.IAsyncServiceProvider.FullName)?.GetMembers(Types.IAsyncServiceProvider.GetServiceAsync)),
                     Flatten(
-                        start.Compilation.GetTypeByMetadataName(Types.Assumes.FullName).GetMembers(Types.Assumes.Present)));
+                        start.Compilation.GetTypeByMetadataName(Types.Assumes.FullName)?.GetMembers(Types.Assumes.Present)));
                 if (state.ShouldAnalyze)
                 {
                     start.RegisterSyntaxNodeAction(state.AnalyzeInvocationExpression, SyntaxKind.InvocationExpression);
