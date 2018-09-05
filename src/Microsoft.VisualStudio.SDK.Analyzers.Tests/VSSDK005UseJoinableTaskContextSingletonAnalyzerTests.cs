@@ -1,29 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 
-using System;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Diagnostics;
-using Microsoft.VisualStudio.SDK.Analyzers;
-using Microsoft.VisualStudio.SDK.Analyzers.Tests;
+using System.Threading.Tasks;
 using Xunit;
-using Xunit.Abstractions;
+using Verify = CSharpCodeFixVerifier<
+    Microsoft.VisualStudio.SDK.Analyzers.VSSDK005UseJoinableTaskContextSingletonAnalyzer,
+    Microsoft.CodeAnalysis.Testing.EmptyCodeFixProvider>;
 
-public class VSSDK005UseJoinableTaskContextSingletonAnalyzerTests : DiagnosticVerifier
+public class VSSDK005UseJoinableTaskContextSingletonAnalyzerTests
 {
-    private DiagnosticResult expect = new DiagnosticResult
-    {
-        Id = VSSDK005UseJoinableTaskContextSingletonAnalyzer.Id,
-        SkipVerifyMessage = true,
-        Severity = DiagnosticSeverity.Error,
-    };
-
-    public VSSDK005UseJoinableTaskContextSingletonAnalyzerTests(ITestOutputHelper logger)
-        : base(logger)
-    {
-    }
-
     [Fact]
-    public void InstantiatingInMethod_ProducesDiagnostic()
+    public async Task InstantiatingInMethod_ProducesDiagnosticAsync()
     {
         var test = @"
 using Microsoft.VisualStudio.Threading;
@@ -34,12 +20,12 @@ class Test {
     }
 }
 ";
-        this.expect.Locations = new[] { new DiagnosticResultLocation("Test0.cs", 6, 19, 6, 44) };
-        this.VerifyCSharpDiagnostic(test, this.expect);
+        var expected = Verify.Diagnostic().WithSpan(6, 19, 6, 44);
+        await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
     [Fact]
-    public void InstantiatingInField_ProducesDiagnostic()
+    public async Task InstantiatingInField_ProducesDiagnosticAsync()
     {
         var test = @"
 using Microsoft.VisualStudio.Threading;
@@ -48,12 +34,12 @@ class Test {
     JoinableTaskContext jtc = new JoinableTaskContext();
 }
 ";
-        this.expect.Locations = new[] { new DiagnosticResultLocation("Test0.cs", 5, 31, 5, 56) };
-        this.VerifyCSharpDiagnostic(test, this.expect);
+        var expected = Verify.Diagnostic().WithSpan(5, 31, 5, 56);
+        await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
     [Fact]
-    public void InstantiatingSimilarlyNamedType_ProducesNoDiagnostic()
+    public async Task InstantiatingSimilarlyNamedType_ProducesNoDiagnosticAsync()
     {
         var test = @"
 class Test {
@@ -62,8 +48,6 @@ class Test {
 
 class JoinableTaskContext { }
 ";
-        this.VerifyCSharpDiagnostic(test);
+        await Verify.VerifyAnalyzerAsync(test);
     }
-
-    protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() => new VSSDK005UseJoinableTaskContextSingletonAnalyzer();
 }

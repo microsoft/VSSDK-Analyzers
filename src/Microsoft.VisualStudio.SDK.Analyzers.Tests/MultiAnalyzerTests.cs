@@ -2,26 +2,18 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis.Testing;
 using Microsoft.VisualStudio.SDK.Analyzers;
-using Microsoft.VisualStudio.SDK.Analyzers.Tests;
 using Xunit;
-using Xunit.Abstractions;
 
-public class MultiAnalyzerTests : DiagnosticVerifier
+public class MultiAnalyzerTests
 {
-    public MultiAnalyzerTests(ITestOutputHelper logger)
-        : base(logger)
-    {
-    }
-
     [Fact]
-    public void BasicPackage()
+    public async Task BasicPackageAsync()
     {
         var test = @"
 using System;
@@ -37,11 +29,14 @@ class Test : AsyncPackage {
 }
 ";
 
-        this.VerifyCSharpDiagnostic(test);
+        await new CSharpTest
+        {
+            TestCode = test,
+        }.RunAsync();
     }
 
     [Fact]
-    public void NoVSSDK()
+    public async Task NoVSSDKAsync()
     {
         var test = @"
 using System;
@@ -51,16 +46,20 @@ class Test {
 }
 ";
 
-        this.VerifyCSharpDiagnostic(test, vssdk: false);
+        await new CSharpTest
+        {
+            TestCode = test,
+            IncludeVisualStudioSdk = false,
+        }.RunAsync();
     }
 
-    protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() => throw new NotImplementedException();
-
-    protected override ImmutableArray<DiagnosticAnalyzer> GetCSharpDiagnosticAnalyzers()
+    internal class CSharpTest : CSharpCodeFixTest<VSSDK001DeriveFromAsyncPackageAnalyzer, EmptyCodeFixProvider>
     {
-        IEnumerable<DiagnosticAnalyzer> analyzers = from type in typeof(VSSDK001DeriveFromAsyncPackageAnalyzer).Assembly.GetTypes()
-                                                    where type.GetCustomAttributes(typeof(DiagnosticAnalyzerAttribute), true).Any()
-                                                    select (DiagnosticAnalyzer)Activator.CreateInstance(type);
-        return analyzers.ToImmutableArray();
+        protected override IEnumerable<DiagnosticAnalyzer> GetDiagnosticAnalyzers()
+        {
+            return from type in typeof(VSSDK001DeriveFromAsyncPackageAnalyzer).Assembly.GetTypes()
+                   where type.GetCustomAttributes(typeof(DiagnosticAnalyzerAttribute), true).Any()
+                   select (DiagnosticAnalyzer)Activator.CreateInstance(type);
+        }
     }
 }
