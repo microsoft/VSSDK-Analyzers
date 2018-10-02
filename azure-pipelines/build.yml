@@ -67,17 +67,24 @@ steps:
   condition: and(succeeded(), ne(variables['SignType'], 'real'))
   enabled: false
 
-- task: VSTest@2
+- powershell: >-
+    $testdir="bin\Microsoft.VisualStudio.SDK.Analyzers.Tests\$(BuildConfiguration)\net46"
+
+    choco install codecov opencover.portable --no-progress
+
+    OpenCover.Console.exe
+    -register:user
+    -target:"$HOME\.nuget\packages\xunit.runner.console\2.3.1\tools\net452\xunit.console.x86.exe"
+    -targetargs:"$testdir\Microsoft.VisualStudio.SDK.Analyzers.Tests.dll -noshadow -parallel all -notrait SkipInCodeCoverage=true -html $testdir\testresults.html -xml $testdir\testresults.xml -appveyor -nologo"
+    -returntargetcode
+    -excludebyattribute:*.ExcludeFromCodeCoverage*
+    -excludebyfile:*\*Designer.cs
+    -filter:"+[Microsoft.VisualStudio.SDK.Analyzers]*"
+    -hideskipped:All
+    -output:$testdir\code_coverage.xml
+
+    codecov -f "$testdir\code_coverage.xml"
   displayName: Run tests on .NET Framework (with code coverage)
-  inputs:
-    testFiltercriteria: TestCategory!=FailsInCloudTest
-    searchFolder: $(System.DefaultWorkingDirectory)\bin
-    testAssemblyVer2: |
-      **\*tests*.dll
-    platform: $(BuildPlatform)
-    configuration: $(BuildConfiguration)
-    codeCoverageEnabled: true
-  condition: and(succeeded(), ne(variables['SignType'], 'real'))
 
 - task: CopyFiles@1
   inputs:
