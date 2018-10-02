@@ -110,7 +110,7 @@ steps:
 #    PathtoPublish: $(build.sourcesdirectory)/bin
 #    ArtifactName: bin
 #    ArtifactType: Container
-#  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), ne(variables['system.pullrequest.isfork'], true))
+#  condition: and(succeeded(), ne(variables['system.pullrequest.isfork'], true))
 
 - ${{ if eq(variables['system.collectionId'], '011b8bdf-6d56-4f87-be0d-0092136884d9') }}:
   - template: azure-pipeline.microbuild.after.yml
@@ -130,4 +130,4 @@ steps:
     ArtifactName: deployables
     ArtifactType: Container
   displayName: Publish deployables artifacts
-  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), ne(variables['system.pullrequest.isfork'], true))
+  condition: and(succeeded(), ne(variables['system.pullrequest.isfork'], true))
