@@ -9,6 +9,7 @@ variables:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   BuildConfiguration: Release
   BuildPlatform: Any CPU
+  codecov_token: 27bb1787-08af-48c7-bda5-ca308440f1b6
 
 resources:
   containers:
