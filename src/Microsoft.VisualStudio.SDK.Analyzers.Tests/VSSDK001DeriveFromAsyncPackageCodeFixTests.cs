@@ -146,7 +146,9 @@ namespace Microsoft.VisualStudio
     }
 
     [Fact]
+#pragma warning disable VSTHRD200 // Use "Async" suffix for async methods
     public void InitializeOverride_BecomesAsync()
+#pragma warning restore VSTHRD200 // Use "Async" suffix for async methods
     {
         var test = @"
 using System;

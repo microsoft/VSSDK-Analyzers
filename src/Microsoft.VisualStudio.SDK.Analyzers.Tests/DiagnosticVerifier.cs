@@ -65,10 +65,11 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
         /// <param name="analyzers">The analyzers to be run on the sources</param>
         /// <param name="hasEntrypoint"><c>true</c> to set the compiler in a mode as if it were compiling an exe (as opposed to a dll).</param>
         /// <param name="allowErrors">A value indicating whether to fail the test if there are compiler errors in the code sample.</param>
+        /// <param name="includeSDKReferences"><c>true</c> to include VS SDK reference assemblies in the project.</param>
         /// <returns>An IEnumerable of Diagnostics that surfaced in the source code, sorted by Location</returns>
-        protected static Diagnostic[] GetSortedDiagnostics(string[] sources, string language, ImmutableArray<DiagnosticAnalyzer> analyzers, bool hasEntrypoint, bool allowErrors = false)
+        protected static Diagnostic[] GetSortedDiagnostics(string[] sources, string language, ImmutableArray<DiagnosticAnalyzer> analyzers, bool hasEntrypoint, bool allowErrors = false, bool includeSDKReferences = true)
         {
-            return GetSortedDiagnosticsFromDocuments(analyzers, GetDocuments(sources, language, hasEntrypoint), allowErrors);
+            return GetSortedDiagnosticsFromDocuments(analyzers, GetDocuments(sources, language, hasEntrypoint, includeSDKReferences), allowErrors);
         }
 
         /// <summary>
@@ -132,8 +133,9 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
         /// <param name="sources">Classes in the form of strings</param>
         /// <param name="language">The language the source code is in</param>
         /// <param name="hasEntrypoint"><c>true</c> to set the compiler in a mode as if it were compiling an exe (as opposed to a dll).</param>
+        /// <param name="includeSDKReferences"><c>true</c> to include VS SDK reference assemblies in the project.</param>
         /// <returns>A Project created out of the Documents created from the source strings</returns>
-        protected static Project CreateProject(string[] sources, string language = LanguageNames.CSharp, bool hasEntrypoint = false)
+        protected static Project CreateProject(string[] sources, string language = LanguageNames.CSharp, bool hasEntrypoint = false, bool includeSDKReferences = true)
         {
             string fileNamePrefix = DefaultFilePathPrefix;
             string fileExt = language == LanguageNames.CSharp ? CSharpDefaultFileExt : throw new NotSupportedException();
@@ -172,16 +174,19 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
                 }
             }
 
-            string globalPackagesFolder = Environment.GetEnvironmentVariable("NuGetGlobalPackagesFolder");
-            string nugetPackageRoot = string.IsNullOrEmpty(globalPackagesFolder)
-                ? Path.Combine(
-                    Environment.GetEnvironmentVariable("USERPROFILE"),
-                    ".nuget",
-                    "packages")
-                : globalPackagesFolder;
-            var vssdkReferences = VSSDKPackageReferences.Select(e =>
-                MetadataReference.CreateFromFile(Path.Combine(nugetPackageRoot, e)));
-            solution = solution.AddMetadataReferences(projectId, vssdkReferences);
+            if (includeSDKReferences)
+            {
+                string globalPackagesFolder = Environment.GetEnvironmentVariable("NuGetGlobalPackagesFolder");
+                string nugetPackageRoot = string.IsNullOrEmpty(globalPackagesFolder)
+                    ? Path.Combine(
+                        Environment.GetEnvironmentVariable("USERPROFILE"),
+                        ".nuget",
+                        "packages")
+                    : globalPackagesFolder;
+                var vssdkReferences = VSSDKPackageReferences.Select(e =>
+                    MetadataReference.CreateFromFile(Path.Combine(nugetPackageRoot, e)));
+                solution = solution.AddMetadataReferences(projectId, vssdkReferences);
+            }
 
             int count = 0;
             foreach (var source in sources)
@@ -254,7 +259,19 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
         /// <param name="expected">An array of <see cref="DiagnosticResult"/> that should appear after the analyzer is run on the source</param>
         protected void VerifyCSharpDiagnostic(string source, params DiagnosticResult[] expected)
         {
-            this.VerifyDiagnostics(new[] { source }, LanguageNames.CSharp, this.GetCSharpDiagnosticAnalyzers(), allowErrors: false, expected: expected);
+            this.VerifyDiagnostics(new[] { source }, LanguageNames.CSharp, this.GetCSharpDiagnosticAnalyzers(), allowErrors: false, includeSDKReferences: true, expected: expected);
+        }
+
+        /// <summary>
+        /// Called to test a C# DiagnosticAnalyzer when applied on the single inputted string as a source
+        /// Note: input a DiagnosticResult for each Diagnostic expected
+        /// </summary>
+        /// <param name="source">A class in the form of a string to run the analyzer on</param>
+        /// <param name="vssdk"><c>true</c> to compile the test source with VS SDK references.</param>
+        /// <param name="expected">An array of <see cref="DiagnosticResult"/> that should appear after the analyzer is run on the source</param>
+        protected void VerifyCSharpDiagnostic(string source, bool vssdk, params DiagnosticResult[] expected)
+        {
+            this.VerifyDiagnostics(new[] { source }, LanguageNames.CSharp, this.GetCSharpDiagnosticAnalyzers(), allowErrors: false, includeSDKReferences: vssdk, expected: expected);
         }
 
         /// <summary>
@@ -265,7 +282,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
         /// <param name="expected">An array of <see cref="DiagnosticResult"/> that should appear after the analyzer is run on the source</param>
         protected void VerifyCSharpDiagnostic(string[] sources, params DiagnosticResult[] expected)
         {
-            this.VerifyDiagnostics(sources, LanguageNames.CSharp, this.GetCSharpDiagnosticAnalyzers(), allowErrors: false, expected: expected);
+            this.VerifyDiagnostics(sources, LanguageNames.CSharp, this.GetCSharpDiagnosticAnalyzers(), allowErrors: false, includeSDKReferences: true, expected: expected);
         }
 
         protected void LogFileContent(string source)
@@ -297,8 +314,9 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
         /// <param name="sources">Classes in the form of strings</param>
         /// <param name="language">The language the source code is in</param>
         /// <param name="hasEntrypoint"><c>true</c> to set the compiler in a mode as if it were compiling an exe (as opposed to a dll).</param>
+        /// <param name="includeSDKReferences"><c>true</c> to include VS SDK reference assemblies in the project.</param>
         /// <returns>An array of Documents produced from the source strings</returns>
-        private static Document[] GetDocuments(string[] sources, string language, bool hasEntrypoint)
+        private static Document[] GetDocuments(string[] sources, string language, bool hasEntrypoint, bool includeSDKReferences)
         {
             if (language != LanguageNames.CSharp && language != LanguageNames.VisualBasic)
             {
@@ -310,7 +328,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
                 string fileName = language == LanguageNames.CSharp ? "Test" + i + ".cs" : "Test" + i + ".vb";
             }
 
-            var project = CreateProject(sources, language, hasEntrypoint);
+            var project = CreateProject(sources, language, hasEntrypoint, includeSDKReferences);
             var documents = project.Documents.ToArray();
 
             if (sources.Length != documents.Length)
@@ -403,8 +421,9 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
         /// <param name="language">The language of the classes represented by the source strings</param>
         /// <param name="analyzers">The analyzers to be run on the source code</param>
         /// <param name="allowErrors">A value indicating whether to fail the test if there are compiler errors in the code sample.</param>
+        /// <param name="includeSDKReferences"><c>true</c> to include VS SDK reference assemblies in the project.</param>
         /// <param name="expected">DiagnosticResults that should appear after the analyzer is run on the sources</param>
-        private void VerifyDiagnostics(string[] sources, string language, ImmutableArray<DiagnosticAnalyzer> analyzers, bool allowErrors, params DiagnosticResult[] expected)
+        private void VerifyDiagnostics(string[] sources, string language, ImmutableArray<DiagnosticAnalyzer> analyzers, bool allowErrors, bool includeSDKReferences, params DiagnosticResult[] expected)
         {
             for (int i = 0; i < sources.Length; i++)
             {
@@ -412,7 +431,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers.Tests
                 this.LogFileContent(sources[i]);
             }
 
-            var diagnostics = GetSortedDiagnostics(sources, language, analyzers, allowErrors);
+            var diagnostics = GetSortedDiagnostics(sources, language, analyzers, hasEntrypoint: false, allowErrors: allowErrors, includeSDKReferences: includeSDKReferences);
             this.VerifyDiagnosticResults(diagnostics, analyzers, expected);
         }
 
