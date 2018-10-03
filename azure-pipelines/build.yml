@@ -129,7 +129,6 @@ steps:
     TargetFolder: $(Build.ArtifactStagingDirectory)/deployables
     flattenFolders: true
   displayName: Collecting deployables
-  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
 
 - task: PublishBuildArtifacts@1
   inputs:
