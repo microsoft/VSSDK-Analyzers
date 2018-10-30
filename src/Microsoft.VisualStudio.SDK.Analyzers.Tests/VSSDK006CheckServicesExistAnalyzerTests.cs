@@ -33,7 +33,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 class Test : Package {
     protected override void Initialize() {
         base.Initialize();
-        var svc = this.GetService(typeof(SVsBuildManagerAccessor)) as IVsBuildManagerAccessor;
+        var svc = this.GetService(typeof(SVsBuildManagerAccessor)) as Microsoft.VisualStudio.Shell.Interop.IVsBuildManagerAccessor;
         svc.BeginDesignTimeBuild();
     }
 }
@@ -47,7 +47,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 class Test : Package {
     protected override void Initialize() {
         base.Initialize();
-        var svc = this.GetService(typeof(SVsBuildManagerAccessor)) as IVsBuildManagerAccessor;
+        var svc = this.GetService(typeof(SVsBuildManagerAccessor)) as Microsoft.VisualStudio.Shell.Interop.IVsBuildManagerAccessor;
         Assumes.Present(svc);
         svc.BeginDesignTimeBuild();
     }
