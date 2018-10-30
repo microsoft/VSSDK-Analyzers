@@ -14,6 +14,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Editing;
+    using Microsoft.CodeAnalysis.Simplification;
 
     /// <summary>
     /// Offers code fixes for diagnostics produced by the <see cref="VSSDK006CheckServicesExistCodeFix"/>.
@@ -61,7 +62,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             var assumesStatement = CreateAssumesPresentStatement(editor.Generator, presentArgument);
             root = root.InsertNodesAfter(relativeTo, new SyntaxNode[] { assumesStatement });
             document = document.WithSyntaxRoot(root);
-            document = await ImportAdder.AddImportsAsync(document, cancellationToken: cancellationToken);
+            document = await ImportAdder.AddImportsAsync(document, Simplifier.Annotation, cancellationToken: cancellationToken);
             return document;
         }
 
@@ -72,7 +73,8 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                     generator.MemberAccessExpression(
                         generator.QualifiedName(generator.IdentifierName(Types.Assumes.Namespace.Single()), generator.IdentifierName(Types.Assumes.TypeName)),
                         Types.Assumes.Present),
-                    generator.Argument(possiblyNullVariable)));
+                    generator.Argument(possiblyNullVariable)))
+                .WithAdditionalAnnotations(Simplifier.Annotation);
         }
     }
 }
