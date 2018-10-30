@@ -13,6 +13,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
+    using Microsoft.CodeAnalysis.Editing;
     using Microsoft.CodeAnalysis.Simplification;
 
     /// <summary>
@@ -209,9 +210,14 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                         return SyntaxFactory.ParenthesizedExpression(SyntaxFactory.AwaitExpression(invocation))
                             .WithAdditionalAnnotations(Simplifier.Annotation);
                     });
+
+                updatedRoot = await Utils.AddUsingTaskEqualsDirectiveAsync(updatedRoot, cancellationToken);
             }
 
-            return context.Document.WithSyntaxRoot(updatedRoot);
+            var newDocument = context.Document.WithSyntaxRoot(updatedRoot);
+            newDocument = await ImportAdder.AddImportsAsync(newDocument, Simplifier.Annotation, cancellationToken: cancellationToken);
+
+            return newDocument;
         }
     }
 }
