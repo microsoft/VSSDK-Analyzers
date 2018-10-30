@@ -127,6 +127,29 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 var progressLocalVarName = SyntaxFactory.IdentifierName("progress");
                 initializeMethodSyntax = updatedRoot.GetCurrentNode(initializeMethodSyntax);
                 var newBody = initializeMethodSyntax.Body;
+
+                var leadingTrivia = SyntaxFactory.TriviaList(
+                    SyntaxFactory.Comment(@"// When initialized asynchronously, we *may* be on a background thread at this point."),
+                    SyntaxFactory.LineFeed,
+                    SyntaxFactory.Comment(@"// Do any initialization that requires the UI thread after switching to the UI thread."),
+                    SyntaxFactory.LineFeed,
+                    SyntaxFactory.Comment(@"// Otherwise, remove the switch to the UI thread if you don't need it."),
+                    SyntaxFactory.LineFeed);
+
+                var switchToMainThreadStatement = SyntaxFactory.ExpressionStatement(
+                    SyntaxFactory.AwaitExpression(
+                        SyntaxFactory.InvocationExpression(
+                            SyntaxFactory.MemberAccessExpression(
+                                SyntaxKind.SimpleMemberAccessExpression,
+                                SyntaxFactory.MemberAccessExpression(
+                                    SyntaxKind.SimpleMemberAccessExpression,
+                                    SyntaxFactory.ThisExpression(),
+                                    SyntaxFactory.IdentifierName(Types.ThreadHelper.JoinableTaskFactory)),
+                                SyntaxFactory.IdentifierName(Types.JoinableTaskFactory.SwitchToMainThreadAsync)))
+                            .AddArgumentListArguments(SyntaxFactory.Argument(cancellationTokenLocalVarName))))
+                    .WithLeadingTrivia(leadingTrivia)
+                    .WithTrailingTrivia(SyntaxFactory.LineFeed);
+
                 if (baseInitializeInvocationSyntax != null)
                 {
                     var baseInitializeAsyncInvocationBookmark = new SyntaxAnnotation();
@@ -146,30 +169,14 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                     newBody = newBody.ReplaceNode(initializeMethodSyntax.GetCurrentNode(baseInitializeInvocationSyntax), baseInitializeAsyncInvocationSyntax);
                     var baseInvocationStatement = newBody.GetAnnotatedNodes(baseInitializeAsyncInvocationBookmark).First().FirstAncestorOrSelf<StatementSyntax>();
 
-                    var leadingTrivia = SyntaxFactory.TriviaList(
-                        SyntaxFactory.LineFeed,
-                        SyntaxFactory.Comment(@"// When initialized asynchronously, we *may* be on a background thread at this point."),
-                        SyntaxFactory.LineFeed,
-                        SyntaxFactory.Comment(@"// Do any initialization that requires the UI thread after switching to the UI thread."),
-                        SyntaxFactory.LineFeed,
-                        SyntaxFactory.Comment(@"// Otherwise, remove the switch to the UI thread if you don't need it."),
-                        SyntaxFactory.LineFeed);
-
-                    var switchToMainThreadStatement = SyntaxFactory.ExpressionStatement(
-                        SyntaxFactory.AwaitExpression(
-                            SyntaxFactory.InvocationExpression(
-                                SyntaxFactory.MemberAccessExpression(
-                                    SyntaxKind.SimpleMemberAccessExpression,
-                                    SyntaxFactory.MemberAccessExpression(
-                                        SyntaxKind.SimpleMemberAccessExpression,
-                                        SyntaxFactory.ThisExpression(),
-                                        SyntaxFactory.IdentifierName(Types.ThreadHelper.JoinableTaskFactory)),
-                                    SyntaxFactory.IdentifierName(Types.JoinableTaskFactory.SwitchToMainThreadAsync)))
-                                .AddArgumentListArguments(SyntaxFactory.Argument(cancellationTokenLocalVarName))))
-                        .WithLeadingTrivia(leadingTrivia)
-                        .WithTrailingTrivia(SyntaxFactory.LineFeed);
-
-                    newBody = newBody.InsertNodesAfter(baseInvocationStatement, new[] { switchToMainThreadStatement });
+                    newBody = newBody.InsertNodesAfter(
+                        baseInvocationStatement,
+                        new[] { switchToMainThreadStatement.WithLeadingTrivia(switchToMainThreadStatement.GetLeadingTrivia().Insert(0, SyntaxFactory.LineFeed)) });
+                }
+                else
+                {
+                    newBody = newBody.WithStatements(
+                        newBody.Statements.Insert(0, switchToMainThreadStatement));
                 }
 
                 var initializeAsyncMethodSyntax = initializeMethodSyntax

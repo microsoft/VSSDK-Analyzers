@@ -189,6 +189,38 @@ class Test : Microsoft.VisualStudio.Shell.AsyncPackage
     }
 
     [Fact]
+    public void InitializeOverride_MissingBaseInitializeCall()
+    {
+        var test = @"
+using System;
+
+class Test : Microsoft.VisualStudio.Shell.Package
+{
+    protected override void Initialize()
+    {
+        Console.WriteLine();
+    }
+}
+";
+        var withFix = @"
+using System;
+
+class Test : Microsoft.VisualStudio.Shell.AsyncPackage
+{
+    protected override async System.Threading.Tasks.Task InitializeAsync(System.Threading.CancellationToken cancellationToken, IProgress<Microsoft.VisualStudio.Shell.ServiceProgressData> progress)
+    {
+        // When initialized asynchronously, we *may* be on a background thread at this point.
+        // Do any initialization that requires the UI thread after switching to the UI thread.
+        // Otherwise, remove the switch to the UI thread if you don't need it.
+        await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+        Console.WriteLine();
+    }
+}
+";
+        this.VerifyCSharpFix(test, withFix);
+    }
+
+    [Fact]
     public void InitializeOverride_GetServiceCallsUpdated()
     {
         var test = @"
