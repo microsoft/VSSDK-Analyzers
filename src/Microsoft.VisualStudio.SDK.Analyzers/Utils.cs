@@ -5,6 +5,8 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading;
+    using System.Threading.Tasks;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -187,6 +189,35 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         internal static SyntaxNode FindFirstAncestorOfTypes(SyntaxNode syntaxNode, params Type[] allowedTypes)
         {
             return FindAncestor<SyntaxNode>(syntaxNode, n => !allowedTypes.Contains(n.GetType()), (n, c) => allowedTypes.Contains(n.GetType()));
+        }
+
+        /// <summary>
+        /// Adds "using Task = System.Threading.Tasks.Task;" to the document if it is not already present.
+        /// </summary>
+        /// <param name="syntaxNode">Any syntax node within the document.</param>
+        /// <param name="cancellationToken">A cancellation token.</param>
+        /// <returns>The original <paramref name="syntaxNode"/> given, as it is represented in the updated syntax tree.</returns>
+        internal static async Task<SyntaxNode> AddUsingTaskEqualsDirectiveAsync(SyntaxNode syntaxNode, CancellationToken cancellationToken)
+        {
+            var existingUsings = syntaxNode.AncestorsAndSelf().OfType<UsingDirectiveSyntax>().Concat(
+                syntaxNode.DescendantNodes(n => n is CompilationUnitSyntax || n is NamespaceDeclarationSyntax).OfType<UsingDirectiveSyntax>());
+            if (existingUsings.Any(u => u.Alias?.Name?.Identifier.ValueText == nameof(Task)))
+            {
+                // The user has already aliased Task.
+                return syntaxNode;
+            }
+
+            var trackAnnotation = new SyntaxAnnotation();
+            syntaxNode = syntaxNode.WithAdditionalAnnotations(trackAnnotation);
+
+            var usingTaskDirective = SyntaxFactory.UsingDirective(
+                QualifyName(Namespaces.SystemThreadingTasks, SyntaxFactory.IdentifierName(nameof(Task))))
+                .WithAlias(SyntaxFactory.NameEquals(nameof(Task)));
+
+            var syntaxRoot = (CompilationUnitSyntax)await syntaxNode.SyntaxTree.GetRootAsync(cancellationToken);
+            syntaxRoot = syntaxRoot.AddUsings(usingTaskDirective);
+
+            return syntaxRoot.GetAnnotatedNodes(trackAnnotation).Single();
         }
 
         private static bool LaunchDebuggerExceptionFilter()
