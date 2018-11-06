@@ -84,11 +84,11 @@ public static class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
 
         public Test()
         {
+            this.TestState.AdditionalReferences.Add(PresentationFrameworkReference);
+            this.TestState.AdditionalReferences.Add(MPFReference);
+
             this.SolutionTransforms.Add((solution, projectId) =>
             {
-                solution = solution.AddMetadataReference(projectId, PresentationFrameworkReference)
-                    .AddMetadataReference(projectId, MPFReference);
-
                 if (this.IncludeVisualStudioSdk)
                 {
                     var nugetPackagesFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nuget", "packages");
