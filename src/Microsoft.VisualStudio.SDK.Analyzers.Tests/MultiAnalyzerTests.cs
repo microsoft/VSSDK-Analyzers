@@ -53,7 +53,7 @@ class Test {
         }.RunAsync();
     }
 
-    internal class CSharpTest : CSharpCodeFixTest<VSSDK001DeriveFromAsyncPackageAnalyzer, EmptyCodeFixProvider>
+    internal class CSharpTest : CSharpCodeFixVerifier<VSSDK001DeriveFromAsyncPackageAnalyzer, EmptyCodeFixProvider>.Test
     {
         protected override IEnumerable<DiagnosticAnalyzer> GetDiagnosticAnalyzers()
         {
