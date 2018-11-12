@@ -65,7 +65,6 @@ steps:
     projects: src/**/*.Tests.csproj
     arguments: --configuration $(BuildConfiguration) --no-build --filter "TestCategory!=FailsInCloudTest" -v n
   condition: and(succeeded(), ne(variables['SignType'], 'real'))
-  enabled: false
 
 - powershell: >-
     $testdir="bin\Microsoft.VisualStudio.SDK.Analyzers.Tests\$(BuildConfiguration)\net46"
