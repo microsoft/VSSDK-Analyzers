@@ -1,30 +1,16 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 
-using System;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CodeFixes;
-using Microsoft.CodeAnalysis.Diagnostics;
-using Microsoft.VisualStudio.SDK.Analyzers;
-using Microsoft.VisualStudio.SDK.Analyzers.Tests;
+using System.Threading.Tasks;
+using Microsoft.CodeAnalysis.Testing;
 using Xunit;
-using Xunit.Abstractions;
+using Verify = CSharpCodeFixVerifier<
+    Microsoft.VisualStudio.SDK.Analyzers.VSSDK006CheckServicesExistAnalyzer,
+    Microsoft.VisualStudio.SDK.Analyzers.VSSDK006CheckServicesExistCodeFix>;
 
-public class VSSDK006CheckServicesExistAnalyzerTests : CodeFixVerifier
+public class VSSDK006CheckServicesExistAnalyzerTests
 {
-    private DiagnosticResult expect = new DiagnosticResult
-    {
-        Id = VSSDK006CheckServicesExistAnalyzer.Id,
-        SkipVerifyMessage = true,
-        Severity = DiagnosticSeverity.Warning,
-    };
-
-    public VSSDK006CheckServicesExistAnalyzerTests(ITestOutputHelper logger)
-        : base(logger)
-    {
-    }
-
     [Fact]
-    public void LocalAssigned_GetService_ThenUsed()
+    public async Task LocalAssigned_GetService_ThenUsedAsync()
     {
         var test = @"
 using Microsoft.VisualStudio.Shell;
@@ -54,12 +40,12 @@ class Test : Package {
 }
 ";
 
-        this.VerifyCSharpDiagnostic(test, this.CreateDiagnostic(8, 13, 3, (9, 9, 3)));
-        this.VerifyCSharpFix(test, fix);
+        var expected = this.CreateDiagnostic(8, 13, 3, (9, 9, 3));
+        await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
     [Fact]
-    public void LocalAssigned_GetService_ThenUsed_WithNullConditional()
+    public async Task LocalAssigned_GetService_ThenUsed_WithNullConditionalAsync()
     {
         var test = @"
 using Microsoft.VisualStudio.Shell;
@@ -74,11 +60,11 @@ class Test : Package {
 }
 ";
 
-        this.VerifyCSharpDiagnostic(test);
+        await Verify.VerifyAnalyzerAsync(test);
     }
 
     [Fact]
-    public void LocalAssigned_IServiceProvider_GetService_ThenUsed()
+    public async Task LocalAssigned_IServiceProvider_GetService_ThenUsedAsync()
     {
         var test = @"
 using System;
@@ -106,12 +92,12 @@ class Test {
 }
 ";
 
-        this.VerifyCSharpDiagnostic(test, this.CreateDiagnostic(7, 13, 3, (8, 9, 3)));
-        this.VerifyCSharpFix(test, fix);
+        var expected = this.CreateDiagnostic(7, 13, 3, (8, 9, 3));
+        await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
     [Fact]
-    public void LocalDeclarationAssignedWithDirectCast_GetService_ThenUsed()
+    public async Task LocalDeclarationAssignedWithDirectCast_GetService_ThenUsedAsync()
     {
         var test = @"
 using Microsoft.VisualStudio.Shell;
@@ -141,12 +127,12 @@ class Test : Package {
 }
 ";
 
-        this.VerifyCSharpDiagnostic(test, this.CreateDiagnostic(8, 13, 3, (9, 9, 3)));
-        this.VerifyCSharpFix(test, fix);
+        var expected = this.CreateDiagnostic(8, 13, 3, (9, 9, 3));
+        await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
     [Fact]
-    public void LocalDeclarationAssignedWithAsCast_GetServiceAsync_ThenUsed()
+    public async Task LocalDeclarationAssignedWithAsCast_GetServiceAsync_ThenUsedAsync()
     {
         var test = @"
 using System;
@@ -182,12 +168,12 @@ class Test : AsyncPackage {
 }
 ";
 
-        this.VerifyCSharpDiagnostic(test, this.CreateDiagnostic(11, 13, 3, (12, 9, 3)));
-        this.VerifyCSharpFix(test, fix);
+        var expected = this.CreateDiagnostic(11, 13, 3, (12, 9, 3));
+        await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
     [Fact]
-    public void LocalDeclarationAssignedWithAsCast_GetService_InAsyncPackage_ThenUsed()
+    public async Task LocalDeclarationAssignedWithAsCast_GetService_InAsyncPackage_ThenUsedAsync()
     {
         var test = @"
 using System;
@@ -223,12 +209,12 @@ class Test : AsyncPackage {
 }
 ";
 
-        this.VerifyCSharpDiagnostic(test, this.CreateDiagnostic(11, 13, 3, (12, 9, 3)));
-        this.VerifyCSharpFix(test, fix);
+        var expected = this.CreateDiagnostic(11, 13, 3, (12, 9, 3));
+        await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
     [Fact]
-    public void LocalDeclarationAssignedWithAsCast_GetService_InAsyncPackage_ThenUsed_Twice()
+    public async Task LocalDeclarationAssignedWithAsCast_GetService_InAsyncPackage_ThenUsed_TwiceAsync()
     {
         var test = @"
 using System;
@@ -275,12 +261,12 @@ class Test : AsyncPackage {
 }
 ";
 
-        this.VerifyCSharpDiagnostic(test, this.CreateDiagnostic(17, 13, 4, (18, 9, 4)));
-        this.VerifyCSharpFix(test, fix);
+        var expected = this.CreateDiagnostic(17, 13, 4, (18, 9, 4));
+        await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
     [Fact]
-    public void LocalAssignedWithAsCast_GetServiceAsync_ThenUsed()
+    public async Task LocalAssignedWithAsCast_GetServiceAsync_ThenUsedAsync()
     {
         var test = @"
 using System;
@@ -318,12 +304,12 @@ class Test : AsyncPackage {
 }
 ";
 
-        this.VerifyCSharpDiagnostic(test, this.CreateDiagnostic(12, 9, 3, (13, 9, 3)));
-        this.VerifyCSharpFix(test, fix);
+        var expected = this.CreateDiagnostic(12, 9, 3, (13, 9, 3));
+        await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
     [Fact]
-    public void LocalAssignedWithDirectCast_GetService_ThenUsed()
+    public async Task LocalAssignedWithDirectCast_GetService_ThenUsedAsync()
     {
         var test = @"
 using Microsoft.VisualStudio.Shell;
@@ -355,12 +341,12 @@ class Test : Package {
 }
 ";
 
-        this.VerifyCSharpDiagnostic(test, this.CreateDiagnostic(9, 9, 3, (10, 9, 3)));
-        this.VerifyCSharpFix(test, fix);
+        var expected = this.CreateDiagnostic(9, 9, 3, (10, 9, 3));
+        await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
     [Fact]
-    public void FieldAssigned_GetService_ThenUsed()
+    public async Task FieldAssigned_GetService_ThenUsedAsync()
     {
         var test = @"
 using Microsoft.VisualStudio.Shell;
@@ -392,12 +378,12 @@ class Test : Package {
 }
 ";
 
-        this.VerifyCSharpDiagnostic(test, this.CreateDiagnostic(9, 9, 8, (10, 9, 8)));
-        this.VerifyCSharpFix(test, fix);
+        var expected = this.CreateDiagnostic(9, 9, 8, (10, 9, 8));
+        await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
     [Fact]
-    public void FieldAssigned_GetService_ThenUsedElsewhere()
+    public async Task FieldAssigned_GetService_ThenUsedElsewhereAsync()
     {
         var test = @"
 using Microsoft.VisualStudio.Shell;
@@ -435,12 +421,12 @@ class Test : Package {
 }
 ";
 
-        this.VerifyCSharpDiagnostic(test, this.CreateDiagnostic(9, 9, 8, (13, 9, 8)));
-        this.VerifyCSharpFix(test, fix);
+        var expected = this.CreateDiagnostic(9, 9, 8, (13, 9, 8));
+        await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
     [Fact]
-    public void FieldAssigned_GetServiceAsync_ThenUsedElsewhere()
+    public async Task FieldAssigned_GetServiceAsync_ThenUsedElsewhereAsync()
     {
         var test = @"
 using System;
@@ -484,13 +470,12 @@ class Test : AsyncPackage {
 }
 ";
 
-        this.VerifyCSharpDiagnostic(test, this.CreateDiagnostic(12, 9, 8, (16, 9, 8)));
-        this.VerifyCSharpFix(test, fix);
-        this.VerifyCSharpDiagnostic(fix);
+        var expected = this.CreateDiagnostic(12, 9, 8, (16, 9, 8));
+        await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
     [Fact]
-    public void FieldAssigned_GetService_ThenUsedElsewhereWithIfCheck()
+    public async Task FieldAssigned_GetService_ThenUsedElsewhereWithIfCheckAsync()
     {
         var test = @"
 using Microsoft.VisualStudio.Shell;
@@ -511,11 +496,11 @@ class Test : Package {
 }
 ";
 
-        this.VerifyCSharpDiagnostic(test);
+        await Verify.VerifyAnalyzerAsync(test);
     }
 
     [Fact]
-    public void PropertyAssigned_GetService_ThenUsedWithinClass()
+    public async Task PropertyAssigned_GetService_ThenUsedWithinClassAsync()
     {
         var test = @"
 using Microsoft.VisualStudio.Shell;
@@ -553,12 +538,12 @@ class Test : Package {
 }
 ";
 
-        this.VerifyCSharpDiagnostic(test, this.CreateDiagnostic(9, 9, 8, (13, 9, 8)));
-        this.VerifyCSharpFix(test, fix);
+        var expected = this.CreateDiagnostic(9, 9, 8, (13, 9, 8));
+        await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
     [Fact]
-    public void GetService_DirectlyUsed()
+    public async Task GetService_DirectlyUsedAsync()
     {
         var test = @"
 using Microsoft.VisualStudio.Shell;
@@ -572,12 +557,12 @@ class Test : Package {
 }
 ";
 
-        this.VerifyCSharpDiagnostic(test, this.CreateDiagnostic(8, 35, 15));
-        this.VerifyNoCSharpFixOffered(test);
+        var expected = this.CreateDiagnostic(8, 35, 15);
+        await Verify.VerifyCodeFixAsync(test, expected, test);
     }
 
     [Fact]
-    public void GetService_DirectlyUsed_WithConditionalMemberAccess()
+    public async Task GetService_DirectlyUsed_WithConditionalMemberAccessAsync()
     {
         var test = @"
 using Microsoft.VisualStudio.Shell;
@@ -591,11 +576,11 @@ class Test : Package {
 }
 ";
 
-        this.VerifyCSharpDiagnostic(test);
+        await Verify.VerifyAnalyzerAsync(test);
     }
 
     [Fact]
-    public void GetServiceAsync_DirectlyUsed()
+    public async Task GetServiceAsync_DirectlyUsedAsync()
     {
         var test = @"
 using System;
@@ -612,12 +597,12 @@ class Test : AsyncPackage {
 }
 ";
 
-        this.VerifyCSharpDiagnostic(test, this.CreateDiagnostic(11, 41, 20));
-        this.VerifyNoCSharpFixOffered(test);
+        var expected = this.CreateDiagnostic(11, 41, 20);
+        await Verify.VerifyCodeFixAsync(test, expected, test);
     }
 
     [Fact]
-    public void LocalAssigned_CheckedByThrow_GetService_ThenUsed()
+    public async Task LocalAssigned_CheckedByThrow_GetService_ThenUsedAsync()
     {
         var test = @"
 using Microsoft;
@@ -633,11 +618,11 @@ class Test : Package {
     }
 }
 ";
-        this.VerifyCSharpDiagnostic(test);
+        await Verify.VerifyAnalyzerAsync(test);
     }
 
     [Fact]
-    public void LocalAssigned_CheckedByIf_GetService_ThenUsed()
+    public async Task LocalAssigned_CheckedByIf_GetService_ThenUsedAsync()
     {
         var test = @"
 using Microsoft;
@@ -654,11 +639,11 @@ class Test : Package {
     }
 }
 ";
-        this.VerifyCSharpDiagnostic(test);
+        await Verify.VerifyAnalyzerAsync(test);
     }
 
     [Fact]
-    public void FieldAssigned_Checked_GetService_ThenUsed()
+    public async Task FieldAssigned_Checked_GetService_ThenUsedAsync()
     {
         var test = @"
 using Microsoft;
@@ -675,29 +660,17 @@ class Test : Package {
     }
 }
 ";
-        this.VerifyCSharpDiagnostic(test);
+        await Verify.VerifyAnalyzerAsync(test);
     }
-
-    protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() => new VSSDK006CheckServicesExistAnalyzer();
-
-    protected override CodeFixProvider GetCSharpCodeFixProvider() => new VSSDK006CheckServicesExistCodeFix();
 
     private DiagnosticResult CreateDiagnostic(int line, int column, int length, params (int line, int column, int length)[] additionalLocations)
     {
-        var allLocations = new DiagnosticResultLocation[additionalLocations.Length + 1];
-        allLocations[0] = new DiagnosticResultLocation("Test0.cs", line, column, line, column + length);
-        for (int i = 0; i < additionalLocations.Length; i++)
+        var diagnostic = Verify.Diagnostic().WithSpan(line, column, line, column + length);
+        foreach (var location in additionalLocations)
         {
-            var addlLoc = additionalLocations[i];
-            allLocations[i + 1] = new DiagnosticResultLocation("Test0.cs", addlLoc.line, addlLoc.column, addlLoc.line, addlLoc.column + addlLoc.length);
+            diagnostic = diagnostic.WithSpan(location.line, location.column, location.line, location.column + location.length);
         }
 
-        return new DiagnosticResult
-        {
-            Id = this.expect.Id,
-            Locations = allLocations,
-            Severity = this.expect.Severity,
-            SkipVerifyMessage = this.expect.SkipVerifyMessage,
-        };
+        return diagnostic;
     }
 }

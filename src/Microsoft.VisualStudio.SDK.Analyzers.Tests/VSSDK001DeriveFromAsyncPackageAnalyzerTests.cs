@@ -1,29 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 
-using System;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Diagnostics;
-using Microsoft.VisualStudio.SDK.Analyzers;
-using Microsoft.VisualStudio.SDK.Analyzers.Tests;
+using System.Threading.Tasks;
 using Xunit;
-using Xunit.Abstractions;
+using Verify = CSharpCodeFixVerifier<
+    Microsoft.VisualStudio.SDK.Analyzers.VSSDK001DeriveFromAsyncPackageAnalyzer,
+    Microsoft.VisualStudio.SDK.Analyzers.VSSDK001DeriveFromAsyncPackageCodeFix>;
 
-public class VSSDK001DeriveFromAsyncPackageAnalyzerTests : DiagnosticVerifier
+public class VSSDK001DeriveFromAsyncPackageAnalyzerTests
 {
-    private DiagnosticResult expect = new DiagnosticResult
-    {
-        Id = VSSDK001DeriveFromAsyncPackageAnalyzer.Id,
-        SkipVerifyMessage = true,
-        Severity = DiagnosticSeverity.Info,
-    };
-
-    public VSSDK001DeriveFromAsyncPackageAnalyzerTests(ITestOutputHelper logger)
-        : base(logger)
-    {
-    }
-
     [Fact]
-    public void AsyncPackageDerivedClassProducesNoDiagnostic()
+    public async Task AsyncPackageDerivedClassProducesNoDiagnosticAsync()
     {
         var test = @"
 using Microsoft.VisualStudio.Shell;
@@ -32,22 +18,22 @@ class Test : AsyncPackage {
 }
 ";
 
-        this.VerifyCSharpDiagnostic(test);
+        await Verify.VerifyAnalyzerAsync(test);
     }
 
     [Fact]
-    public void NoBaseTypeProducesNoDiagnostic()
+    public async Task NoBaseTypeProducesNoDiagnosticAsync()
     {
         var test = @"
 class Test {
 }
 ";
 
-        this.VerifyCSharpDiagnostic(test);
+        await Verify.VerifyAnalyzerAsync(test);
     }
 
     [Fact]
-    public void PackageDerivedClassProducesDiagnostic()
+    public async Task PackageDerivedClassProducesDiagnosticAsync()
     {
         var test = @"
 using Microsoft.VisualStudio.Shell;
@@ -56,12 +42,12 @@ class Test : Package {
 }
 ";
 
-        this.expect.Locations = new[] { new DiagnosticResultLocation("Test0.cs", 4, 14, 4, 21) };
-        this.VerifyCSharpDiagnostic(test, this.expect);
+        var expected = Verify.Diagnostic().WithSpan(4, 14, 4, 21);
+        await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
     [Fact]
-    public void PackageDerivedClassWithInterfacesProducesDiagnostic()
+    public async Task PackageDerivedClassWithInterfacesProducesDiagnosticAsync()
     {
         var test = @"
 using System;
@@ -72,9 +58,7 @@ class Test : Package, IDisposable {
 }
 ";
 
-        this.expect.Locations = new[] { new DiagnosticResultLocation("Test0.cs", 5, 14, 5, 21) };
-        this.VerifyCSharpDiagnostic(test, this.expect);
+        var expected = Verify.Diagnostic().WithSpan(5, 14, 5, 21);
+        await Verify.VerifyAnalyzerAsync(test, expected);
     }
-
-    protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() => new VSSDK001DeriveFromAsyncPackageAnalyzer();
 }

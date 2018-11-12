@@ -1,29 +1,16 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 
-using System;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Diagnostics;
-using Microsoft.VisualStudio.SDK.Analyzers;
-using Microsoft.VisualStudio.SDK.Analyzers.Tests;
+using System.Threading.Tasks;
+using Microsoft.CodeAnalysis.Testing;
 using Xunit;
-using Xunit.Abstractions;
+using Verify = CSharpCodeFixVerifier<
+    Microsoft.VisualStudio.SDK.Analyzers.VSSDK004ProvideAutoLoadAttributeAnalyzer,
+    Microsoft.CodeAnalysis.Testing.EmptyCodeFixProvider>;
 
-public class VSSDK004ProvideAutoLoadAttributeAnalyzerTests : DiagnosticVerifier
+public class VSSDK004ProvideAutoLoadAttributeAnalyzerTests
 {
-    private DiagnosticResult expect = new DiagnosticResult
-    {
-        Id = VSSDK004ProvideAutoLoadAttributeAnalyzer.Id,
-        SkipVerifyMessage = true,
-        Severity = DiagnosticSeverity.Warning,
-    };
-
-    public VSSDK004ProvideAutoLoadAttributeAnalyzerTests(ITestOutputHelper logger)
-        : base(logger)
-    {
-    }
-
     [Fact]
-    public void NoPackageBaseClassProvidesNoDiagnostics()
+    public async Task NoPackageBaseClassProvidesNoDiagnosticsAsync()
     {
         var test = @"
 using Microsoft.VisualStudio.Shell;
@@ -32,11 +19,11 @@ using Microsoft.VisualStudio.Shell;
 class Test {
 }
 ";
-        this.VerifyCSharpDiagnostic(test);
+        await Verify.VerifyAnalyzerAsync(test);
     }
 
     [Fact]
-    public void NoProvideAutoLoadProducesNoDiagnostics()
+    public async Task NoProvideAutoLoadProducesNoDiagnosticsAsync()
     {
         var test = @"
 using Microsoft.VisualStudio.Shell;
@@ -44,11 +31,11 @@ using Microsoft.VisualStudio.Shell;
 class Test : AsyncPackage {
 }
 ";
-        this.VerifyCSharpDiagnostic(test);
+        await Verify.VerifyAnalyzerAsync(test);
     }
 
     [Fact]
-    public void BasicProvideAutoLoadProducesDiagnostics()
+    public async Task BasicProvideAutoLoadProducesDiagnosticsAsync()
     {
         var test = @"
 using Microsoft.VisualStudio.Shell;
@@ -57,12 +44,12 @@ using Microsoft.VisualStudio.Shell;
 class Test : AsyncPackage {
 }
 ";
-        this.expect.Locations = new[] { new DiagnosticResultLocation("Test0.cs", 4, 2, 4, 59) };
-        this.VerifyCSharpDiagnostic(test, this.expect);
+        var expected = Verify.Diagnostic().WithSpan(4, 2, 4, 59);
+        await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
     [Fact]
-    public void ProvideAutoLoadWithFlagsButNoBackgroundLoadProducesDiagnostics()
+    public async Task ProvideAutoLoadWithFlagsButNoBackgroundLoadProducesDiagnosticsAsync()
     {
         var test = @"
 using Microsoft.VisualStudio.Shell;
@@ -71,12 +58,12 @@ using Microsoft.VisualStudio.Shell;
 class Test : AsyncPackage {
 }
 ";
-        this.expect.Locations = new[] { new DiagnosticResultLocation("Test0.cs", 4, 2, 4, 86) };
-        this.VerifyCSharpDiagnostic(test, this.expect);
+        var expected = Verify.Diagnostic().WithSpan(4, 2, 4, 86);
+        await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
     [Fact]
-    public void MultipleProvideAutoLoadProducesMultipleDiagnostics()
+    public async Task MultipleProvideAutoLoadProducesMultipleDiagnosticsAsync()
     {
         var test = @"
 using Microsoft.VisualStudio.Shell;
@@ -86,29 +73,16 @@ using Microsoft.VisualStudio.Shell;
 class Test : AsyncPackage {
 }
 ";
-        DiagnosticResult[] expected = new[]
+        DiagnosticResult[] expected =
         {
-            new DiagnosticResult()
-            {
-                Id = VSSDK004ProvideAutoLoadAttributeAnalyzer.Id,
-                SkipVerifyMessage = true,
-                Severity = DiagnosticSeverity.Warning,
-                Locations = new[] { new DiagnosticResultLocation("Test0.cs", 4, 2, 4, 86) },
-            },
-            new DiagnosticResult()
-            {
-                Id = VSSDK004ProvideAutoLoadAttributeAnalyzer.Id,
-                SkipVerifyMessage = true,
-                Severity = DiagnosticSeverity.Warning,
-                Locations = new[] { new DiagnosticResultLocation("Test0.cs", 5, 2, 5, 86) },
-            },
+            Verify.Diagnostic().WithSpan(4, 2, 4, 86),
+            Verify.Diagnostic().WithSpan(5, 2, 5, 86),
         };
-
-        this.VerifyCSharpDiagnostic(test, expected);
+        await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
     [Fact]
-    public void ProvideAutoLoadWithNamedFlagsButNoBackgroundLoadProducesDiagnostics()
+    public async Task ProvideAutoLoadWithNamedFlagsButNoBackgroundLoadProducesDiagnosticsAsync()
     {
         var test = @"
 using Microsoft.VisualStudio.Shell;
@@ -117,12 +91,12 @@ using Microsoft.VisualStudio.Shell;
 class Test : AsyncPackage {
 }
 ";
-        this.expect.Locations = new[] { new DiagnosticResultLocation("Test0.cs", 4, 2, 4, 93) };
-        this.VerifyCSharpDiagnostic(test, this.expect);
+        var expected = Verify.Diagnostic().WithSpan(4, 2, 4, 93);
+        await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
     [Fact]
-    public void ProvideAutoLoadWithSkipFlagProducesNoDiagnostics()
+    public async Task ProvideAutoLoadWithSkipFlagProducesNoDiagnosticsAsync()
     {
         var test = @"
 using Microsoft.VisualStudio.Shell;
@@ -131,11 +105,11 @@ using Microsoft.VisualStudio.Shell;
 class Test : Package {
 }
 ";
-        this.VerifyCSharpDiagnostic(test);
+        await Verify.VerifyAnalyzerAsync(test);
     }
 
     [Fact]
-    public void ProvideAutoLoadWithBackgroundLoadFlagProducesNoDiagnostics()
+    public async Task ProvideAutoLoadWithBackgroundLoadFlagProducesNoDiagnosticsAsync()
     {
         var test = @"
 using Microsoft.VisualStudio.Shell;
@@ -144,11 +118,11 @@ using Microsoft.VisualStudio.Shell;
 class Test : AsyncPackage {
 }
 ";
-        this.VerifyCSharpDiagnostic(test);
+        await Verify.VerifyAnalyzerAsync(test);
     }
 
     [Fact]
-    public void ProvideAutoLoadOnPackageWithBackgroundLoadFlagProducesDiagnostics()
+    public async Task ProvideAutoLoadOnPackageWithBackgroundLoadFlagProducesDiagnosticsAsync()
     {
         var test = @"
 using Microsoft.VisualStudio.Shell;
@@ -157,9 +131,7 @@ using Microsoft.VisualStudio.Shell;
 class Test : Package {
 }
 ";
-        this.expect.Locations = new[] { new DiagnosticResultLocation("Test0.cs", 4, 2, 4, 96) };
-        this.VerifyCSharpDiagnostic(test, this.expect);
+        var expected = Verify.Diagnostic().WithSpan(4, 2, 4, 96);
+        await Verify.VerifyAnalyzerAsync(test, expected);
     }
-
-    protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() => new VSSDK004ProvideAutoLoadAttributeAnalyzer();
 }

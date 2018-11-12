@@ -131,11 +131,11 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
 
                 var leadingTrivia = SyntaxFactory.TriviaList(
                     SyntaxFactory.Comment(@"// When initialized asynchronously, we *may* be on a background thread at this point."),
-                    SyntaxFactory.LineFeed,
+                    SyntaxFactory.CarriageReturnLineFeed,
                     SyntaxFactory.Comment(@"// Do any initialization that requires the UI thread after switching to the UI thread."),
-                    SyntaxFactory.LineFeed,
+                    SyntaxFactory.CarriageReturnLineFeed,
                     SyntaxFactory.Comment(@"// Otherwise, remove the switch to the UI thread if you don't need it."),
-                    SyntaxFactory.LineFeed);
+                    SyntaxFactory.CarriageReturnLineFeed);
 
                 var switchToMainThreadStatement = SyntaxFactory.ExpressionStatement(
                     SyntaxFactory.AwaitExpression(
@@ -149,7 +149,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                                 SyntaxFactory.IdentifierName(Types.JoinableTaskFactory.SwitchToMainThreadAsync)))
                             .AddArgumentListArguments(SyntaxFactory.Argument(cancellationTokenLocalVarName))))
                     .WithLeadingTrivia(leadingTrivia)
-                    .WithTrailingTrivia(SyntaxFactory.LineFeed);
+                    .WithTrailingTrivia(SyntaxFactory.CarriageReturnLineFeed);
 
                 if (baseInitializeInvocationSyntax != null)
                 {
@@ -196,7 +196,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                     getServiceInvocationsSyntax,
                     (orig, node) =>
                     {
-                        var invocation = (InvocationExpressionSyntax)node;
+                        var invocation = node;
                         if (invocation.Expression is IdentifierNameSyntax methodName)
                         {
                             invocation = invocation.WithExpression(SyntaxFactory.IdentifierName(Types.AsyncPackage.GetServiceAsync));
