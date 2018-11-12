@@ -1,6 +1,6 @@
 # Analyzers for VS extensions
 
-[![Build Status](https://andrewarnott.visualstudio.com/OSS/_apis/build/status/vssdk-analyzers)](https://andrewarnott.visualstudio.com/OSS/_build/latest?definitionId=20)
+[![Build Status](https://dev.azure.com/azure-public/vside/_apis/build/status/vssdk-analyzers)](https://dev.azure.com/azure-public/vside/_build/latest?definitionId=14)
 [![codecov](https://codecov.io/gh/microsoft/vssdk-analyzers/branch/master/graph/badge.svg)](https://codecov.io/gh/microsoft/vssdk-analyzers)
 [![NuGet](https://img.shields.io/nuget/v/Microsoft.VisualStudio.SDK.Analyzers.svg)](https://nuget.org/packages/Microsoft.VisualStudio.SDK.Analyzers)
 
