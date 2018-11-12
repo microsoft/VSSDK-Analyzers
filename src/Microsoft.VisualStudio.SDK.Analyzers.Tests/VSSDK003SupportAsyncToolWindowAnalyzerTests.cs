@@ -1,30 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 
-using System;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CodeFixes;
-using Microsoft.CodeAnalysis.Diagnostics;
-using Microsoft.VisualStudio.SDK.Analyzers;
-using Microsoft.VisualStudio.SDK.Analyzers.Tests;
+using System.Threading.Tasks;
 using Xunit;
-using Xunit.Abstractions;
+using Verify = CSharpCodeFixVerifier<
+    Microsoft.VisualStudio.SDK.Analyzers.VSSDK003SupportAsyncToolWindowAnalyzer,
+    Microsoft.CodeAnalysis.Testing.EmptyCodeFixProvider>;
 
-public class VSSDK003SupportAsyncToolWindowAnalyzerTests : DiagnosticVerifier
+public class VSSDK003SupportAsyncToolWindowAnalyzerTests
 {
-    private DiagnosticResult expect = new DiagnosticResult
-    {
-        Id = VSSDK003SupportAsyncToolWindowAnalyzer.Id,
-        SkipVerifyMessage = true,
-        Severity = DiagnosticSeverity.Info,
-    };
-
-    public VSSDK003SupportAsyncToolWindowAnalyzerTests(ITestOutputHelper logger)
-        : base(logger)
-    {
-    }
-
     [Fact]
-    public void SyncToolWindow_NonAsyncPackage_ProducesDiagnostic()
+    public async Task SyncToolWindow_NonAsyncPackage_ProducesDiagnosticAsync()
     {
         var package = @"
 using Microsoft.VisualStudio.Shell;
@@ -50,11 +35,17 @@ public class ToolWindow1 : ToolWindowPane
 }
 ";
 
-        this.VerifyCSharpDiagnostic(new[] { package, toolWindow });
+        await new Verify.Test
+        {
+            TestState =
+            {
+                Sources = { package, toolWindow },
+            },
+        }.RunAsync();
     }
 
     [Fact]
-    public void SyncToolWindow_AsyncPackage_ProducesDiagnostic()
+    public async Task SyncToolWindow_AsyncPackage_ProducesDiagnosticAsync()
     {
         var package = @"
 using Microsoft.VisualStudio.Shell;
@@ -80,12 +71,18 @@ public class ToolWindow1 : ToolWindowPane
 }
 ";
 
-        this.expect.Locations = new[] { new DiagnosticResultLocation("Test0.cs", 4, 27, 4, 38) };
-        this.VerifyCSharpDiagnostic(new[] { package, toolWindow }, this.expect);
+        await new Verify.Test
+        {
+            TestState =
+            {
+                Sources = { package, toolWindow },
+            },
+            ExpectedDiagnostics = { Verify.Diagnostic().WithSpan(4, 27, 4, 38) },
+        }.RunAsync();
     }
 
     [Fact]
-    public void AsyncToolWindow_ProducesNoDiagnostic()
+    public async Task AsyncToolWindow_ProducesNoDiagnosticAsync()
     {
         var package = @"
 using System;
@@ -147,11 +144,17 @@ public class ToolWindow1 : ToolWindowPane
 }
 ";
 
-        this.VerifyCSharpDiagnostic(new[] { package, toolWindow });
+        await new Verify.Test
+        {
+            TestState =
+            {
+                Sources = { package, toolWindow },
+            },
+        }.RunAsync();
     }
 
     [Fact]
-    public void RTWCompatibleAsyncToolWindow_ProducesNoDiagnostic()
+    public async Task RTWCompatibleAsyncToolWindow_ProducesNoDiagnosticAsync()
     {
         var package = @"
 using System;
@@ -213,19 +216,23 @@ public class ToolWindow1 : ToolWindowPane
 }
 ";
 
-        this.VerifyCSharpDiagnostic(new[] { package, toolWindow });
+        await new Verify.Test
+        {
+            TestState =
+            {
+                Sources = { package, toolWindow },
+            },
+        }.RunAsync();
     }
 
     [Fact]
-    public void NoPackageAttributes()
+    public async Task NoPackageAttributesAsync()
     {
         var package = @"
 public class ProtocolPackage : Microsoft.VisualStudio.Shell.AsyncPackage
 {
 }
     ";
-        this.VerifyCSharpDiagnostic(package);
+        await Verify.VerifyAnalyzerAsync(package);
     }
-
-    protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() => new VSSDK003SupportAsyncToolWindowAnalyzer();
 }

@@ -1,27 +1,20 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CodeFixes;
-using Microsoft.CodeAnalysis.Diagnostics;
-using Microsoft.VisualStudio.SDK.Analyzers;
-using Microsoft.VisualStudio.SDK.Analyzers.Tests;
+using System.Threading.Tasks;
 using Xunit;
-using Xunit.Abstractions;
+using Verify = CSharpCodeFixVerifier<
+    Microsoft.VisualStudio.SDK.Analyzers.VSSDK001DeriveFromAsyncPackageAnalyzer,
+    Microsoft.VisualStudio.SDK.Analyzers.VSSDK001DeriveFromAsyncPackageCodeFix>;
 
-public class VSSDK001DeriveFromAsyncPackageCodeFixTests : CodeFixVerifier
+public class VSSDK001DeriveFromAsyncPackageCodeFixTests
 {
-    public VSSDK001DeriveFromAsyncPackageCodeFixTests(ITestOutputHelper logger)
-        : base(logger)
-    {
-    }
-
     [Fact]
-    public void BaseTypeChangesToAsyncPackage()
+    public async Task BaseTypeChangesToAsyncPackageAsync()
     {
         var test = @"
 using Microsoft.VisualStudio.Shell;
 
-class Test : Package
+class Test : [|Package|]
 {
 }
 ";
@@ -32,17 +25,17 @@ class Test : AsyncPackage
 {
 }
 ";
-        this.VerifyCSharpFix(test, withFix);
+        await Verify.VerifyCodeFixAsync(test, withFix);
     }
 
     [Fact]
-    public void PackageRegistrationUpdated_NewArgument()
+    public async Task PackageRegistrationUpdated_NewArgumentAsync()
     {
         var test = @"
 using Microsoft.VisualStudio.Shell;
 
 [PackageRegistration(UseManagedResourcesOnly = true)]
-class Test : Package
+class Test : [|Package|]
 {
 }
 ";
@@ -54,17 +47,17 @@ class Test : AsyncPackage
 {
 }
 ";
-        this.VerifyCSharpFix(test, withFix);
+        await Verify.VerifyCodeFixAsync(test, withFix);
     }
 
     [Fact]
-    public void PackageRegistrationUpdated_ExistingArgument()
+    public async Task PackageRegistrationUpdated_ExistingArgumentAsync()
     {
         var test = @"
 using Microsoft.VisualStudio.Shell;
 
 [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = false)]
-class Test : Package
+class Test : [|Package|]
 {
 }
 ";
@@ -76,17 +69,17 @@ class Test : AsyncPackage
 {
 }
 ";
-        this.VerifyCSharpFix(test, withFix);
+        await Verify.VerifyCodeFixAsync(test, withFix);
     }
 
     [Fact]
-    public void BaseTypeChangesToAsyncPackage_WithInterfaces()
+    public async Task BaseTypeChangesToAsyncPackage_WithInterfacesAsync()
     {
         var test = @"
 using System;
 using Microsoft.VisualStudio.Shell;
 
-class Test : Package, IDisposable
+class Test : [|Package|], IDisposable
 {
     public void Dispose()
     {
@@ -104,14 +97,14 @@ class Test : AsyncPackage, IDisposable
     }
 }
 ";
-        this.VerifyCSharpFix(test, withFix);
+        await Verify.VerifyCodeFixAsync(test, withFix);
     }
 
     [Fact]
-    public void BaseTypeChangesToAsyncPackage_NoUsings()
+    public async Task BaseTypeChangesToAsyncPackage_NoUsingsAsync()
     {
         var test = @"
-class Test : Microsoft.VisualStudio.Shell.Package
+class Test : [|Microsoft.VisualStudio.Shell.Package|]
 {
 }
 ";
@@ -120,16 +113,16 @@ class Test : Microsoft.VisualStudio.Shell.AsyncPackage
 {
 }
 ";
-        this.VerifyCSharpFix(test, withFix);
+        await Verify.VerifyCodeFixAsync(test, withFix);
     }
 
     [Fact]
-    public void BaseTypeChangesToAsyncPackage_InPartiallyMatchingNamespace()
+    public async Task BaseTypeChangesToAsyncPackage_InPartiallyMatchingNamespaceAsync()
     {
         var test = @"
 namespace Microsoft.VisualStudio
 {
-    class Test : Microsoft.VisualStudio.Shell.Package
+    class Test : [|Microsoft.VisualStudio.Shell.Package|]
     {
     }
 }
@@ -142,18 +135,16 @@ namespace Microsoft.VisualStudio
     }
 }
 ";
-        this.VerifyCSharpFix(test, withFix);
+        await Verify.VerifyCodeFixAsync(test, withFix);
     }
 
     [Fact]
-#pragma warning disable VSTHRD200 // Use "Async" suffix for async methods
-    public void InitializeOverride_BecomesAsync()
-#pragma warning restore VSTHRD200 // Use "Async" suffix for async methods
+    public async Task InitializeOverride_BecomesAsync()
     {
         var test = @"
 using System;
 
-class Test : Microsoft.VisualStudio.Shell.Package
+class Test : [|Microsoft.VisualStudio.Shell.Package|]
 {
     protected override void Initialize()
     {
@@ -185,18 +176,18 @@ class Test : Microsoft.VisualStudio.Shell.AsyncPackage
     }
 }
 ";
-        this.VerifyCSharpFix(test, withFix);
+        await Verify.VerifyCodeFixAsync(test, withFix);
     }
 
     [Fact]
-    public void InitializeOverride_GetServiceCallsUpdated()
+    public async Task InitializeOverride_GetServiceCallsUpdatedAsync()
     {
         var test = @"
 using System;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
-class Test : Package
+class Test : [|Package|]
 {
     protected override void Initialize()
     {
@@ -230,10 +221,6 @@ class Test : AsyncPackage
     }
 }
 ";
-        this.VerifyCSharpFix(test, withFix);
+        await Verify.VerifyCodeFixAsync(test, withFix);
     }
-
-    protected override CodeFixProvider GetCSharpCodeFixProvider() => new VSSDK001DeriveFromAsyncPackageCodeFix();
-
-    protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer() => new VSSDK001DeriveFromAsyncPackageAnalyzer();
 }
