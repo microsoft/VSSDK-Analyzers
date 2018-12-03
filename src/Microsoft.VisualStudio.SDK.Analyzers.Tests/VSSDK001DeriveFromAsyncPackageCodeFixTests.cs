@@ -108,7 +108,8 @@ class Test : [|Microsoft.VisualStudio.Shell.Package|]
 {
 }
 ";
-        var withFix = @"using Microsoft.VisualStudio.Shell;
+        var withFix = @"
+using Microsoft.VisualStudio.Shell;
 
 class Test : AsyncPackage
 {
@@ -161,7 +162,8 @@ namespace Microsoft.VisualStudio
     }
 }
 ";
-        var withFix = @"using Microsoft.VisualStudio.Shell;
+        var withFix = @"
+using Microsoft.VisualStudio.Shell;
 
 namespace Microsoft.VisualStudio
 {
@@ -187,7 +189,8 @@ namespace Microsoft.VisualStudio
     }
 }
 ";
-        var withFix = @"using Microsoft.VisualStudio.Shell;
+        var withFix = @"
+using Microsoft.VisualStudio.Shell;
 
 namespace Microsoft.VisualStudio
 {
