@@ -13,6 +13,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
+    using Microsoft.CodeAnalysis.Editing;
     using Microsoft.CodeAnalysis.Simplification;
 
     /// <summary>
@@ -127,6 +128,29 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 var progressLocalVarName = SyntaxFactory.IdentifierName("progress");
                 initializeMethodSyntax = updatedRoot.GetCurrentNode(initializeMethodSyntax);
                 var newBody = initializeMethodSyntax.Body;
+
+                var leadingTrivia = SyntaxFactory.TriviaList(
+                    SyntaxFactory.Comment(@"// When initialized asynchronously, we *may* be on a background thread at this point."),
+                    SyntaxFactory.CarriageReturnLineFeed,
+                    SyntaxFactory.Comment(@"// Do any initialization that requires the UI thread after switching to the UI thread."),
+                    SyntaxFactory.CarriageReturnLineFeed,
+                    SyntaxFactory.Comment(@"// Otherwise, remove the switch to the UI thread if you don't need it."),
+                    SyntaxFactory.CarriageReturnLineFeed);
+
+                var switchToMainThreadStatement = SyntaxFactory.ExpressionStatement(
+                    SyntaxFactory.AwaitExpression(
+                        SyntaxFactory.InvocationExpression(
+                            SyntaxFactory.MemberAccessExpression(
+                                SyntaxKind.SimpleMemberAccessExpression,
+                                SyntaxFactory.MemberAccessExpression(
+                                    SyntaxKind.SimpleMemberAccessExpression,
+                                    SyntaxFactory.ThisExpression(),
+                                    SyntaxFactory.IdentifierName(Types.ThreadHelper.JoinableTaskFactory)),
+                                SyntaxFactory.IdentifierName(Types.JoinableTaskFactory.SwitchToMainThreadAsync)))
+                            .AddArgumentListArguments(SyntaxFactory.Argument(cancellationTokenLocalVarName))))
+                    .WithLeadingTrivia(leadingTrivia)
+                    .WithTrailingTrivia(SyntaxFactory.CarriageReturnLineFeed);
+
                 if (baseInitializeInvocationSyntax != null)
                 {
                     var baseInitializeAsyncInvocationBookmark = new SyntaxAnnotation();
@@ -146,30 +170,14 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                     newBody = newBody.ReplaceNode(initializeMethodSyntax.GetCurrentNode(baseInitializeInvocationSyntax), baseInitializeAsyncInvocationSyntax);
                     var baseInvocationStatement = newBody.GetAnnotatedNodes(baseInitializeAsyncInvocationBookmark).First().FirstAncestorOrSelf<StatementSyntax>();
 
-                    var leadingTrivia = SyntaxFactory.TriviaList(
-                        SyntaxFactory.LineFeed,
-                        SyntaxFactory.Comment(@"// When initialized asynchronously, we *may* be on a background thread at this point."),
-                        SyntaxFactory.CarriageReturnLineFeed,
-                        SyntaxFactory.Comment(@"// Do any initialization that requires the UI thread after switching to the UI thread."),
-                        SyntaxFactory.CarriageReturnLineFeed,
-                        SyntaxFactory.Comment(@"// Otherwise, remove the switch to the UI thread if you don't need it."),
-                        SyntaxFactory.CarriageReturnLineFeed);
-
-                    var switchToMainThreadStatement = SyntaxFactory.ExpressionStatement(
-                        SyntaxFactory.AwaitExpression(
-                            SyntaxFactory.InvocationExpression(
-                                SyntaxFactory.MemberAccessExpression(
-                                    SyntaxKind.SimpleMemberAccessExpression,
-                                    SyntaxFactory.MemberAccessExpression(
-                                        SyntaxKind.SimpleMemberAccessExpression,
-                                        SyntaxFactory.ThisExpression(),
-                                        SyntaxFactory.IdentifierName(Types.ThreadHelper.JoinableTaskFactory)),
-                                    SyntaxFactory.IdentifierName(Types.JoinableTaskFactory.SwitchToMainThreadAsync)))
-                                .AddArgumentListArguments(SyntaxFactory.Argument(cancellationTokenLocalVarName))))
-                        .WithLeadingTrivia(leadingTrivia)
-                        .WithTrailingTrivia(SyntaxFactory.CarriageReturnLineFeed);
-
-                    newBody = newBody.InsertNodesAfter(baseInvocationStatement, new[] { switchToMainThreadStatement });
+                    newBody = newBody.InsertNodesAfter(
+                        baseInvocationStatement,
+                        new[] { switchToMainThreadStatement.WithLeadingTrivia(switchToMainThreadStatement.GetLeadingTrivia().Insert(0, SyntaxFactory.LineFeed)) });
+                }
+                else
+                {
+                    newBody = newBody.WithStatements(
+                        newBody.Statements.Insert(0, switchToMainThreadStatement));
                 }
 
                 var initializeAsyncMethodSyntax = initializeMethodSyntax
@@ -188,7 +196,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                     getServiceInvocationsSyntax,
                     (orig, node) =>
                     {
-                        var invocation = (InvocationExpressionSyntax)node;
+                        var invocation = node;
                         if (invocation.Expression is IdentifierNameSyntax methodName)
                         {
                             invocation = invocation.WithExpression(SyntaxFactory.IdentifierName(Types.AsyncPackage.GetServiceAsync));
@@ -202,9 +210,14 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                         return SyntaxFactory.ParenthesizedExpression(SyntaxFactory.AwaitExpression(invocation))
                             .WithAdditionalAnnotations(Simplifier.Annotation);
                     });
+
+                updatedRoot = await Utils.AddUsingTaskEqualsDirectiveAsync(updatedRoot, cancellationToken);
             }
 
-            return context.Document.WithSyntaxRoot(updatedRoot);
+            var newDocument = context.Document.WithSyntaxRoot(updatedRoot);
+            newDocument = await ImportAdder.AddImportsAsync(newDocument, Simplifier.Annotation, cancellationToken: cancellationToken);
+
+            return newDocument;
         }
     }
 }

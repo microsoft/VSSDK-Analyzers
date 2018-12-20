@@ -79,5 +79,6 @@
   </Rules>
   <Rules AnalyzerId="Microsoft.VisualStudio.Threading.Analyzers" RuleNamespace="Microsoft.VisualStudio.Threading.Analyzers">
     <Rule Id="VSTHRD002" Action="None" />
+    <Rule Id="VSTHRD200" Action="Hidden" />
   </Rules>
 </RuleSet>
