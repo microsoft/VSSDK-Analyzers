@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.3</TargetFramework>
+    <CodeAnalysisRuleSet>..\Microsoft.VisualStudio.SDK.Analyzers\Microsoft.VisualStudio.SDK.Analyzers.ruleset</CodeAnalysisRuleSet>
+    <PackageTargetFallback>$(PackageTargetFallback);portable-net45+win8;net46</PackageTargetFallback>
+
+    <PackageId>Microsoft.VisualStudio.SDK.Analyzers</PackageId>
+    <PackageTags>analyzers visualstudio vssdk sdk</PackageTags>
+    <PackageReleaseNotes></PackageReleaseNotes>
+    <Description>A collection of analyzers to help Visual Studio extension developers write quality code.</Description>
+
+    <!-- Analyzers should not be added to the lib folder. -->
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);PackBuildOutputs</TargetsForTfmSpecificContentInPackage>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="1.2.0" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Microsoft.VisualStudio.SDK.Analyzers\Microsoft.VisualStudio.SDK.Analyzers.csproj" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="tools\*.ps1" Pack="true" PackagePath="tools\" />
+  </ItemGroup>
+
+  <Target Name="PackBuildOutputs" BeforeTargets="_GetPackageFiles" DependsOnTargets="SatelliteDllsProjectOutputGroup;DebugSymbolsProjectOutputGroup">
+    <ItemGroup>
+      <Content Include="$(TargetDir)Microsoft.VisualStudio.SDK.Analyzers.dll" Pack="true" PackagePath="analyzers\cs\" />
+      <Content Include="$(TargetPath)" Pack="true" PackagePath="analyzers\cs\" />
+      <!--<Content Include="@(DebugSymbolsProjectOutputGroupOutput)" Pack="true" PackagePath="analyzers\cs\" />-->
+      <Content Include="@(SatelliteDllsProjectOutputGroupOutput)" Pack="true" PackagePath="analyzers\cs\%(SatelliteDllsProjectOutputGroupOutput.Culture)\" />
+    </ItemGroup>
+  </Target>
+
+</Project>
