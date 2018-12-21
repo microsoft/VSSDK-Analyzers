@@ -1,39 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.1</TargetFramework>
+    <TargetFramework>netstandard1.3</TargetFramework>
     <CodeAnalysisRuleSet>Microsoft.VisualStudio.SDK.Analyzers.ruleset</CodeAnalysisRuleSet>
     <PackageTargetFallback>$(PackageTargetFallback);portable-net45+win8;net46</PackageTargetFallback>
 
-    <PackageTags>analyzers visualstudio vssdk sdk</PackageTags>
-    <PackageReleaseNotes></PackageReleaseNotes>
-    <Description>A collection of analyzers to help Visual Studio extension developers write quality code.</Description>
-
-    <!-- Analyzers should not be added to the lib folder. -->
-    <IncludeBuildOutput>false</IncludeBuildOutput>
-    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);PackBuildOutputs</TargetsForTfmSpecificContentInPackage>
+    <PackageId>Microsoft.VisualStudio.SDK.Just.Analyzers</PackageId>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="tools\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="tools\**" Pack="true" PackagePath="tools\" />
-    <Content Include="build\**" Pack="true" PackagePath="build\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="1.2.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="1.2.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="2.6.2" PrivateAssets="all" />
-    <PackageReference Update="NETStandard.Library" PrivateAssets="all" />
   </ItemGroup>
 
-  <Target Name="PackBuildOutputs" DependsOnTargets="SatelliteDllsProjectOutputGroup;DebugSymbolsProjectOutputGroup">
-    <ItemGroup>
-      <TfmSpecificPackageFile Include="$(TargetPath)" PackagePath="analyzers\cs\" />
-      <!--<TfmSpecificPackageFile Include="@(DebugSymbolsProjectOutputGroupOutput)" PackagePath="analyzers\cs\" />-->
-      <TfmSpecificPackageFile Include="@(SatelliteDllsProjectOutputGroupOutput->'%(FinalOutputPath)')" PackagePath="analyzers\cs\%(SatelliteDllsProjectOutputGroupOutput.Culture)\" />
-    </ItemGroup>
-  </Target>
 </Project>
