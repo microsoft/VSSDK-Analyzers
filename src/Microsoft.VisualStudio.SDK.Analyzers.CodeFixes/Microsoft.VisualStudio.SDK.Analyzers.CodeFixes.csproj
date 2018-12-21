@@ -24,7 +24,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="tools\*.ps1" Pack="true" PackagePath="tools\" />
+    <None Remove="tools\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="tools\**" Pack="true" PackagePath="tools\" />
+    <Content Include="build\**" Pack="true" PackagePath="build\" />
   </ItemGroup>
 
   <Target Name="PackBuildOutputs" BeforeTargets="_GetPackageFiles" DependsOnTargets="SatelliteDllsProjectOutputGroup;DebugSymbolsProjectOutputGroup">
