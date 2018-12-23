@@ -86,20 +86,29 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             internal void AnalyzeInvocationExpression(SyntaxNodeAnalysisContext context)
             {
                 var invocationExpression = (InvocationExpressionSyntax)context.Node;
-                var invokedMethod = context.SemanticModel.GetSymbolInfo(invocationExpression.Expression, context.CancellationToken).Symbol;
+                var invokedMethod = context.SemanticModel.GetSymbolInfo(invocationExpression.Expression, context.CancellationToken).Symbol as IMethodSymbol;
                 if (invokedMethod != null && this.getServiceMethods.Contains(invokedMethod))
                 {
+                    bool isTask = Utils.IsTask(invokedMethod.ReturnType);
+                    SyntaxNode startWalkFrom = isTask
+                        ? (SyntaxNode)Utils.FindAncestor<AwaitExpressionSyntax>(invocationExpression, n => n is MemberAccessExpressionSyntax || n is InvocationExpressionSyntax, (aes, child) => aes.Expression == child)
+                        : invocationExpression;
+                    if (startWalkFrom == null)
+                    {
+                        return;
+                    }
+
                     AssignmentExpressionSyntax assignment;
                     VariableDeclaratorSyntax variableDeclarator;
                     if (Utils.FindAncestor<MemberAccessExpressionSyntax>(
-                        invocationExpression,
+                        startWalkFrom,
                         n => n is CastExpressionSyntax || n is ParenthesizedExpressionSyntax || n is AwaitExpressionSyntax,
                         (mae, child) => mae.Expression == child) != null)
                     {
                         context.ReportDiagnostic(Diagnostic.Create(Descriptor, invocationExpression.Expression.GetLocation()));
                     }
                     else if ((assignment = Utils.FindAncestor<AssignmentExpressionSyntax>(
-                        invocationExpression,
+                        startWalkFrom,
                         n => n is CastExpressionSyntax || n is EqualsValueClauseSyntax || n is AwaitExpressionSyntax || (n is BinaryExpressionSyntax be && be.OperatorToken.IsKind(SyntaxKind.AsKeyword)),
                         (aes, child) => aes.Right == child)) != null)
                     {
@@ -127,7 +136,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                         }
                     }
                     else if ((variableDeclarator = Utils.FindAncestor<VariableDeclaratorSyntax>(
-                        invocationExpression,
+                        startWalkFrom,
                         n => n is CastExpressionSyntax || n is EqualsValueClauseSyntax || n is AwaitExpressionSyntax || (n is BinaryExpressionSyntax be && be.OperatorToken.IsKind(SyntaxKind.AsKeyword)),
                         (vds, child) => vds.Initializer == child)) != null)
                     {

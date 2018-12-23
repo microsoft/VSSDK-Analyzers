@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -63,6 +64,45 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         internal static string GetHelpLink(string analyzerId)
         {
             return $"https://github.com/Microsoft/VSSDK-Analyzers/blob/master/doc/{analyzerId}.md";
+        }
+
+        /// <summary>
+        /// Checks whether a symbol is a <see cref="Task"/> or <see cref="Task{T}"/>.
+        /// </summary>
+        /// <param name="typeSymbol">The symbol to test.</param>
+        /// <returns><c>true</c> if the symbol is a <see cref="Task"/>.</returns>
+        internal static bool IsTask(ITypeSymbol typeSymbol) => typeSymbol?.Name == nameof(Task) && typeSymbol.BelongsToNamespace(Namespaces.SystemThreadingTasks);
+
+        /// <summary>
+        /// Tests whether a symbol belongs to a given namespace.
+        /// </summary>
+        /// <param name="symbol">The symbol whose namespace membership is being tested.</param>
+        /// <param name="namespaces">A sequence of namespaces from global to most precise. For example: [System, Threading, Tasks]</param>
+        /// <returns><c>true</c> if the symbol belongs to the given namespace; otherwise <c>false</c>.</returns>
+        internal static bool BelongsToNamespace(this ISymbol symbol, IReadOnlyList<string> namespaces)
+        {
+            if (namespaces == null)
+            {
+                throw new ArgumentNullException(nameof(namespaces));
+            }
+
+            if (symbol == null)
+            {
+                return false;
+            }
+
+            INamespaceSymbol currentNamespace = symbol.ContainingNamespace;
+            for (int i = namespaces.Count - 1; i >= 0; i--)
+            {
+                if (currentNamespace?.Name != namespaces[i])
+                {
+                    return false;
+                }
+
+                currentNamespace = currentNamespace.ContainingNamespace;
+            }
+
+            return currentNamespace?.IsGlobalNamespace ?? false;
         }
 
         /// <summary>

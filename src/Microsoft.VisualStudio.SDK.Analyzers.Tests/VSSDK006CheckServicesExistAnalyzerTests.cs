@@ -475,6 +475,55 @@ class Test : AsyncPackage {
     }
 
     [Fact]
+    public async Task FieldAssigned_GetServiceAsync_WithConfigureAwait_ThenUsedElsewhereAsync()
+    {
+        var test = @"
+using System;
+using System.Threading;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+using Task = System.Threading.Tasks.Task;
+
+class Test : AsyncPackage {
+    IVsBuildManagerAccessor svc;
+    protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress) {
+        await base.InitializeAsync(cancellationToken, progress);
+        this.svc = await this.GetServiceAsync(typeof(SVsBuildManagerAccessor)).ConfigureAwait(true) as IVsBuildManagerAccessor;
+    }
+
+    void Foo() {
+        this.svc.BeginDesignTimeBuild();
+    }
+}
+";
+
+        var fix = @"
+using System;
+using System.Threading;
+using Microsoft;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+using Task = System.Threading.Tasks.Task;
+
+class Test : AsyncPackage {
+    IVsBuildManagerAccessor svc;
+    protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress) {
+        await base.InitializeAsync(cancellationToken, progress);
+        this.svc = await this.GetServiceAsync(typeof(SVsBuildManagerAccessor)).ConfigureAwait(true) as IVsBuildManagerAccessor;
+        Assumes.Present(this.svc);
+    }
+
+    void Foo() {
+        this.svc.BeginDesignTimeBuild();
+    }
+}
+";
+
+        var expected = this.CreateDiagnostic(12, 9, 8, (16, 9, 8));
+        await Verify.VerifyCodeFixAsync(test, expected, fix);
+    }
+
+    [Fact]
     public async Task FieldAssigned_GetService_ThenUsedElsewhereWithIfCheckAsync()
     {
         var test = @"
@@ -599,6 +648,49 @@ class Test : AsyncPackage {
 
         var expected = this.CreateDiagnostic(11, 41, 20);
         await Verify.VerifyCodeFixAsync(test, expected, test);
+    }
+
+    [Fact]
+    public async Task GetServiceAsync_WithConfigureAwait_DirectlyUsedAsync()
+    {
+        var test = @"
+using System;
+using System.Threading;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+using Task = System.Threading.Tasks.Task;
+
+class Test : AsyncPackage {
+    protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress) {
+        await base.InitializeAsync(cancellationToken, progress);
+        ((IVsBuildManagerAccessor)await this.GetServiceAsync(typeof(SVsBuildManagerAccessor)).ConfigureAwait(true)).BeginDesignTimeBuild();
+    }
+}
+";
+
+        var expected = this.CreateDiagnostic(11, 41, 20);
+        await Verify.VerifyAnalyzerAsync(test, expected);
+    }
+
+    [Fact]
+    public async Task GetServiceAsync_WithConfigureAwait()
+    {
+        var test = @"
+using System;
+using System.Threading;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+using Task = System.Threading.Tasks.Task;
+
+class Test : AsyncPackage {
+    protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress) {
+        await base.InitializeAsync(cancellationToken, progress);
+        var sbm = await this.GetServiceAsync(typeof(SVsBuildManagerAccessor)).ConfigureAwait(true);
+    }
+}
+";
+
+        await Verify.VerifyAnalyzerAsync(test);
     }
 
     [Fact]
