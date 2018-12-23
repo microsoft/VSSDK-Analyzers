@@ -438,7 +438,7 @@ class Test : Package {
     protected override void Initialize() {
         base.Initialize();
         this.svc = this.GetService(typeof(SVsBuildManagerAccessor)) as IVsBuildManagerAccessor;
-        Assumes.Present(this.svc);
+        Assumes.Present(svc);
         this.svc.BeginDesignTimeBuild();
     }
 }
@@ -478,7 +478,7 @@ class Test : Package {
     protected override void Initialize() {
         base.Initialize();
         this.svc = this.GetService(typeof(SVsBuildManagerAccessor)) as IVsBuildManagerAccessor;
-        Assumes.Present(this.svc);
+        Assumes.Present(svc);
     }
 
     void Foo() {
@@ -527,7 +527,7 @@ class Test : AsyncPackage {
     protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress) {
         await base.InitializeAsync(cancellationToken, progress);
         this.svc = await this.GetServiceAsync(typeof(SVsBuildManagerAccessor)) as IVsBuildManagerAccessor;
-        Assumes.Present(this.svc);
+        Assumes.Present(svc);
     }
 
     void Foo() {
@@ -576,7 +576,7 @@ class Test : AsyncPackage {
     protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress) {
         await base.InitializeAsync(cancellationToken, progress);
         this.svc = await this.GetServiceAsync(typeof(SVsBuildManagerAccessor)).ConfigureAwait(true) as IVsBuildManagerAccessor;
-        Assumes.Present(this.svc);
+        Assumes.Present(svc);
     }
 
     void Foo() {
@@ -644,7 +644,7 @@ class Test : Package {
     protected override void Initialize() {
         base.Initialize();
         this.svc = this.GetService(typeof(SVsBuildManagerAccessor)) as IVsBuildManagerAccessor;
-        Assumes.Present(this.svc);
+        Assumes.Present(svc);
     }
 
     void Foo() {
