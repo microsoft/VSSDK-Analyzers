@@ -19,7 +19,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 class Test : Package {
     protected override void Initialize() {
         base.Initialize();
-        var svc = this.GetService(typeof(SVsBuildManagerAccessor)) as IVsBuildManagerAccessor;
+        var svc = this.GetService(typeof(SVsBuildManagerAccessor)) as Microsoft.VisualStudio.Shell.Interop.IVsBuildManagerAccessor;
         svc.BeginDesignTimeBuild();
     }
 }
@@ -33,7 +33,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 class Test : Package {
     protected override void Initialize() {
         base.Initialize();
-        var svc = this.GetService(typeof(SVsBuildManagerAccessor)) as IVsBuildManagerAccessor;
+        var svc = this.GetService(typeof(SVsBuildManagerAccessor)) as Microsoft.VisualStudio.Shell.Interop.IVsBuildManagerAccessor;
         Assumes.Present(svc);
         svc.BeginDesignTimeBuild();
     }
@@ -41,6 +41,72 @@ class Test : Package {
 ";
 
         var expected = this.CreateDiagnostic(8, 13, 3, (9, 9, 3));
+        await Verify.VerifyCodeFixAsync(test, expected, fix);
+    }
+
+    [Fact]
+    public async Task LocalAssigned_OleInterop_QueryService_Guid_ThenUsedAsync()
+    {
+        var test = @"
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+
+class Test : Package {
+    private void SomeMethod(Microsoft.VisualStudio.OLE.Interop.IServiceProvider oleServiceProvider) {
+        var svc = oleServiceProvider.QueryService(typeof(SVsBuildManagerAccessor).GUID) as IVsBuildManagerAccessor;
+        svc.BeginDesignTimeBuild();
+    }
+}
+";
+
+        var fix = @"
+using Microsoft;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+
+class Test : Package {
+    private void SomeMethod(Microsoft.VisualStudio.OLE.Interop.IServiceProvider oleServiceProvider) {
+        var svc = oleServiceProvider.QueryService(typeof(SVsBuildManagerAccessor).GUID) as IVsBuildManagerAccessor;
+        Assumes.Present(svc);
+        svc.BeginDesignTimeBuild();
+    }
+}
+";
+
+        var expected = this.CreateDiagnostic(7, 13, 3, (8, 9, 3));
+        await Verify.VerifyCodeFixAsync(test, expected, fix);
+    }
+
+    [Fact]
+    public async Task LocalAssigned_OleInterop_QueryService_Generic_ThenUsedAsync()
+    {
+        var test = @"
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+
+class Test : Package {
+    private void SomeMethod(Microsoft.VisualStudio.OLE.Interop.IServiceProvider oleServiceProvider) {
+        var svc = oleServiceProvider.QueryService<SVsBuildManagerAccessor>() as IVsBuildManagerAccessor;
+        svc.BeginDesignTimeBuild();
+    }
+}
+";
+
+        var fix = @"
+using Microsoft;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+
+class Test : Package {
+    private void SomeMethod(Microsoft.VisualStudio.OLE.Interop.IServiceProvider oleServiceProvider) {
+        var svc = oleServiceProvider.QueryService<SVsBuildManagerAccessor>() as IVsBuildManagerAccessor;
+        Assumes.Present(svc);
+        svc.BeginDesignTimeBuild();
+    }
+}
+";
+
+        var expected = this.CreateDiagnostic(7, 13, 3, (8, 9, 3));
         await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
@@ -372,7 +438,7 @@ class Test : Package {
     protected override void Initialize() {
         base.Initialize();
         this.svc = this.GetService(typeof(SVsBuildManagerAccessor)) as IVsBuildManagerAccessor;
-        Assumes.Present(this.svc);
+        Assumes.Present(svc);
         this.svc.BeginDesignTimeBuild();
     }
 }
@@ -412,7 +478,7 @@ class Test : Package {
     protected override void Initialize() {
         base.Initialize();
         this.svc = this.GetService(typeof(SVsBuildManagerAccessor)) as IVsBuildManagerAccessor;
-        Assumes.Present(this.svc);
+        Assumes.Present(svc);
     }
 
     void Foo() {
@@ -461,7 +527,7 @@ class Test : AsyncPackage {
     protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress) {
         await base.InitializeAsync(cancellationToken, progress);
         this.svc = await this.GetServiceAsync(typeof(SVsBuildManagerAccessor)) as IVsBuildManagerAccessor;
-        Assumes.Present(this.svc);
+        Assumes.Present(svc);
     }
 
     void Foo() {
@@ -510,7 +576,7 @@ class Test : AsyncPackage {
     protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress) {
         await base.InitializeAsync(cancellationToken, progress);
         this.svc = await this.GetServiceAsync(typeof(SVsBuildManagerAccessor)).ConfigureAwait(true) as IVsBuildManagerAccessor;
-        Assumes.Present(this.svc);
+        Assumes.Present(svc);
     }
 
     void Foo() {
@@ -578,7 +644,7 @@ class Test : Package {
     protected override void Initialize() {
         base.Initialize();
         this.svc = this.GetService(typeof(SVsBuildManagerAccessor)) as IVsBuildManagerAccessor;
-        Assumes.Present(this.svc);
+        Assumes.Present(svc);
     }
 
     void Foo() {

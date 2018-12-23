@@ -51,6 +51,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                         start.Compilation.GetTypeByMetadataName(Types.AsyncPackage.FullName)?.GetMembers(Types.Package.GetService),
                         start.Compilation.GetTypeByMetadataName(Types.ServiceProvider.FullName)?.GetMembers(Types.ServiceProvider.GetService),
                         start.Compilation.GetTypeByMetadataName(Types.IServiceProvider.FullName)?.GetMembers(Types.IServiceProvider.GetService),
+                        start.Compilation.GetTypeByMetadataName(Types.PackageUtilities.FullName)?.GetMembers(Types.PackageUtilities.QueryService),
                         start.Compilation.GetTypeByMetadataName(Types.IAsyncServiceProvider.FullName)?.GetMembers(Types.IAsyncServiceProvider.GetServiceAsync)),
                     Flatten(
                         start.Compilation.GetTypeByMetadataName(Types.Assumes.FullName)?.GetMembers(Types.Assumes.Present)));
@@ -87,7 +88,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             {
                 var invocationExpression = (InvocationExpressionSyntax)context.Node;
                 var invokedMethod = context.SemanticModel.GetSymbolInfo(invocationExpression.Expression, context.CancellationToken).Symbol as IMethodSymbol;
-                if (invokedMethod != null && this.getServiceMethods.Contains(invokedMethod))
+                if (invokedMethod != null && this.getServiceMethods.Contains(invokedMethod.ReducedFrom ?? invokedMethod))
                 {
                     bool isTask = Utils.IsTask(invokedMethod.ReturnType);
                     SyntaxNode startWalkFrom = isTask
