@@ -73,7 +73,8 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                     generator.MemberAccessExpression(
                         generator.QualifiedName(generator.IdentifierName(Types.Assumes.Namespace.Single()), generator.IdentifierName(Types.Assumes.TypeName)),
                         Types.Assumes.Present),
-                    generator.Argument(possiblyNullVariable)));
+                    generator.Argument(possiblyNullVariable)))
+                .WithAdditionalAnnotations(Simplifier.Annotation);
         }
     }
 }
