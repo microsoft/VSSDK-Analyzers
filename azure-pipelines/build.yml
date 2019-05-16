@@ -69,7 +69,7 @@ steps:
 - powershell: >-
     $testdir="bin\Microsoft.VisualStudio.SDK.Analyzers.Tests\$(BuildConfiguration)\net46"
 
-    choco install codecov opencover.portable --no-progress
+    choco install codecov opencover.portable --no-progress -y
 
     OpenCover.Console.exe
     -register:user
