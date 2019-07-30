@@ -1,0 +1,1 @@
+﻿P:System.Net.ServicePointManager.SecurityProtocol; Modifying this would affect Visual Studio's process wide networking state.
