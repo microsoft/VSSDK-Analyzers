@@ -51,6 +51,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                         start.Compilation.GetTypeByMetadataName(Types.AsyncPackage.FullName)?.GetMembers(Types.Package.GetService),
                         start.Compilation.GetTypeByMetadataName(Types.ServiceProvider.FullName)?.GetMembers(Types.ServiceProvider.GetService),
                         start.Compilation.GetTypeByMetadataName(Types.IServiceProvider.FullName)?.GetMembers(Types.IServiceProvider.GetService),
+                        start.Compilation.GetTypeByMetadataName(Types.PackageUtilities.FullName)?.GetMembers(Types.PackageUtilities.QueryService),
                         start.Compilation.GetTypeByMetadataName(Types.IAsyncServiceProvider.FullName)?.GetMembers(Types.IAsyncServiceProvider.GetServiceAsync)),
                     Flatten(
                         start.Compilation.GetTypeByMetadataName(Types.Assumes.FullName)?.GetMembers(Types.Assumes.Present)));
@@ -86,20 +87,29 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             internal void AnalyzeInvocationExpression(SyntaxNodeAnalysisContext context)
             {
                 var invocationExpression = (InvocationExpressionSyntax)context.Node;
-                var invokedMethod = context.SemanticModel.GetSymbolInfo(invocationExpression.Expression, context.CancellationToken).Symbol;
-                if (invokedMethod != null && this.getServiceMethods.Contains(invokedMethod))
+                var invokedMethod = context.SemanticModel.GetSymbolInfo(invocationExpression.Expression, context.CancellationToken).Symbol as IMethodSymbol;
+                if (invokedMethod != null && this.getServiceMethods.Contains(invokedMethod.ReducedFrom ?? invokedMethod))
                 {
+                    bool isTask = Utils.IsTask(invokedMethod.ReturnType);
+                    SyntaxNode startWalkFrom = isTask
+                        ? (SyntaxNode)Utils.FindAncestor<AwaitExpressionSyntax>(invocationExpression, n => n is MemberAccessExpressionSyntax || n is InvocationExpressionSyntax, (aes, child) => aes.Expression == child)
+                        : invocationExpression;
+                    if (startWalkFrom == null)
+                    {
+                        return;
+                    }
+
                     AssignmentExpressionSyntax assignment;
                     VariableDeclaratorSyntax variableDeclarator;
                     if (Utils.FindAncestor<MemberAccessExpressionSyntax>(
-                        invocationExpression,
+                        startWalkFrom,
                         n => n is CastExpressionSyntax || n is ParenthesizedExpressionSyntax || n is AwaitExpressionSyntax,
                         (mae, child) => mae.Expression == child) != null)
                     {
                         context.ReportDiagnostic(Diagnostic.Create(Descriptor, invocationExpression.Expression.GetLocation()));
                     }
                     else if ((assignment = Utils.FindAncestor<AssignmentExpressionSyntax>(
-                        invocationExpression,
+                        startWalkFrom,
                         n => n is CastExpressionSyntax || n is EqualsValueClauseSyntax || n is AwaitExpressionSyntax || (n is BinaryExpressionSyntax be && be.OperatorToken.IsKind(SyntaxKind.AsKeyword)),
                         (aes, child) => aes.Right == child)) != null)
                     {
@@ -127,7 +137,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                         }
                     }
                     else if ((variableDeclarator = Utils.FindAncestor<VariableDeclaratorSyntax>(
-                        invocationExpression,
+                        startWalkFrom,
                         n => n is CastExpressionSyntax || n is EqualsValueClauseSyntax || n is AwaitExpressionSyntax || (n is BinaryExpressionSyntax be && be.OperatorToken.IsKind(SyntaxKind.AsKeyword)),
                         (vds, child) => vds.Initializer == child)) != null)
                     {

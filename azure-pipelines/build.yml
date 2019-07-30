@@ -1,9 +1,20 @@
 steps:
+- task: DotNetCoreInstaller@0
+  displayName: Install .NET Core SDK 2.2.203
+  inputs:
+    packageType: sdk
+    version: 2.2.203
+  condition: and(succeeded(), ne(variables['Hosted'], 'true')) # Hosted agents already have this.
+
+- script: dotnet --info
+  displayName: Show dotnet SDK info
+
 - script: |
-    dotnet tool install --tool-path . nbgv
-    .\nbgv cloud -p src
+    dotnet tool install --tool-path .. nbgv --ignore-failed-sources
+    ..\nbgv cloud
+  workingDirectory: src
   displayName: Set build number
-  condition: ne(variables['system.pullrequest.isfork'], true)
+
 - task: PowerShell@2
   displayName: Set VSTS variables
   inputs:
@@ -30,16 +41,6 @@ steps:
 
 - ${{ if eq(variables['system.collectionId'], '011b8bdf-6d56-4f87-be0d-0092136884d9') }}:
   - template: azure-pipeline.microbuild.before.yml
-
-- task: DotNetCoreInstaller@0
-  displayName: Install .NET Core SDK 2.1.300
-  inputs:
-    packageType: sdk
-    version: 2.1.300
-  condition: and(succeeded(), ne(variables['Hosted'], 'true')) # Hosted agents already have this.
-
-- script: dotnet --info
-  displayName: Show dotnet SDK info
 
 # We have to use the traditional nuget.exe for restoring since we have vcxproj projects too.
 - task: NuGetToolInstaller@0
@@ -69,7 +70,7 @@ steps:
 - powershell: >-
     $testdir="bin\Microsoft.VisualStudio.SDK.Analyzers.Tests\$(BuildConfiguration)\net46"
 
-    choco install codecov opencover.portable --no-progress
+    choco install codecov opencover.portable --no-progress -y
 
     OpenCover.Console.exe
     -register:user

@@ -43,6 +43,37 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         }
 
         /// <summary>
+        /// Describes the <see cref="Microsoft.VisualStudio.OLE.Interop.IServiceProvider"/> type.
+        /// </summary>
+        internal static class IOleServiceProvider
+        {
+            /// <summary>
+            /// Gets the simple name of the <see cref="Microsoft.VisualStudio.OLE.Interop.IServiceProvider"/> type.
+            /// </summary>
+            internal const string TypeName = nameof(OLE.Interop.IServiceProvider);
+
+            /// <summary>
+            /// The name of the QueryService method.
+            /// </summary>
+            internal const string QueryService = nameof(OLE.Interop.IServiceProvider.QueryService);
+
+            /// <summary>
+            /// Gets an array of the nesting namespaces for this type.
+            /// </summary>
+            internal static readonly IReadOnlyList<string> Namespace = Namespaces.MicrosoftVisualStudioOLEInterop;
+
+            /// <summary>
+            /// Gets the <see cref="Microsoft.CodeAnalysis.CSharp.Syntax.TypeSyntax"/> for this type.
+            /// </summary>
+            internal static TypeSyntax TypeSyntax { get; } = Utils.QualifyName(Namespace, SyntaxFactory.IdentifierName(TypeName));
+
+            /// <summary>
+            /// Gets the fully-qualified name of this type as a string.
+            /// </summary>
+            internal static string FullName => string.Join(".", Namespace) + "." + TypeName;
+        }
+
+        /// <summary>
         /// Describes the System.IServiceProvider type.
         /// </summary>
         internal static class IServiceProvider
@@ -195,6 +226,37 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             /// The name of the GetService method.
             /// </summary>
             internal const string GetService = "GetService";
+
+            /// <summary>
+            /// Gets an array of the nesting namespaces for this type.
+            /// </summary>
+            internal static readonly IReadOnlyList<string> Namespace = Namespaces.MicrosoftVisualStudioShell;
+
+            /// <summary>
+            /// Gets the <see cref="Microsoft.CodeAnalysis.CSharp.Syntax.TypeSyntax"/> for this type.
+            /// </summary>
+            internal static TypeSyntax TypeSyntax { get; } = Utils.QualifyName(Namespace, SyntaxFactory.IdentifierName(TypeName));
+
+            /// <summary>
+            /// Gets the fully-qualified name of this type as a string.
+            /// </summary>
+            internal static string FullName => string.Join(".", Namespace) + "." + TypeName;
+        }
+
+        /// <summary>
+        /// Describes the <see cref="Shell.PackageUtilities"/> type.
+        /// </summary>
+        internal static class PackageUtilities
+        {
+            /// <summary>
+            /// Gets the simple name of the <see cref="Shell.PackageUtilities"/> type.
+            /// </summary>
+            internal const string TypeName = nameof(Shell.PackageUtilities);
+
+            /// <summary>
+            /// The name of the QueryService method.
+            /// </summary>
+            internal const string QueryService = "QueryService";
 
             /// <summary>
             /// Gets an array of the nesting namespaces for this type.

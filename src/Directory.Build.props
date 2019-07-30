@@ -8,7 +8,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <LangVersion>7.3</LangVersion>
 
-    <MicroBuildVersion>2.0.54</MicroBuildVersion>
+    <MicroBuildVersion>2.0.55</MicroBuildVersion>
     <MicroBuild_DoNotStrongNameSign>true</MicroBuild_DoNotStrongNameSign>
 
     <PackageProjectUrl>https://github.com/Microsoft/VSSDK-Analyzers</PackageProjectUrl>
@@ -31,7 +31,7 @@
     <PackageReference Include="Microsoft.VisualStudio.Threading" Version="15.8.122" PrivateAssets="all" />
 
     <!-- We WANT these analyzers to be expressed as dependencies of the final package. -->
-    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="16.0.96-beta" PrivateAssets="none" />
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="16.0.102" PrivateAssets="none" />
     <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="2.9.4" PrivateAssets="none" />
   </ItemGroup>
 
