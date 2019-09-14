@@ -78,7 +78,7 @@ public static class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
             Path.Combine("Microsoft.VisualStudio.Shell.Interop.15.6.DesignTime", "15.6.27415", "lib\\net20", "Microsoft.VisualStudio.Shell.Interop.15.6.DesignTime.dll"),
             Path.Combine("Microsoft.VisualStudio.Shell.15.0", "15.6.27415", "lib\\net45", "Microsoft.VisualStudio.Shell.15.0.dll"),
             Path.Combine("Microsoft.VisualStudio.Shell.Framework", "15.6.27415", "lib\\net45", "Microsoft.VisualStudio.Shell.Framework.dll"),
-            Path.Combine("Microsoft.VisualStudio.Threading", "15.8.122", "lib\\net45", "Microsoft.VisualStudio.Threading.dll"),
+            Path.Combine("Microsoft.VisualStudio.Threading", "16.3.52", "lib\\net472", "Microsoft.VisualStudio.Threading.dll"),
             Path.Combine("Microsoft.VisualStudio.Validation", "15.3.15", "lib\\net45", "Microsoft.VisualStudio.Validation.dll"),
         });
 
@@ -91,7 +91,7 @@ public static class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
             {
                 if (this.IncludeVisualStudioSdk)
                 {
-                    var nugetPackagesFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nuget", "packages");
+                    string nugetPackagesFolder = Environment.GetEnvironmentVariable("NUGET_PACKAGES") ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nuget", "packages");
                     foreach (var reference in VSSDKPackageReferences)
                     {
                         solution = solution.AddMetadataReference(projectId, MetadataReference.CreateFromFile(Path.Combine(nugetPackagesFolder, reference)));

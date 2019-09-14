@@ -78,7 +78,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         /// Tests whether a symbol belongs to a given namespace.
         /// </summary>
         /// <param name="symbol">The symbol whose namespace membership is being tested.</param>
-        /// <param name="namespaces">A sequence of namespaces from global to most precise. For example: [System, Threading, Tasks]</param>
+        /// <param name="namespaces">A sequence of namespaces from global to most precise. For example: [System, Threading, Tasks].</param>
         /// <returns><c>true</c> if the symbol belongs to the given namespace; otherwise <c>false</c>.</returns>
         internal static bool BelongsToNamespace(this ISymbol symbol, IReadOnlyList<string> namespaces)
         {
@@ -110,7 +110,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         /// Gets a value indicating whether one type is equal to or derives from another type.
         /// </summary>
         /// <param name="type">The type to check.</param>
-        /// <param name="baseType">The type to compare with, that may be a base type of <paramref name="type"/></param>
+        /// <param name="baseType">The type to compare with, that may be a base type of <paramref name="type"/>.</param>
         /// <returns><c>true</c> if <paramref name="baseType"/> is a base type or equal to <paramref name="type"/>.</returns>
         internal static bool IsEqualToOrDerivedFrom(ITypeSymbol type, ITypeSymbol baseType)
         {
@@ -121,7 +121,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         /// Gets a value indicating whether one type derives from another type.
         /// </summary>
         /// <param name="type">The type to check.</param>
-        /// <param name="baseType">The type to compare with, that may be a base type of <paramref name="type"/></param>
+        /// <param name="baseType">The type to compare with, that may be a base type of <paramref name="type"/>.</param>
         /// <returns><c>true</c> if <paramref name="baseType"/> is a base type of <paramref name="type"/>.</returns>
         internal static bool IsDerivedFrom(ITypeSymbol type, ITypeSymbol baseType)
         {
@@ -165,7 +165,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             NameSyntax result = SyntaxFactory.IdentifierName(qualifiers[0]);
             for (int i = 1; i < qualifiers.Count; i++)
             {
-                var rightSide = SyntaxFactory.IdentifierName(qualifiers[i]);
+                IdentifierNameSyntax rightSide = SyntaxFactory.IdentifierName(qualifiers[i]);
                 result = SyntaxFactory.QualifiedName(result, rightSide);
             }
 
@@ -198,8 +198,8 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 return default;
             }
 
-            var current = syntaxNode.Parent;
-            var child = syntaxNode;
+            SyntaxNode current = syntaxNode.Parent;
+            SyntaxNode child = syntaxNode;
             while (current != null)
             {
                 if (current is T t && isMatch(t, child))
@@ -238,7 +238,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         /// <returns>The original <paramref name="syntaxNode"/> given, as it is represented in the updated syntax tree.</returns>
         internal static async Task<SyntaxNode> AddUsingTaskEqualsDirectiveAsync(SyntaxNode syntaxNode, CancellationToken cancellationToken)
         {
-            var existingUsings = syntaxNode.AncestorsAndSelf().OfType<UsingDirectiveSyntax>().Concat(
+            IEnumerable<UsingDirectiveSyntax> existingUsings = syntaxNode.AncestorsAndSelf().OfType<UsingDirectiveSyntax>().Concat(
                 syntaxNode.DescendantNodes(n => n is CompilationUnitSyntax || n is NamespaceDeclarationSyntax).OfType<UsingDirectiveSyntax>());
             if (existingUsings.Any(u => u.Alias?.Name?.Identifier.ValueText == nameof(Task)))
             {
@@ -249,7 +249,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             var trackAnnotation = new SyntaxAnnotation();
             syntaxNode = syntaxNode.WithAdditionalAnnotations(trackAnnotation);
 
-            var usingTaskDirective = SyntaxFactory.UsingDirective(
+            UsingDirectiveSyntax usingTaskDirective = SyntaxFactory.UsingDirective(
                 QualifyName(Namespaces.SystemThreadingTasks, SyntaxFactory.IdentifierName(nameof(Task))))
                 .WithAlias(SyntaxFactory.NameEquals(nameof(Task)));
 

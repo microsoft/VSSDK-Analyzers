@@ -34,9 +34,9 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         /// <inheritdoc />
         public override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {
-            var diagnostic = context.Diagnostics.First();
-            var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken);
-            var node = root.FindNode(diagnostic.Location.SourceSpan, getInnermostNodeForTie: true);
+            Diagnostic diagnostic = context.Diagnostics.First();
+            SyntaxNode root = await context.Document.GetSyntaxRootAsync(context.CancellationToken);
+            SyntaxNode node = root.FindNode(diagnostic.Location.SourceSpan, getInnermostNodeForTie: true);
             SyntaxNode presentArgument = node is VariableDeclaratorSyntax declaratorSyntax ? SyntaxFactory.IdentifierName(declaratorSyntax.Identifier)
                 : node.Parent is InvocationExpressionSyntax ? null // direct GetService result invocation
                 : node is NameSyntax ? node
@@ -56,10 +56,10 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
 
         private static async Task<Document> AppendAfterAssignmentAsync(CodeFixContext context, StatementSyntax relativeTo, SyntaxNode presentArgument, CancellationToken cancellationToken)
         {
-            var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken);
-            var document = context.Document;
-            var root = await document.GetSyntaxRootAsync(cancellationToken);
-            var assumesStatement = CreateAssumesPresentStatement(editor.Generator, presentArgument);
+            DocumentEditor editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken);
+            Document document = context.Document;
+            SyntaxNode root = await document.GetSyntaxRootAsync(cancellationToken);
+            SyntaxNode assumesStatement = CreateAssumesPresentStatement(editor.Generator, presentArgument);
             root = root.InsertNodesAfter(relativeTo, new SyntaxNode[] { assumesStatement });
             document = document.WithSyntaxRoot(root);
             document = await ImportAdder.AddImportsAsync(document, Simplifier.Annotation, cancellationToken: cancellationToken);

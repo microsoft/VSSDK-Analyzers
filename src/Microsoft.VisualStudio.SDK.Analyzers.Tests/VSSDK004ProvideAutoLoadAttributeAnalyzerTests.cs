@@ -44,7 +44,7 @@ using Microsoft.VisualStudio.Shell;
 class Test : AsyncPackage {
 }
 ";
-        var expected = Verify.Diagnostic().WithSpan(4, 2, 4, 59);
+        DiagnosticResult expected = Verify.Diagnostic().WithSpan(4, 2, 4, 59);
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
@@ -58,7 +58,7 @@ using Microsoft.VisualStudio.Shell;
 class Test : AsyncPackage {
 }
 ";
-        var expected = Verify.Diagnostic().WithSpan(4, 2, 4, 86);
+        DiagnosticResult expected = Verify.Diagnostic().WithSpan(4, 2, 4, 86);
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
@@ -91,7 +91,7 @@ using Microsoft.VisualStudio.Shell;
 class Test : AsyncPackage {
 }
 ";
-        var expected = Verify.Diagnostic().WithSpan(4, 2, 4, 93);
+        DiagnosticResult expected = Verify.Diagnostic().WithSpan(4, 2, 4, 93);
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
@@ -131,7 +131,7 @@ using Microsoft.VisualStudio.Shell;
 class Test : Package {
 }
 ";
-        var expected = Verify.Diagnostic().WithSpan(4, 2, 4, 96);
+        DiagnosticResult expected = Verify.Diagnostic().WithSpan(4, 2, 4, 96);
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 }

@@ -527,7 +527,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             internal static readonly IReadOnlyList<string> Namespace = Namespaces.MicrosoftVisualStudioShell;
 
             /// <summary>
-            /// Copy of auto load flag values from <see cref="Shell.PackageAutoLoadFlags"/>
+            /// Copy of auto load flag values from <see cref="Shell.PackageAutoLoadFlags"/>.
             /// </summary>
             internal enum Values
             {

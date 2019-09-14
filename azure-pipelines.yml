@@ -1,44 +1,22 @@
 trigger:
   branches:
-    include: ["master", "*"]
+    include:
+    - master
+    - microbuild
+    - validate/*
   paths:
-    exclude: [".github", "doc", "*.md", ".appveyor.yml", ".travis.yml"]
+    exclude:
+    - doc/
+    - '*.md'
+    - .vscode/
 
 variables:
   TreatWarningsAsErrors: true
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   BuildConfiguration: Release
   BuildPlatform: Any CPU
-  codecov_token: 27bb1787-08af-48c7-bda5-ca308440f1b6
-
-resources:
-  containers:
-  - container: xenial
-    image: andrewarnott/linux-buildagent
+  # codecov_token: 4dc9e7e2-6b01-4932-a180-847b52b43d35 # Get a new one from https://codecov.io/
+  NUGET_PACKAGES: $(Agent.TempDirectory)/.nuget/packages
 
 jobs:
-- job: Windows
-  pool: Hosted Windows 2019 with VS2019
-  steps:
-  - template: azure-pipelines/build.yml
-
-#- job: Linux
-#  pool:
-#    vmImage: Ubuntu 16.04
-#  container: xenial
-#  variables:
-#    GitLinkEnabled: false
-#  steps:
-#  - template: azure-pipelines/testfx.yml
-#    parameters:
-#      projectdirectory: src/Microsoft.VisualStudio.SDK.Analyzers.Tests
-#
-#- job: macOS
-#  pool:
-#    vmImage: macOS 10.13
-#  variables:
-#    GitLinkEnabled: false
-#  steps:
-#  - template: azure-pipelines/testfx.yml
-#    parameters:
-#      projectdirectory: src/Microsoft.VisualStudio.SDK.Analyzers.Tests
+- template: azure-pipelines/build.yml
