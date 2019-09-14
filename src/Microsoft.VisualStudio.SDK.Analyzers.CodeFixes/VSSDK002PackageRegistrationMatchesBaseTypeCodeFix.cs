@@ -29,10 +29,10 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         /// <inheritdoc />
         public override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {
-            var diagnostic = context.Diagnostics.First();
+            Diagnostic diagnostic = context.Diagnostics.First();
 
-            var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
-            var classDeclarationSyntax = root.FindNode(diagnostic.Location.SourceSpan).FirstAncestorOrSelf<ClassDeclarationSyntax>();
+            SyntaxNode root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
+            ClassDeclarationSyntax classDeclarationSyntax = root.FindNode(diagnostic.Location.SourceSpan).FirstAncestorOrSelf<ClassDeclarationSyntax>();
             if (classDeclarationSyntax != null)
             {
                 context.RegisterCodeFix(
@@ -49,7 +49,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             bool isAsyncPackage = diagnostic.Properties[VSSDK002PackageRegistrationMatchesBaseTypeAnalyzer.BaseTypeDiagnosticPropertyName] == Types.AsyncPackage.TypeName;
             LiteralExpressionSyntax appropriateArgument = SyntaxFactory.LiteralExpression(isAsyncPackage ? SyntaxKind.TrueLiteralExpression : SyntaxKind.FalseLiteralExpression);
 
-            var root = await context.Document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
+            SyntaxNode root = await context.Document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
             switch (root.FindNode(diagnostic.Location.SourceSpan))
             {
                 case AttributeSyntax packageRegistrationSyntax:

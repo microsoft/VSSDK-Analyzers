@@ -40,7 +40,7 @@ class Test : Package {
 }
 ";
 
-        var expected = this.CreateDiagnostic(8, 13, 3, (9, 9, 3));
+        DiagnosticResult expected = this.CreateDiagnostic(8, 13, 3, (9, 9, 3));
         await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
@@ -73,7 +73,7 @@ class Test : Package {
 }
 ";
 
-        var expected = this.CreateDiagnostic(7, 13, 3, (8, 9, 3));
+        DiagnosticResult expected = this.CreateDiagnostic(7, 13, 3, (8, 9, 3));
         await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
@@ -106,7 +106,7 @@ class Test : Package {
 }
 ";
 
-        var expected = this.CreateDiagnostic(7, 13, 3, (8, 9, 3));
+        DiagnosticResult expected = this.CreateDiagnostic(7, 13, 3, (8, 9, 3));
         await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
@@ -158,7 +158,7 @@ class Test {
 }
 ";
 
-        var expected = this.CreateDiagnostic(7, 13, 3, (8, 9, 3));
+        DiagnosticResult expected = this.CreateDiagnostic(7, 13, 3, (8, 9, 3));
         await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
@@ -193,7 +193,7 @@ class Test : Package {
 }
 ";
 
-        var expected = this.CreateDiagnostic(8, 13, 3, (9, 9, 3));
+        DiagnosticResult expected = this.CreateDiagnostic(8, 13, 3, (9, 9, 3));
         await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
@@ -234,7 +234,7 @@ class Test : AsyncPackage {
 }
 ";
 
-        var expected = this.CreateDiagnostic(11, 13, 3, (12, 9, 3));
+        DiagnosticResult expected = this.CreateDiagnostic(11, 13, 3, (12, 9, 3));
         await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
@@ -275,7 +275,7 @@ class Test : AsyncPackage {
 }
 ";
 
-        var expected = this.CreateDiagnostic(11, 13, 3, (12, 9, 3));
+        DiagnosticResult expected = this.CreateDiagnostic(11, 13, 3, (12, 9, 3));
         await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
@@ -327,7 +327,7 @@ class Test : AsyncPackage {
 }
 ";
 
-        var expected = this.CreateDiagnostic(17, 13, 4, (18, 9, 4));
+        DiagnosticResult expected = this.CreateDiagnostic(17, 13, 4, (18, 9, 4));
         await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
@@ -370,7 +370,7 @@ class Test : AsyncPackage {
 }
 ";
 
-        var expected = this.CreateDiagnostic(12, 9, 3, (13, 9, 3));
+        DiagnosticResult expected = this.CreateDiagnostic(12, 9, 3, (13, 9, 3));
         await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
@@ -407,7 +407,7 @@ class Test : Package {
 }
 ";
 
-        var expected = this.CreateDiagnostic(9, 9, 3, (10, 9, 3));
+        DiagnosticResult expected = this.CreateDiagnostic(9, 9, 3, (10, 9, 3));
         await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
@@ -444,7 +444,7 @@ class Test : Package {
 }
 ";
 
-        var expected = this.CreateDiagnostic(9, 9, 8, (10, 9, 8));
+        DiagnosticResult expected = this.CreateDiagnostic(9, 9, 8, (10, 9, 8));
         await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
@@ -487,7 +487,7 @@ class Test : Package {
 }
 ";
 
-        var expected = this.CreateDiagnostic(9, 9, 8, (13, 9, 8));
+        DiagnosticResult expected = this.CreateDiagnostic(9, 9, 8, (13, 9, 8));
         await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
@@ -536,7 +536,7 @@ class Test : AsyncPackage {
 }
 ";
 
-        var expected = this.CreateDiagnostic(12, 9, 8, (16, 9, 8));
+        DiagnosticResult expected = this.CreateDiagnostic(12, 9, 8, (16, 9, 8));
         await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
@@ -585,7 +585,7 @@ class Test : AsyncPackage {
 }
 ";
 
-        var expected = this.CreateDiagnostic(12, 9, 8, (16, 9, 8));
+        DiagnosticResult expected = this.CreateDiagnostic(12, 9, 8, (16, 9, 8));
         await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
@@ -653,7 +653,7 @@ class Test : Package {
 }
 ";
 
-        var expected = this.CreateDiagnostic(9, 9, 8, (13, 9, 8));
+        DiagnosticResult expected = this.CreateDiagnostic(9, 9, 8, (13, 9, 8));
         await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
@@ -672,7 +672,7 @@ class Test : Package {
 }
 ";
 
-        var expected = this.CreateDiagnostic(8, 35, 15);
+        DiagnosticResult expected = this.CreateDiagnostic(8, 35, 15);
         await Verify.VerifyCodeFixAsync(test, expected, test);
     }
 
@@ -712,7 +712,7 @@ class Test : AsyncPackage {
 }
 ";
 
-        var expected = this.CreateDiagnostic(11, 41, 20);
+        DiagnosticResult expected = this.CreateDiagnostic(11, 41, 20);
         await Verify.VerifyCodeFixAsync(test, expected, test);
     }
 
@@ -734,7 +734,7 @@ class Test : AsyncPackage {
 }
 ";
 
-        var expected = this.CreateDiagnostic(11, 41, 20);
+        DiagnosticResult expected = this.CreateDiagnostic(11, 41, 20);
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
@@ -823,8 +823,8 @@ class Test : Package {
 
     private DiagnosticResult CreateDiagnostic(int line, int column, int length, params (int line, int column, int length)[] additionalLocations)
     {
-        var diagnostic = Verify.Diagnostic().WithSpan(line, column, line, column + length);
-        foreach (var location in additionalLocations)
+        DiagnosticResult diagnostic = Verify.Diagnostic().WithSpan(line, column, line, column + length);
+        foreach ((int line, int column, int length) location in additionalLocations)
         {
             diagnostic = diagnostic.WithSpan(location.line, location.column, location.line, location.column + location.length);
         }

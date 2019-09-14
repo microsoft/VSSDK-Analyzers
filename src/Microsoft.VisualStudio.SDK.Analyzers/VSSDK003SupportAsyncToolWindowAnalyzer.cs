@@ -53,8 +53,8 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             // Register for compilation first so that we only activate the analyzer for applicable compilations
             context.RegisterCompilationStartAction(compilationContext =>
             {
-                var asyncPackageType = compilationContext.Compilation.GetTypeByMetadataName(Types.AsyncPackage.FullName)?.OriginalDefinition;
-                var provideToolWindowAttribute = compilationContext.Compilation.GetTypeByMetadataName(Types.ProvideToolWindowAttribute.FullName)?.OriginalDefinition;
+                INamedTypeSymbol asyncPackageType = compilationContext.Compilation.GetTypeByMetadataName(Types.AsyncPackage.FullName)?.OriginalDefinition;
+                INamedTypeSymbol provideToolWindowAttribute = compilationContext.Compilation.GetTypeByMetadataName(Types.ProvideToolWindowAttribute.FullName)?.OriginalDefinition;
                 bool targetVSSupportsAsyncToolWindows = asyncPackageType?.MemberNames.Any(n => n == Types.AsyncPackage.GetAsyncToolWindowFactory) ?? false;
                 if (targetVSSupportsAsyncToolWindows)
                 {
@@ -69,7 +69,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         private void AnalyzeClassDeclaration(SyntaxNodeAnalysisContext context, INamedTypeSymbol asyncPackageType, INamedTypeSymbol provideToolWindowAttributeType)
         {
             var declaration = (ClassDeclarationSyntax)context.Node;
-            var baseType = declaration.BaseList?.Types.FirstOrDefault();
+            BaseTypeSyntax baseType = declaration.BaseList?.Types.FirstOrDefault();
             if (baseType == null)
             {
                 return;
@@ -82,9 +82,9 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 return;
             }
 
-            var userClassSymbol = context.SemanticModel.GetDeclaredSymbol(declaration, context.CancellationToken);
-            var packageRegistrationInstance = userClassSymbol?.GetAttributes().FirstOrDefault(a => a.AttributeClass?.Equals(provideToolWindowAttributeType) ?? false);
-            var firstParameter = packageRegistrationInstance?.ConstructorArguments.FirstOrDefault();
+            INamedTypeSymbol userClassSymbol = context.SemanticModel.GetDeclaredSymbol(declaration, context.CancellationToken);
+            AttributeData packageRegistrationInstance = userClassSymbol?.GetAttributes().FirstOrDefault(a => a.AttributeClass?.Equals(provideToolWindowAttributeType) ?? false);
+            TypedConstant? firstParameter = packageRegistrationInstance?.ConstructorArguments.FirstOrDefault();
             if (firstParameter.HasValue && firstParameter.Value.Kind == TypedConstantKind.Type && firstParameter.Value.Value is INamedTypeSymbol typeOfUserToolWindow)
             {
                 bool toolWindowHasCtorWithOneParameter = typeOfUserToolWindow.GetMembers(ConstructorInfo.ConstructorName).OfType<IMethodSymbol>().Any(c => c.Parameters.Length == 1);

@@ -113,15 +113,15 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                         n => n is CastExpressionSyntax || n is EqualsValueClauseSyntax || n is AwaitExpressionSyntax || (n is BinaryExpressionSyntax be && be.OperatorToken.IsKind(SyntaxKind.AsKeyword)),
                         (aes, child) => aes.Right == child)) != null)
                     {
-                        var leftSymbol = context.SemanticModel.GetSymbolInfo(assignment.Left, context.CancellationToken).Symbol;
+                        ISymbol leftSymbol = context.SemanticModel.GetSymbolInfo(assignment.Left, context.CancellationToken).Symbol;
                         if (leftSymbol != null)
                         {
                             // If the assigned variable is actually a field, scan this block for Assumes.Present
-                            var parentBlock = Utils.FindFirstAncestorOfTypes(invocationExpression, typeof(BlockSyntax), typeof(ArrowExpressionClauseSyntax));
+                            SyntaxNode parentBlock = Utils.FindFirstAncestorOfTypes(invocationExpression, typeof(BlockSyntax), typeof(ArrowExpressionClauseSyntax));
                             if (!parentBlock?.DescendantNodes().Any(n => this.IsThrowingNullCheck(n, leftSymbol, context)) ?? true)
                             {
                                 // Since we didn't find an Assumes.Present call for this symbol, scan all blocks and expression bodies within this type.
-                                var derefs = from member in leftSymbol.ContainingType.GetMembers().OfType<IMethodSymbol>()
+                                System.Collections.Generic.IEnumerable<Location> derefs = from member in leftSymbol.ContainingType.GetMembers().OfType<IMethodSymbol>()
                                              from syntaxRef in member.DeclaringSyntaxReferences
                                              let methodSyntax = syntaxRef.GetSyntax(context.CancellationToken) as MethodDeclarationSyntax
                                              where methodSyntax != null
@@ -145,8 +145,8 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                         var leftSymbol = context.SemanticModel.GetDeclaredSymbol(variableDeclarator, context.CancellationToken) as ILocalSymbol;
                         if (leftSymbol != null)
                         {
-                            var containingBlock = context.Node.FirstAncestorOrSelf<BlockSyntax>();
-                            var derefs = this.ScanBlockForDereferencesWithoutNullCheck(context, leftSymbol, containingBlock);
+                            BlockSyntax containingBlock = context.Node.FirstAncestorOrSelf<BlockSyntax>();
+                            ImmutableArray<Location> derefs = this.ScanBlockForDereferencesWithoutNullCheck(context, leftSymbol, containingBlock);
                             if (derefs.Any())
                             {
                                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, variableDeclarator.Identifier.GetLocation(), derefs));
@@ -165,7 +165,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
 
                 if (symbol != null)
                 {
-                    var variableUses = from access in containingBlockOrExpression.DescendantNodes().OfType<MemberAccessExpressionSyntax>()
+                    System.Collections.Generic.IEnumerable<MemberAccessExpressionSyntax> variableUses = from access in containingBlockOrExpression.DescendantNodes().OfType<MemberAccessExpressionSyntax>()
                                        let symbolAccessed = context.SemanticModel.GetSymbolInfo(access.Expression, context.CancellationToken).Symbol
                                        where symbol.Equals(symbolAccessed)
                                        select access;
@@ -207,7 +207,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 if (node is InvocationExpressionSyntax invocationExpression &&
                     this.nullThrowingMethods.Contains(context.SemanticModel.GetSymbolInfo(invocationExpression.Expression).Symbol?.OriginalDefinition))
                 {
-                    var firstArg = invocationExpression.ArgumentList.Arguments.FirstOrDefault();
+                    ArgumentSyntax firstArg = invocationExpression.ArgumentList.Arguments.FirstOrDefault();
                     if (firstArg != null && symbol.Equals(context.SemanticModel.GetSymbolInfo(firstArg.Expression, context.CancellationToken).Symbol))
                     {
                         return true;

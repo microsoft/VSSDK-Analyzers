@@ -42,7 +42,7 @@ class Test : Package {
 }
 ";
 
-        var expected = Verify.Diagnostic().WithSpan(4, 14, 4, 21);
+        Microsoft.CodeAnalysis.Testing.DiagnosticResult expected = Verify.Diagnostic().WithSpan(4, 14, 4, 21);
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
@@ -58,7 +58,7 @@ class Test : Package, IDisposable {
 }
 ";
 
-        var expected = Verify.Diagnostic().WithSpan(5, 14, 5, 21);
+        Microsoft.CodeAnalysis.Testing.DiagnosticResult expected = Verify.Diagnostic().WithSpan(5, 14, 5, 21);
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 }

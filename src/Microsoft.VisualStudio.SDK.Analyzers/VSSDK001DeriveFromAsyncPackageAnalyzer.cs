@@ -50,8 +50,8 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             // Register for compilation first so that we only activate the analyzer for applicable compilations
             context.RegisterCompilationStartAction(compilationContext =>
             {
-                var packageType = compilationContext.Compilation.GetTypeByMetadataName(Types.Package.FullName);
-                var asyncPackage = compilationContext.Compilation.GetTypeByMetadataName(Types.AsyncPackage.FullName);
+                INamedTypeSymbol packageType = compilationContext.Compilation.GetTypeByMetadataName(Types.Package.FullName);
+                INamedTypeSymbol asyncPackage = compilationContext.Compilation.GetTypeByMetadataName(Types.AsyncPackage.FullName);
                 if (asyncPackage != null)
                 {
                     // Reuse the type symbols we looked up so that we don't have to look them up for every single class declaration.
@@ -63,13 +63,13 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         private void AnalyzeClassDeclaration(SyntaxNodeAnalysisContext context, INamedTypeSymbol packageType)
         {
             var declaration = (ClassDeclarationSyntax)context.Node;
-            var baseType = declaration.BaseList?.Types.FirstOrDefault();
+            BaseTypeSyntax baseType = declaration.BaseList?.Types.FirstOrDefault();
             if (baseType == null)
             {
                 return;
             }
 
-            var baseTypeSymbol = context.SemanticModel.GetSymbolInfo(baseType.Type, context.CancellationToken);
+            SymbolInfo baseTypeSymbol = context.SemanticModel.GetSymbolInfo(baseType.Type, context.CancellationToken);
             if (baseTypeSymbol.Symbol?.OriginalDefinition == packageType.OriginalDefinition)
             {
                 context.ReportDiagnostic(Diagnostic.Create(

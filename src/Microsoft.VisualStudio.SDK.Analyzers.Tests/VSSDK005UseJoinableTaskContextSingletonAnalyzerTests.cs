@@ -20,7 +20,7 @@ class Test {
     }
 }
 ";
-        var expected = Verify.Diagnostic().WithSpan(6, 19, 6, 44);
+        Microsoft.CodeAnalysis.Testing.DiagnosticResult expected = Verify.Diagnostic().WithSpan(6, 19, 6, 44);
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
@@ -34,7 +34,7 @@ class Test {
     JoinableTaskContext jtc = new JoinableTaskContext();
 }
 ";
-        var expected = Verify.Diagnostic().WithSpan(5, 31, 5, 56);
+        Microsoft.CodeAnalysis.Testing.DiagnosticResult expected = Verify.Diagnostic().WithSpan(5, 31, 5, 56);
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
