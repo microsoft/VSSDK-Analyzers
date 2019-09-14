@@ -1,19 +1,8 @@
 <Project>
-  <!--
-    These properties must be in the targets file because the .NET SDK is erroneously stomping
-    them for some of the DEF assemblies due to this work-around: https://github.com/Microsoft/vstest/pull/528
-  -->
-  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <DebugType>full</DebugType>
+  <PropertyGroup Condition=" '$(IsTestProject)' == 'true' ">
+    <CoverletOutputFormat>cobertura</CoverletOutputFormat>
+    <Exclude>[xunit.*]*</Exclude>
+    <!-- Ensure we preserve each coverlet output file per target framework: https://github.com/tonerdo/coverlet/issues/177 -->
+    <CoverletOutput>$(OutputPath)/</CoverletOutput>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <DebugType>pdbonly</DebugType>
-  </PropertyGroup>
-
-  <Target Name="SetNuSpecProperties" BeforeTargets="GenerateNuspec" DependsOnTargets="GetBuildVersion">
-    <PropertyGroup>
-      <PackageLicenseUrl>https://raw.githubusercontent.com/Microsoft/vssdk-analyzers/$(GitCommitIdShort)/LICENSE</PackageLicenseUrl>
-    </PropertyGroup>
-  </Target>
-
 </Project>
