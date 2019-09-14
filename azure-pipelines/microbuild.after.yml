@@ -4,6 +4,7 @@ steps:
   inputs:
     TargetFolders: |
       $(Build.SourcesDirectory)/bin/Packages/$(BuildConfiguration)/NuGet
+    WhiteListPathForSigs: azure-pipelines/no_strongname.txt
 
 - task: MicroBuildCleanup@1
   condition: succeededOrFailed()

@@ -1,0 +1,2 @@
+*\microsoft.visualstudio.sdk.analyzers.dll,Non-reference assemblies do not require a strong name
+*\microsoft.visualstudio.sdk.analyzers.codefixes.dll,Non-reference assemblies do not require a strong name
