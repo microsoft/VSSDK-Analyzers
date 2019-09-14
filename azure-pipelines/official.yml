@@ -2,7 +2,7 @@ trigger:
   branches:
     include: ["master", "*"]
   paths:
-    exclude: [".github", "doc", "*.md", ".appveyor.yml", ".travis.yml"]
+    exclude: [".github", "doc", "*.md"]
 
 variables:
   TreatWarningsAsErrors: true
@@ -12,6 +12,6 @@ variables:
 
 jobs:
 - job: Windows
-  pool: VSEng-MicroBuildVS2017
+  pool: VSEng-MicroBuildVS2019
   steps:
   - template: build.yml
