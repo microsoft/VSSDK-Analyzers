@@ -91,7 +91,7 @@ public static class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
             {
                 if (this.IncludeVisualStudioSdk)
                 {
-                    var nugetPackagesFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nuget", "packages");
+                    string nugetPackagesFolder = Environment.GetEnvironmentVariable("NUGET_PACKAGES") ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nuget", "packages");
                     foreach (var reference in VSSDKPackageReferences)
                     {
                         solution = solution.AddMetadataReference(projectId, MetadataReference.CreateFromFile(Path.Combine(nugetPackagesFolder, reference)));
