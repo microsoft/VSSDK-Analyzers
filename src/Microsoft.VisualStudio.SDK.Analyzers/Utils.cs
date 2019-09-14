@@ -78,7 +78,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         /// Tests whether a symbol belongs to a given namespace.
         /// </summary>
         /// <param name="symbol">The symbol whose namespace membership is being tested.</param>
-        /// <param name="namespaces">A sequence of namespaces from global to most precise. For example: [System, Threading, Tasks]</param>
+        /// <param name="namespaces">A sequence of namespaces from global to most precise. For example: [System, Threading, Tasks].</param>
         /// <returns><c>true</c> if the symbol belongs to the given namespace; otherwise <c>false</c>.</returns>
         internal static bool BelongsToNamespace(this ISymbol symbol, IReadOnlyList<string> namespaces)
         {
@@ -110,7 +110,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         /// Gets a value indicating whether one type is equal to or derives from another type.
         /// </summary>
         /// <param name="type">The type to check.</param>
-        /// <param name="baseType">The type to compare with, that may be a base type of <paramref name="type"/></param>
+        /// <param name="baseType">The type to compare with, that may be a base type of <paramref name="type"/>.</param>
         /// <returns><c>true</c> if <paramref name="baseType"/> is a base type or equal to <paramref name="type"/>.</returns>
         internal static bool IsEqualToOrDerivedFrom(ITypeSymbol type, ITypeSymbol baseType)
         {
@@ -121,7 +121,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         /// Gets a value indicating whether one type derives from another type.
         /// </summary>
         /// <param name="type">The type to check.</param>
-        /// <param name="baseType">The type to compare with, that may be a base type of <paramref name="type"/></param>
+        /// <param name="baseType">The type to compare with, that may be a base type of <paramref name="type"/>.</param>
         /// <returns><c>true</c> if <paramref name="baseType"/> is a base type of <paramref name="type"/>.</returns>
         internal static bool IsDerivedFrom(ITypeSymbol type, ITypeSymbol baseType)
         {

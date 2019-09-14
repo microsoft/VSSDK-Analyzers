@@ -1,9 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.3</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <CodeAnalysisRuleSet>Microsoft.VisualStudio.SDK.Analyzers.ruleset</CodeAnalysisRuleSet>
-    <PackageTargetFallback>$(PackageTargetFallback);portable-net45+win8;net46</PackageTargetFallback>
 
     <PackageId>Microsoft.VisualStudio.SDK.Just.Analyzers</PackageId>
     <IsPackable>false</IsPackable>

@@ -1,9 +1,9 @@
 steps:
 - task: UseDotNet@2
-  displayName: Install .NET Core SDK 2.2.203
+  displayName: Install .NET Core SDK 2.2.401
   inputs:
     packageType: sdk
-    version: 2.2.203
+    version: 2.2.401
   condition: and(succeeded(), ne(variables['Hosted'], 'true')) # Hosted agents already have this.
 
 - script: dotnet --info
@@ -42,18 +42,13 @@ steps:
 - ${{ if eq(variables['system.collectionId'], '011b8bdf-6d56-4f87-be0d-0092136884d9') }}:
   - template: azure-pipeline.microbuild.before.yml
 
-# We have to use the traditional nuget.exe for restoring since we have vcxproj projects too.
-- task: NuGetToolInstaller@0
-  displayName: Pin nuget.exe version
-  inputs:
-    versionSpec: 4.6.1
-
-- powershell: nuget restore src\Microsoft.VisualStudio.SDK.Analyzers.sln
-  displayName: Nuget restore packages
+- powershell: dotnet restore
+  displayName: dotnet restore
+  workingDirectory: src
 
 - task: VSBuild@1
   inputs:
-    vsVersion: 15.0
+    vsVersion: 16.0
     msbuildArgs: /t:build,pack /m /bl:"$(Build.ArtifactStagingDirectory)/build_logs/msbuild.binlog"
     platform: Any CPU
     configuration: $(BuildConfiguration)
