@@ -4,3 +4,4 @@ steps:
     signType: $(SignType)
     zipSources: false
   displayName: Install MicroBuild Signing Plugin
+  condition: eq(variables['System.PullRequest.IsFork'], 'false')
