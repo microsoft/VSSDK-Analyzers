@@ -19,3 +19,4 @@
 ![Microsoft.VisualStudio.Shell.Interop.IVsAppContainerProjectDeployOperation]
 ![Microsoft.VisualStudio.Shell.Interop.IVsAppContainerProjectDeployResult]
 ![Microsoft.VisualStudio.Shell.Interop.SVsAppContainerProjectDeploy]
+[Microsoft.VisualStudio.Shell.UIContext]::IsActive
