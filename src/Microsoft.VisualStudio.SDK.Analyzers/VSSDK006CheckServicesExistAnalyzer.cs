@@ -184,14 +184,22 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             private bool IsNonNullCheck(SyntaxNode node, ISymbol symbol, SyntaxNodeAnalysisContext context)
             {
                 bool IsSymbol(SyntaxNode n) => symbol.Equals(context.SemanticModel.GetSymbolInfo(n, context.CancellationToken).Symbol);
+                bool IsEqualsOrExclamationEqualsCheck(BinaryExpressionSyntax o) => (o.OperatorToken.IsKind(SyntaxKind.EqualsEqualsToken) || o.OperatorToken.IsKind(SyntaxKind.ExclamationEqualsToken))
+                                                                                    && (o.Left.IsKind(SyntaxKind.NullLiteralExpression) || o.Right.IsKind(SyntaxKind.NullLiteralExpression))
+                                                                                    && (IsSymbol(o.Left) || IsSymbol(o.Right));
+                bool IsIsNullCheck(IsPatternExpressionSyntax o) => o.Pattern is ConstantPatternSyntax pattern
+                                                                && pattern.Expression.IsKind(SyntaxKind.NullLiteralExpression)
+                                                                && IsSymbol(o.Expression);
 
-                if (node is IfStatementSyntax ifStatement &&
-                    ifStatement.Condition.DescendantNodesAndSelf().OfType<BinaryExpressionSyntax>().Any(
-                        o => (o.OperatorToken.IsKind(SyntaxKind.EqualsEqualsToken) || o.OperatorToken.IsKind(SyntaxKind.ExclamationEqualsToken))
-                            && (o.Left.IsKind(SyntaxKind.NullLiteralExpression) || o.Right.IsKind(SyntaxKind.NullLiteralExpression))
-                            && (IsSymbol(o.Left) || IsSymbol(o.Right))))
+                if (node is IfStatementSyntax ifStatement)
                 {
-                    return true;
+                    if (ifStatement.Condition.DescendantNodesAndSelf().OfType<BinaryExpressionSyntax>().Any(
+                          o => IsEqualsOrExclamationEqualsCheck(o))
+                        || ifStatement.Condition.DescendantNodesAndSelf().OfType<IsPatternExpressionSyntax>().Any(
+                          o => IsIsNullCheck(o)))
+                    {
+                        return true;
+                    }
                 }
 
                 if (this.IsThrowingNullCheck(node, symbol, context))
