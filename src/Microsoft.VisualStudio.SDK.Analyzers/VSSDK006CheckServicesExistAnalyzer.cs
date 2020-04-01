@@ -62,7 +62,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             });
         }
 
-        private static ImmutableArray<ISymbol> Flatten(params ImmutableArray<ISymbol>?[] symbols) => symbols.Where(m => m.HasValue).SelectMany(m => m.Value).ToImmutableArray();
+        private static ImmutableArray<ISymbol> Flatten(params ImmutableArray<ISymbol>?[] symbols) => symbols.Where(m => m.HasValue).SelectMany(m => m!.Value).ToImmutableArray();
 
         private class CompilationState
         {
@@ -91,16 +91,16 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 if (invokedMethod != null && this.getServiceMethods.Contains(invokedMethod.ReducedFrom ?? invokedMethod))
                 {
                     bool isTask = Utils.IsTask(invokedMethod.ReturnType);
-                    SyntaxNode startWalkFrom = isTask
-                        ? (SyntaxNode)Utils.FindAncestor<AwaitExpressionSyntax>(invocationExpression, n => n is MemberAccessExpressionSyntax || n is InvocationExpressionSyntax, (aes, child) => aes.Expression == child)
+                    SyntaxNode? startWalkFrom = isTask
+                        ? (SyntaxNode?)Utils.FindAncestor<AwaitExpressionSyntax>(invocationExpression, n => n is MemberAccessExpressionSyntax || n is InvocationExpressionSyntax, (aes, child) => aes.Expression == child)
                         : invocationExpression;
                     if (startWalkFrom == null)
                     {
                         return;
                     }
 
-                    AssignmentExpressionSyntax assignment;
-                    VariableDeclaratorSyntax variableDeclarator;
+                    AssignmentExpressionSyntax? assignment;
+                    VariableDeclaratorSyntax? variableDeclarator;
                     if (Utils.FindAncestor<MemberAccessExpressionSyntax>(
                         startWalkFrom,
                         n => n is CastExpressionSyntax || n is ParenthesizedExpressionSyntax || n is AwaitExpressionSyntax,
@@ -117,7 +117,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                         if (leftSymbol != null)
                         {
                             // If the assigned variable is actually a field, scan this block for Assumes.Present
-                            SyntaxNode parentBlock = Utils.FindFirstAncestorOfTypes(invocationExpression, typeof(BlockSyntax), typeof(ArrowExpressionClauseSyntax));
+                            SyntaxNode? parentBlock = Utils.FindFirstAncestorOfTypes(invocationExpression, typeof(BlockSyntax), typeof(ArrowExpressionClauseSyntax));
                             if (!parentBlock?.DescendantNodes().Any(n => this.IsThrowingNullCheck(n, leftSymbol, context)) ?? true)
                             {
                                 // Since we didn't find an Assumes.Present call for this symbol, scan all blocks and expression bodies within this type.
@@ -216,7 +216,8 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             private bool IsThrowingNullCheck(SyntaxNode node, ISymbol symbol, SyntaxNodeAnalysisContext context)
             {
                 if (node is InvocationExpressionSyntax invocationExpression &&
-                    this.nullThrowingMethods.Contains(context.SemanticModel.GetSymbolInfo(invocationExpression.Expression).Symbol?.OriginalDefinition))
+                    context.SemanticModel.GetSymbolInfo(invocationExpression.Expression).Symbol?.OriginalDefinition is { } item &&
+                    this.nullThrowingMethods.Contains(item))
                 {
                     ArgumentSyntax firstArg = invocationExpression.ArgumentList.Arguments.FirstOrDefault();
                     if (firstArg != null && symbol.Equals(context.SemanticModel.GetSymbolInfo(firstArg.Expression, context.CancellationToken).Symbol))

@@ -55,15 +55,15 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             MethodDeclarationSyntax initializeMethodSyntax = classDeclarationSyntax.DescendantNodes()
                 .OfType<MethodDeclarationSyntax>()
                 .FirstOrDefault(method => method.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.OverrideKeyword)) && method.Identifier.Text == Types.Package.Initialize);
-            InvocationExpressionSyntax baseInitializeInvocationSyntax = initializeMethodSyntax?.Body?.DescendantNodes()
+            InvocationExpressionSyntax? baseInitializeInvocationSyntax = initializeMethodSyntax?.Body?.DescendantNodes()
                 .OfType<InvocationExpressionSyntax>()
                 .FirstOrDefault(ies => ies.Expression is MemberAccessExpressionSyntax memberAccess && memberAccess.Name?.Identifier.Text == Types.Package.Initialize && memberAccess.Expression is BaseExpressionSyntax);
             var getServiceInvocationsSyntax = new List<InvocationExpressionSyntax>();
-            AttributeSyntax packageRegistrationSyntax = null;
+            AttributeSyntax? packageRegistrationSyntax = null;
             {
                 INamedTypeSymbol userClassSymbol = semanticModel.GetDeclaredSymbol(classDeclarationSyntax, context.CancellationToken);
                 INamedTypeSymbol packageRegistrationType = compilation.GetTypeByMetadataName(Types.PackageRegistrationAttribute.FullName);
-                AttributeData packageRegistrationInstance = userClassSymbol?.GetAttributes().FirstOrDefault(a => a.AttributeClass == packageRegistrationType);
+                AttributeData? packageRegistrationInstance = userClassSymbol?.GetAttributes().FirstOrDefault(a => a.AttributeClass == packageRegistrationType);
                 if (packageRegistrationInstance?.ApplicationSyntaxReference != null)
                 {
                     packageRegistrationSyntax = (AttributeSyntax)await packageRegistrationInstance.ApplicationSyntaxReference.GetSyntaxAsync(cancellationToken).ConfigureAwait(false);
@@ -82,7 +82,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             }
 
             // Make it easier to track nodes across changes.
-            var nodesToTrack = new List<SyntaxNode>
+            var nodesToTrack = new List<SyntaxNode?>
             {
                 baseTypeSyntax,
                 initializeMethodSyntax,

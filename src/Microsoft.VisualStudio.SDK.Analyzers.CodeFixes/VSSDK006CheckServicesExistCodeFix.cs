@@ -36,8 +36,8 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         {
             Diagnostic diagnostic = context.Diagnostics.First();
             SyntaxNode root = await context.Document.GetSyntaxRootAsync(context.CancellationToken);
-            SyntaxNode node = root.FindNode(diagnostic.Location.SourceSpan, getInnermostNodeForTie: true);
-            SyntaxNode presentArgument = node is VariableDeclaratorSyntax declaratorSyntax ? SyntaxFactory.IdentifierName(declaratorSyntax.Identifier)
+            SyntaxNode? node = root.FindNode(diagnostic.Location.SourceSpan, getInnermostNodeForTie: true);
+            SyntaxNode? presentArgument = node is VariableDeclaratorSyntax declaratorSyntax ? SyntaxFactory.IdentifierName(declaratorSyntax.Identifier)
                 : node.Parent is InvocationExpressionSyntax ? null // direct GetService result invocation
                 : node is NameSyntax ? node
                 : node is MemberAccessExpressionSyntax ? node

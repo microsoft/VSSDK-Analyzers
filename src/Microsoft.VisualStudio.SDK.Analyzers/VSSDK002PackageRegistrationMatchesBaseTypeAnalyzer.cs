@@ -59,8 +59,8 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             // Register for compilation first so that we only activate the analyzer for applicable compilations
             context.RegisterCompilationStartAction(compilationContext =>
             {
-                INamedTypeSymbol packageType = compilationContext.Compilation.GetTypeByMetadataName(Types.Package.FullName)?.OriginalDefinition;
-                INamedTypeSymbol asyncPackageType = compilationContext.Compilation.GetTypeByMetadataName(Types.AsyncPackage.FullName)?.OriginalDefinition;
+                INamedTypeSymbol? packageType = compilationContext.Compilation.GetTypeByMetadataName(Types.Package.FullName)?.OriginalDefinition;
+                INamedTypeSymbol? asyncPackageType = compilationContext.Compilation.GetTypeByMetadataName(Types.AsyncPackage.FullName)?.OriginalDefinition;
                 if (packageType != null && asyncPackageType != null)
                 {
                     // Reuse the type symbols we looked up so that we don't have to look them up for every single class declaration.
@@ -74,7 +74,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         private void AnalyzeClassDeclaration(SyntaxNodeAnalysisContext context, INamedTypeSymbol packageType, INamedTypeSymbol asyncPackageType)
         {
             var declaration = (ClassDeclarationSyntax)context.Node;
-            BaseTypeSyntax baseType = declaration.BaseList?.Types.FirstOrDefault();
+            BaseTypeSyntax? baseType = declaration.BaseList?.Types.FirstOrDefault();
             if (baseType == null)
             {
                 return;
@@ -86,7 +86,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             {
                 INamedTypeSymbol packageRegistrationType = context.Compilation.GetTypeByMetadataName(Types.PackageRegistrationAttribute.FullName);
                 INamedTypeSymbol userClassSymbol = context.SemanticModel.GetDeclaredSymbol(declaration, context.CancellationToken);
-                AttributeData packageRegistrationInstance = userClassSymbol?.GetAttributes().FirstOrDefault(a => a.AttributeClass == packageRegistrationType);
+                AttributeData? packageRegistrationInstance = userClassSymbol?.GetAttributes().FirstOrDefault(a => a.AttributeClass == packageRegistrationType);
                 if (packageRegistrationInstance == null)
                 {
                     return;
@@ -102,11 +102,14 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 if (isAsyncPackageBaseType != allowsBackgroundLoading)
                 {
                     var attributeSyntax = packageRegistrationInstance.ApplicationSyntaxReference.GetSyntax(context.CancellationToken) as AttributeSyntax;
-                    AttributeArgumentSyntax allowBackgroundLoadingSyntax = attributeSyntax?.ArgumentList.Arguments.FirstOrDefault(a => a.NameEquals?.Name?.Identifier.Text == Types.PackageRegistrationAttribute.AllowsBackgroundLoading);
-                    Location location = allowBackgroundLoadingSyntax?.GetLocation() ?? attributeSyntax.GetLocation();
-                    ImmutableDictionary<string, string> properties = ImmutableDictionary.Create<string, string>()
-                        .Add(BaseTypeDiagnosticPropertyName, isAsyncPackageBaseType ? Types.AsyncPackage.TypeName : Types.Package.TypeName);
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, location, properties));
+                    if (attributeSyntax is object)
+                    {
+                        AttributeArgumentSyntax? allowBackgroundLoadingSyntax = attributeSyntax.ArgumentList.Arguments.FirstOrDefault(a => a.NameEquals?.Name?.Identifier.Text == Types.PackageRegistrationAttribute.AllowsBackgroundLoading);
+                        Location location = allowBackgroundLoadingSyntax?.GetLocation() ?? attributeSyntax.GetLocation();
+                        ImmutableDictionary<string, string> properties = ImmutableDictionary.Create<string, string>()
+                            .Add(BaseTypeDiagnosticPropertyName, isAsyncPackageBaseType ? Types.AsyncPackage.TypeName : Types.Package.TypeName);
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptor, location, properties));
+                    }
                 }
             }
         }

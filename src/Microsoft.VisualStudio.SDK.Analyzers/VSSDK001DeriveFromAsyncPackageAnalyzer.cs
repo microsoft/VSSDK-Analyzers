@@ -63,7 +63,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         private void AnalyzeClassDeclaration(SyntaxNodeAnalysisContext context, INamedTypeSymbol packageType)
         {
             var declaration = (ClassDeclarationSyntax)context.Node;
-            BaseTypeSyntax baseType = declaration.BaseList?.Types.FirstOrDefault();
+            BaseTypeSyntax? baseType = declaration.BaseList?.Types.FirstOrDefault();
             if (baseType == null)
             {
                 return;

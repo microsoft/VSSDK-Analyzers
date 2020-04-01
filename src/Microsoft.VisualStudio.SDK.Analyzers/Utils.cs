@@ -112,7 +112,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         /// <param name="type">The type to check.</param>
         /// <param name="baseType">The type to compare with, that may be a base type of <paramref name="type"/>.</param>
         /// <returns><c>true</c> if <paramref name="baseType"/> is a base type or equal to <paramref name="type"/>.</returns>
-        internal static bool IsEqualToOrDerivedFrom(ITypeSymbol type, ITypeSymbol baseType)
+        internal static bool IsEqualToOrDerivedFrom(ITypeSymbol? type, ITypeSymbol baseType)
         {
             return type?.OriginalDefinition == baseType || IsDerivedFrom(type, baseType);
         }
@@ -123,7 +123,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         /// <param name="type">The type to check.</param>
         /// <param name="baseType">The type to compare with, that may be a base type of <paramref name="type"/>.</param>
         /// <returns><c>true</c> if <paramref name="baseType"/> is a base type of <paramref name="type"/>.</returns>
-        internal static bool IsDerivedFrom(ITypeSymbol type, ITypeSymbol baseType)
+        internal static bool IsDerivedFrom(ITypeSymbol? type, ITypeSymbol baseType)
         {
             type = type?.BaseType;
             while (type != null)
@@ -180,7 +180,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         /// <param name="continueAscending">A function to determine whether to keep ascending the syntax tree.</param>
         /// <param name="isMatch">A function to determine whether a given ancestor is the target we're looking for.</param>
         /// <returns><c>true</c> if the target ancestor was found.</returns>
-        internal static T FindAncestor<T>(SyntaxNode syntaxNode, Func<SyntaxNode, bool> continueAscending, Func<T, SyntaxNode, bool> isMatch)
+        internal static T? FindAncestor<T>(SyntaxNode syntaxNode, Func<SyntaxNode, bool> continueAscending, Func<T, SyntaxNode, bool> isMatch)
             where T : SyntaxNode
         {
             if (continueAscending == null)
@@ -225,7 +225,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         /// <param name="syntaxNode">The syntax node to start the search at.</param>
         /// <param name="allowedTypes">The set of types that we should stop searching and return when we encounter it.</param>
         /// <returns>The matching syntax node, if any.</returns>
-        internal static SyntaxNode FindFirstAncestorOfTypes(SyntaxNode syntaxNode, params Type[] allowedTypes)
+        internal static SyntaxNode? FindFirstAncestorOfTypes(SyntaxNode syntaxNode, params Type[] allowedTypes)
         {
             return FindAncestor<SyntaxNode>(syntaxNode, n => !allowedTypes.Contains(n.GetType()), (n, c) => allowedTypes.Contains(n.GetType()));
         }
