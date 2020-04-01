@@ -667,6 +667,56 @@ class Test : Package {
     }
 
     [Fact]
+    public async Task FieldAssigned_GetService_ThenUsedElsewhereWithIfIsObjectCheckAsync()
+    {
+        var test = @"
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+
+class Test : Package {
+    IVsBuildManagerAccessor svc;
+    protected override void Initialize() {
+        base.Initialize();
+        this.svc = this.GetService(typeof(SVsBuildManagerAccessor)) as IVsBuildManagerAccessor;
+    }
+
+    void Foo() {
+        if (svc is object) {
+            svc.BeginDesignTimeBuild();
+        }
+    }
+}
+";
+
+        await Verify.VerifyAnalyzerAsync(test);
+    }
+
+    [Fact]
+    public async Task FieldAssigned_GetService_ThenUsedElsewhereWithIfIsExpectedTypeCheckAsync()
+    {
+        var test = @"
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+
+class Test : Package {
+    IVsBuildManagerAccessor svc;
+    protected override void Initialize() {
+        base.Initialize();
+        this.svc = this.GetService(typeof(SVsBuildManagerAccessor)) as IVsBuildManagerAccessor;
+    }
+
+    void Foo() {
+        if (svc is IVsBuildManagerAccessor) {
+            svc.BeginDesignTimeBuild();
+        }
+    }
+}
+";
+
+        await Verify.VerifyAnalyzerAsync(test);
+    }
+
+    [Fact]
     public async Task PropertyAssigned_GetService_ThenUsedWithinClassAsync()
     {
         var test = @"

@@ -187,16 +187,19 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 bool IsEqualsOrExclamationEqualsCheck(BinaryExpressionSyntax o) => (o.OperatorToken.IsKind(SyntaxKind.EqualsEqualsToken) || o.OperatorToken.IsKind(SyntaxKind.ExclamationEqualsToken))
                                                                                     && (o.Left.IsKind(SyntaxKind.NullLiteralExpression) || o.Right.IsKind(SyntaxKind.NullLiteralExpression))
                                                                                     && (IsSymbol(o.Left) || IsSymbol(o.Right));
-                bool IsIsNullCheck(IsPatternExpressionSyntax o) => o.Pattern is ConstantPatternSyntax pattern
-                                                                && pattern.Expression.IsKind(SyntaxKind.NullLiteralExpression)
-                                                                && IsSymbol(o.Expression);
+                bool IsPatternMatchTypeCheck(BinaryExpressionSyntax o) => o.OperatorToken.IsKind(SyntaxKind.IsKeyword)
+                                                                          && (o.Right.IsKind(SyntaxKind.IdentifierName) || o.Right.IsKind(SyntaxKind.PredefinedType))
+                                                                          && IsSymbol(o.Left);
+                bool IsPatternMatchNullCheck(IsPatternExpressionSyntax o) => o.Pattern is ConstantPatternSyntax pattern
+                                                                             && pattern.Expression.IsKind(SyntaxKind.NullLiteralExpression)
+                                                                             && IsSymbol(o.Expression);
 
                 if (node is IfStatementSyntax ifStatement)
                 {
                     if (ifStatement.Condition.DescendantNodesAndSelf().OfType<BinaryExpressionSyntax>().Any(
-                          o => IsEqualsOrExclamationEqualsCheck(o))
+                          o => IsEqualsOrExclamationEqualsCheck(o) || IsPatternMatchTypeCheck(o))
                         || ifStatement.Condition.DescendantNodesAndSelf().OfType<IsPatternExpressionSyntax>().Any(
-                          o => IsIsNullCheck(o)))
+                          o => IsPatternMatchNullCheck(o)))
                     {
                         return true;
                     }
