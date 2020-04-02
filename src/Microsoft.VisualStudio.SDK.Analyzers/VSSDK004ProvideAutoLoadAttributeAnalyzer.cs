@@ -63,7 +63,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             var declaration = (ClassDeclarationSyntax)context.Node;
             INamedTypeSymbol userClassSymbol = context.SemanticModel.GetDeclaredSymbol(declaration, context.CancellationToken);
 
-            BaseTypeSyntax baseType = declaration.BaseList?.Types.FirstOrDefault();
+            BaseTypeSyntax? baseType = declaration.BaseList?.Types.FirstOrDefault();
             if (baseType == null)
             {
                 return;
@@ -79,23 +79,26 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             bool isBaseTypeAsyncPackage = Utils.IsEqualToOrDerivedFrom(baseTypeSymbol, asyncPackageType);
 
             // Enumerate all attribute lists and attribute to find ProvideAutoLoad attributes as there can be multiple ones
-            foreach (AttributeData autoLoadInstance in userClassSymbol?.GetAttributes().Where(a => a.AttributeClass == autoLoadAttributeType))
+            if (userClassSymbol is object)
             {
-                TypedConstant flagsArgument = autoLoadInstance.ConstructorArguments.FirstOrDefault(p => p.Type == packageAutoLoadFlagsType);
-                Types.PackageAutoLoadFlags.Values flagsValue = flagsArgument.IsNull ? Types.PackageAutoLoadFlags.Values.None : (Types.PackageAutoLoadFlags.Values)flagsArgument.Value;
-
-                // Check if AutoLoad attribute applies to VS versions with AsyncPackage support
-                if (flagsValue.HasFlag(Types.PackageAutoLoadFlags.Values.SkipWhenUIContextRulesActive))
+                foreach (AttributeData autoLoadInstance in userClassSymbol.GetAttributes().Where(a => a.AttributeClass == autoLoadAttributeType))
                 {
-                    continue;
-                }
+                    TypedConstant flagsArgument = autoLoadInstance.ConstructorArguments.FirstOrDefault(p => p.Type == packageAutoLoadFlagsType);
+                    Types.PackageAutoLoadFlags.Values flagsValue = flagsArgument.IsNull ? Types.PackageAutoLoadFlags.Values.None : (Types.PackageAutoLoadFlags.Values)flagsArgument.Value;
 
-                // Check if BackgroundLoad flag is present and base class is AsyncPackage
-                if (!(flagsValue.HasFlag(Types.PackageAutoLoadFlags.Values.BackgroundLoad) && isBaseTypeAsyncPackage))
-                {
-                    var attributeSyntax = autoLoadInstance.ApplicationSyntaxReference.GetSyntax(context.CancellationToken) as AttributeSyntax;
-                    Location location = attributeSyntax.GetLocation();
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, attributeSyntax.GetLocation()));
+                    // Check if AutoLoad attribute applies to VS versions with AsyncPackage support
+                    if (flagsValue.HasFlag(Types.PackageAutoLoadFlags.Values.SkipWhenUIContextRulesActive))
+                    {
+                        continue;
+                    }
+
+                    // Check if BackgroundLoad flag is present and base class is AsyncPackage
+                    if (!(flagsValue.HasFlag(Types.PackageAutoLoadFlags.Values.BackgroundLoad) && isBaseTypeAsyncPackage))
+                    {
+                        var attributeSyntax = (AttributeSyntax)autoLoadInstance.ApplicationSyntaxReference.GetSyntax(context.CancellationToken);
+                        Location location = attributeSyntax.GetLocation();
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptor, attributeSyntax.GetLocation()));
+                    }
                 }
             }
         }

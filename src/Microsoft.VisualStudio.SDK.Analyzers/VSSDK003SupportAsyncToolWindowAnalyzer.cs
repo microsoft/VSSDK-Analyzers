@@ -53,15 +53,18 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             // Register for compilation first so that we only activate the analyzer for applicable compilations
             context.RegisterCompilationStartAction(compilationContext =>
             {
-                INamedTypeSymbol asyncPackageType = compilationContext.Compilation.GetTypeByMetadataName(Types.AsyncPackage.FullName)?.OriginalDefinition;
-                INamedTypeSymbol provideToolWindowAttribute = compilationContext.Compilation.GetTypeByMetadataName(Types.ProvideToolWindowAttribute.FullName)?.OriginalDefinition;
-                bool targetVSSupportsAsyncToolWindows = asyncPackageType?.MemberNames.Any(n => n == Types.AsyncPackage.GetAsyncToolWindowFactory) ?? false;
-                if (targetVSSupportsAsyncToolWindows)
+                INamedTypeSymbol? asyncPackageType = compilationContext.Compilation.GetTypeByMetadataName(Types.AsyncPackage.FullName)?.OriginalDefinition;
+                if (asyncPackageType is object)
                 {
-                    // Reuse the type symbols we looked up so that we don't have to look them up for every single class declaration.
-                    compilationContext.RegisterSyntaxNodeAction(
-                        Utils.DebuggableWrapper(ctxt => this.AnalyzeClassDeclaration(ctxt, asyncPackageType, provideToolWindowAttribute)),
-                        SyntaxKind.ClassDeclaration);
+                    INamedTypeSymbol? provideToolWindowAttribute = compilationContext.Compilation.GetTypeByMetadataName(Types.ProvideToolWindowAttribute.FullName)?.OriginalDefinition;
+                    bool targetVSSupportsAsyncToolWindows = asyncPackageType.MemberNames.Any(n => n == Types.AsyncPackage.GetAsyncToolWindowFactory);
+                    if (targetVSSupportsAsyncToolWindows && provideToolWindowAttribute is object)
+                    {
+                        // Reuse the type symbols we looked up so that we don't have to look them up for every single class declaration.
+                        compilationContext.RegisterSyntaxNodeAction(
+                            Utils.DebuggableWrapper(ctxt => this.AnalyzeClassDeclaration(ctxt, asyncPackageType, provideToolWindowAttribute)),
+                            SyntaxKind.ClassDeclaration);
+                    }
                 }
             });
         }
@@ -69,7 +72,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         private void AnalyzeClassDeclaration(SyntaxNodeAnalysisContext context, INamedTypeSymbol asyncPackageType, INamedTypeSymbol provideToolWindowAttributeType)
         {
             var declaration = (ClassDeclarationSyntax)context.Node;
-            BaseTypeSyntax baseType = declaration.BaseList?.Types.FirstOrDefault();
+            BaseTypeSyntax? baseType = declaration.BaseList?.Types.FirstOrDefault();
             if (baseType == null)
             {
                 return;
@@ -83,14 +86,14 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             }
 
             INamedTypeSymbol userClassSymbol = context.SemanticModel.GetDeclaredSymbol(declaration, context.CancellationToken);
-            AttributeData packageRegistrationInstance = userClassSymbol?.GetAttributes().FirstOrDefault(a => a.AttributeClass?.Equals(provideToolWindowAttributeType) ?? false);
+            AttributeData? packageRegistrationInstance = userClassSymbol?.GetAttributes().FirstOrDefault(a => a.AttributeClass?.Equals(provideToolWindowAttributeType) ?? false);
             TypedConstant? firstParameter = packageRegistrationInstance?.ConstructorArguments.FirstOrDefault();
             if (firstParameter.HasValue && firstParameter.Value.Kind == TypedConstantKind.Type && firstParameter.Value.Value is INamedTypeSymbol typeOfUserToolWindow)
             {
                 bool toolWindowHasCtorWithOneParameter = typeOfUserToolWindow.GetMembers(ConstructorInfo.ConstructorName).OfType<IMethodSymbol>().Any(c => c.Parameters.Length == 1);
                 if (!toolWindowHasCtorWithOneParameter)
                 {
-                    if (packageRegistrationInstance.ApplicationSyntaxReference?.GetSyntax(context.CancellationToken) is AttributeSyntax attributeSyntax)
+                    if (packageRegistrationInstance!.ApplicationSyntaxReference?.GetSyntax(context.CancellationToken) is AttributeSyntax attributeSyntax)
                     {
                         AttributeArgumentSyntax firstArgumentSyntax = attributeSyntax.ArgumentList.Arguments.First();
                         Location diagnosticLocation = firstArgumentSyntax.GetLocation();

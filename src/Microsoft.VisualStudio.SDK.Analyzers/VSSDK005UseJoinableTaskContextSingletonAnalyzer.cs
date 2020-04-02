@@ -45,7 +45,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             // Register for compilation first so that we only activate the analyzer for applicable compilations
             context.RegisterCompilationStartAction(compilationContext =>
             {
-                INamedTypeSymbol joinableTaskContext = compilationContext.Compilation.GetTypeByMetadataName(Types.JoinableTaskContext.FullName)?.OriginalDefinition;
+                INamedTypeSymbol? joinableTaskContext = compilationContext.Compilation.GetTypeByMetadataName(Types.JoinableTaskContext.FullName)?.OriginalDefinition;
                 if (joinableTaskContext != null)
                 {
                     // Reuse the type symbols we looked up so that we don't have to look them up for every single class declaration.
