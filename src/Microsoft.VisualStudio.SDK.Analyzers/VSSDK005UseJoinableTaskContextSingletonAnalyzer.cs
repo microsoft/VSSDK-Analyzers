@@ -60,7 +60,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         {
             var creationSyntax = (ObjectCreationExpressionSyntax)ctxt.Node;
             ISymbol symbolBeingInstantiated = ctxt.SemanticModel.GetSymbolInfo(creationSyntax.Type).Symbol;
-            if (joinableTaskContext.Equals(symbolBeingInstantiated))
+            if (SymbolEqualityComparer.Default.Equals(joinableTaskContext, symbolBeingInstantiated))
             {
                 ctxt.ReportDiagnostic(Diagnostic.Create(Descriptor, creationSyntax.GetLocation()));
             }

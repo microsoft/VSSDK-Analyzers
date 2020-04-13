@@ -46,15 +46,19 @@ class Test {
 }
 ";
 
-        await new CSharpTest
+        await new CSharpTest(includeVisualStudioSdk: false)
         {
             TestCode = test,
-            IncludeVisualStudioSdk = false,
         }.RunAsync();
     }
 
     internal class CSharpTest : CSharpCodeFixVerifier<VSSDK001DeriveFromAsyncPackageAnalyzer, EmptyCodeFixProvider>.Test
     {
+        internal CSharpTest(bool includeVisualStudioSdk = true)
+            : base(includeVisualStudioSdk)
+        {
+        }
+
         protected override IEnumerable<DiagnosticAnalyzer> GetDiagnosticAnalyzers()
         {
             return from type in typeof(VSSDK001DeriveFromAsyncPackageAnalyzer).Assembly.GetTypes()

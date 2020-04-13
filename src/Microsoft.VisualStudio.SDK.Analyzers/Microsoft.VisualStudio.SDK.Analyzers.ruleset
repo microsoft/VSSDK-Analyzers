@@ -71,4 +71,7 @@
   <Rules AnalyzerId="AsyncUsageAnalyzers" RuleNamespace="AsyncUsageAnalyzers">
     <Rule Id="UseConfigureAwait" Action="Warning" />
   </Rules>
+  <Rules AnalyzerId="Microsoft.CodeAnalysis.Analyzers" RuleNamespace="Microsoft.CodeAnalysis.Analyzers">
+    <Rule Id="RS2008" Action="Info" />
+  </Rules>
 </RuleSet>

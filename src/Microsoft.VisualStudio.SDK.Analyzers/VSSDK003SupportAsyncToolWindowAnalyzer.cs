@@ -86,7 +86,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             }
 
             INamedTypeSymbol userClassSymbol = context.SemanticModel.GetDeclaredSymbol(declaration, context.CancellationToken);
-            AttributeData? packageRegistrationInstance = userClassSymbol?.GetAttributes().FirstOrDefault(a => a.AttributeClass?.Equals(provideToolWindowAttributeType) ?? false);
+            AttributeData? packageRegistrationInstance = userClassSymbol?.GetAttributes().FirstOrDefault(a => SymbolEqualityComparer.Default.Equals(a.AttributeClass, provideToolWindowAttributeType));
             TypedConstant? firstParameter = packageRegistrationInstance?.ConstructorArguments.FirstOrDefault();
             if (firstParameter.HasValue && firstParameter.Value.Kind == TypedConstantKind.Type && firstParameter.Value.Value is INamedTypeSymbol typeOfUserToolWindow)
             {

@@ -167,7 +167,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 {
                     System.Collections.Generic.IEnumerable<MemberAccessExpressionSyntax> variableUses = from access in containingBlockOrExpression.DescendantNodes().OfType<MemberAccessExpressionSyntax>()
                                        let symbolAccessed = context.SemanticModel.GetSymbolInfo(access.Expression, context.CancellationToken).Symbol
-                                       where symbol.Equals(symbolAccessed)
+                                       where SymbolEqualityComparer.Default.Equals(symbol, symbolAccessed)
                                        select access;
                     if (!containingBlockOrExpression.DescendantNodes().Any(n => this.IsNonNullCheck(n, symbol, context)))
                     {
@@ -183,7 +183,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             /// </summary>
             private bool IsNonNullCheck(SyntaxNode node, ISymbol symbol, SyntaxNodeAnalysisContext context)
             {
-                bool IsSymbol(SyntaxNode n) => symbol.Equals(context.SemanticModel.GetSymbolInfo(n, context.CancellationToken).Symbol);
+                bool IsSymbol(SyntaxNode n) => SymbolEqualityComparer.Default.Equals(symbol, context.SemanticModel.GetSymbolInfo(n, context.CancellationToken).Symbol);
                 bool IsEqualsOrExclamationEqualsCheck(BinaryExpressionSyntax o) => (o.OperatorToken.IsKind(SyntaxKind.EqualsEqualsToken) || o.OperatorToken.IsKind(SyntaxKind.ExclamationEqualsToken))
                                                                                     && (o.Left.IsKind(SyntaxKind.NullLiteralExpression) || o.Right.IsKind(SyntaxKind.NullLiteralExpression))
                                                                                     && (IsSymbol(o.Left) || IsSymbol(o.Right));
@@ -220,7 +220,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                     this.nullThrowingMethods.Contains(item))
                 {
                     ArgumentSyntax firstArg = invocationExpression.ArgumentList.Arguments.FirstOrDefault();
-                    if (firstArg != null && symbol.Equals(context.SemanticModel.GetSymbolInfo(firstArg.Expression, context.CancellationToken).Symbol))
+                    if (firstArg != null && SymbolEqualityComparer.Default.Equals(symbol, context.SemanticModel.GetSymbolInfo(firstArg.Expression, context.CancellationToken).Symbol))
                     {
                         return true;
                     }

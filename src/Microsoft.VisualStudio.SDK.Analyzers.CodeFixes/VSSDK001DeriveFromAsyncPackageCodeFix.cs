@@ -48,7 +48,8 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         private async Task<Document> ConvertToAsyncPackageAsync(CodeFixContext context, Diagnostic diagnostic, CancellationToken cancellationToken)
         {
             SemanticModel semanticModel = await context.Document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
-            Compilation compilation = await context.Document.Project.GetCompilationAsync(cancellationToken).ConfigureAwait(false);
+            Compilation? compilation = await context.Document.Project.GetCompilationAsync(cancellationToken).ConfigureAwait(false);
+            Assumes.NotNull(compilation);
             SyntaxNode root = await context.Document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
             BaseTypeSyntax baseTypeSyntax = root.FindNode(diagnostic.Location.SourceSpan).FirstAncestorOrSelf<BaseTypeSyntax>();
             ClassDeclarationSyntax classDeclarationSyntax = baseTypeSyntax.FirstAncestorOrSelf<ClassDeclarationSyntax>();
@@ -63,7 +64,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             {
                 INamedTypeSymbol userClassSymbol = semanticModel.GetDeclaredSymbol(classDeclarationSyntax, context.CancellationToken);
                 INamedTypeSymbol packageRegistrationType = compilation.GetTypeByMetadataName(Types.PackageRegistrationAttribute.FullName);
-                AttributeData? packageRegistrationInstance = userClassSymbol?.GetAttributes().FirstOrDefault(a => a.AttributeClass == packageRegistrationType);
+                AttributeData? packageRegistrationInstance = userClassSymbol?.GetAttributes().FirstOrDefault(a => Equals(a.AttributeClass, packageRegistrationType));
                 if (packageRegistrationInstance?.ApplicationSyntaxReference != null)
                 {
                     packageRegistrationSyntax = (AttributeSyntax)await packageRegistrationInstance.ApplicationSyntaxReference.GetSyntaxAsync(cancellationToken).ConfigureAwait(false);
