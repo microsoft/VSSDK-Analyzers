@@ -2,4 +2,4 @@
 
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("Microsoft.VisualStudio.SDK.Analyzers.CodeFixes")]
+[assembly: InternalsVisibleTo("Microsoft.VisualStudio.SDK.Analyzers.CodeFixes, PublicKey=" + ThisAssembly.PublicKey)]
