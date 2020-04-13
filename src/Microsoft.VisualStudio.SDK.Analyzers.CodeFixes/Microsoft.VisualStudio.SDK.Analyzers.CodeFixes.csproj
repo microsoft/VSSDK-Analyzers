@@ -35,8 +35,9 @@
   <Target Name="PackBuildOutputs" BeforeTargets="_GetPackageFiles" DependsOnTargets="SatelliteDllsProjectOutputGroup;DebugSymbolsProjectOutputGroup">
     <ItemGroup>
       <Content Include="$(TargetDir)Microsoft.VisualStudio.SDK.Analyzers.dll" Pack="true" PackagePath="analyzers\cs\" />
+      <Content Include="$(TargetDir)Microsoft.VisualStudio.SDK.Analyzers.pdb" Pack="true" PackagePath="analyzers\cs\" />
       <Content Include="$(TargetPath)" Pack="true" PackagePath="analyzers\cs\" />
-      <!--<Content Include="@(DebugSymbolsProjectOutputGroupOutput)" Pack="true" PackagePath="analyzers\cs\" />-->
+      <Content Include="@(DebugSymbolsProjectOutputGroupOutput)" Pack="true" PackagePath="analyzers\cs\" />
       <Content Include="@(SatelliteDllsProjectOutputGroupOutput)" Pack="true" PackagePath="analyzers\cs\%(SatelliteDllsProjectOutputGroupOutput.Culture)\" />
     </ItemGroup>
   </Target>
