@@ -86,7 +86,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             {
                 INamedTypeSymbol packageRegistrationType = context.Compilation.GetTypeByMetadataName(Types.PackageRegistrationAttribute.FullName);
                 INamedTypeSymbol userClassSymbol = context.SemanticModel.GetDeclaredSymbol(declaration, context.CancellationToken);
-                AttributeData? packageRegistrationInstance = userClassSymbol?.GetAttributes().FirstOrDefault(a => a.AttributeClass == packageRegistrationType);
+                AttributeData? packageRegistrationInstance = userClassSymbol?.GetAttributes().FirstOrDefault(a => SymbolEqualityComparer.Default.Equals(a.AttributeClass, packageRegistrationType));
                 if (packageRegistrationInstance == null)
                 {
                     return;

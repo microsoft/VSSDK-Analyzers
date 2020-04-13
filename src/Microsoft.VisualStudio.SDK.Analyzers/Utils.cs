@@ -114,7 +114,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         /// <returns><c>true</c> if <paramref name="baseType"/> is a base type or equal to <paramref name="type"/>.</returns>
         internal static bool IsEqualToOrDerivedFrom(ITypeSymbol? type, ITypeSymbol baseType)
         {
-            return type?.OriginalDefinition == baseType || IsDerivedFrom(type, baseType);
+            return SymbolEqualityComparer.Default.Equals(type?.OriginalDefinition, baseType) || IsDerivedFrom(type, baseType);
         }
 
         /// <summary>
@@ -128,7 +128,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             type = type?.BaseType;
             while (type != null)
             {
-                if (type.OriginalDefinition == baseType)
+                if (SymbolEqualityComparer.Default.Equals(type.OriginalDefinition, baseType))
                 {
                     return true;
                 }

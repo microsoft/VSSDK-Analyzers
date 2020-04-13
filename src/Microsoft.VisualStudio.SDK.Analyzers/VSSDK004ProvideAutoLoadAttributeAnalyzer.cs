@@ -81,9 +81,9 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             // Enumerate all attribute lists and attribute to find ProvideAutoLoad attributes as there can be multiple ones
             if (userClassSymbol is object)
             {
-                foreach (AttributeData autoLoadInstance in userClassSymbol.GetAttributes().Where(a => a.AttributeClass == autoLoadAttributeType))
+                foreach (AttributeData autoLoadInstance in userClassSymbol.GetAttributes().Where(a => SymbolEqualityComparer.Default.Equals(a.AttributeClass, autoLoadAttributeType)))
                 {
-                    TypedConstant flagsArgument = autoLoadInstance.ConstructorArguments.FirstOrDefault(p => p.Type == packageAutoLoadFlagsType);
+                    TypedConstant flagsArgument = autoLoadInstance.ConstructorArguments.FirstOrDefault(p => SymbolEqualityComparer.Default.Equals(p.Type, packageAutoLoadFlagsType));
                     Types.PackageAutoLoadFlags.Values flagsValue = flagsArgument.IsNull ? Types.PackageAutoLoadFlags.Values.None : (Types.PackageAutoLoadFlags.Values)flagsArgument.Value;
 
                     // Check if AutoLoad attribute applies to VS versions with AsyncPackage support

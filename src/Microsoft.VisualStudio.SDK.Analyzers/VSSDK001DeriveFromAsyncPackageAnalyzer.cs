@@ -70,7 +70,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             }
 
             SymbolInfo baseTypeSymbol = context.SemanticModel.GetSymbolInfo(baseType.Type, context.CancellationToken);
-            if (baseTypeSymbol.Symbol?.OriginalDefinition == packageType.OriginalDefinition)
+            if (SymbolEqualityComparer.Default.Equals(baseTypeSymbol.Symbol?.OriginalDefinition, packageType.OriginalDefinition))
             {
                 context.ReportDiagnostic(Diagnostic.Create(
                     Descriptor,
