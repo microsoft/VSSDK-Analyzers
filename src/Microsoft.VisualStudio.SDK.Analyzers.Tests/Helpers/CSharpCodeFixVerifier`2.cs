@@ -1,11 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 
-using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.IO;
-using System.Linq;
-using System.Text;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
@@ -69,6 +65,12 @@ public static class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
         private static readonly ReferenceAssemblies VsSdkReferences = DefaultReferences
             .AddPackages(ImmutableArray.Create(
                 new PackageIdentity("Microsoft.VisualStudio.Shell.15.0", "16.5.29911.84")));
+
+        static Test()
+        {
+            // Force all test runners to talk the latest TLS version so nuget.org packages can be downloaded.
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+        }
 
         public Test(bool includeVisualStudioSdk = true)
         {
