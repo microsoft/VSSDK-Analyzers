@@ -33,17 +33,13 @@
     <PackageReference Include="MicroBuild.VisualStudio" Version="$(MicroBuildVersion)" PrivateAssets="all" />
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="16.0.28729" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.14.0" Version="14.3.26929" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.VisualStudio.Threading" Version="16.6.13" PrivateAssets="all" />
-    <PackageReference Include="Nerdbank.GitVersioning" Version="3.1.74" PrivateAssets="all" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" PrivateAssets="all" />
-    <PackageReference Include="StreamJsonRpc" Version="2.3.103" PrivateAssets="all" />
+    <PackageReference Include="Nerdbank.GitVersioning" Version="3.1.91" PrivateAssets="all" />
+    <PackageReference Include="StreamJsonRpc" Version="2.5.37" PrivateAssets="all" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
 
     <!-- We WANT these analyzers to be expressed as dependencies of the final package. -->
     <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="16.7.40" PrivateAssets="none" />
-    <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="2.9.8" PrivateAssets="none" />
+    <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="3.0.0" PrivateAssets="none" />
   </ItemGroup>
 
   <ItemGroup>
