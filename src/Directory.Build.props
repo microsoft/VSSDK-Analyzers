@@ -42,7 +42,7 @@
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
 
     <!-- We WANT these analyzers to be expressed as dependencies of the final package. -->
-    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="16.6.13" PrivateAssets="none" />
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="16.7.40" PrivateAssets="none" />
     <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="2.9.8" PrivateAssets="none" />
   </ItemGroup>
 
