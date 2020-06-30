@@ -57,7 +57,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                         start.Compilation.GetTypeByMetadataName(Types.Assumes.FullName)?.GetMembers(Types.Assumes.Present)));
                 if (state.ShouldAnalyze)
                 {
-                    start.RegisterSyntaxNodeAction(state.AnalyzeInvocationExpression, SyntaxKind.InvocationExpression);
+                    start.RegisterSyntaxNodeAction(Utils.DebuggableWrapper(state.AnalyzeInvocationExpression), SyntaxKind.InvocationExpression);
                 }
             });
         }
@@ -166,7 +166,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 if (symbol != null)
                 {
                     System.Collections.Generic.IEnumerable<MemberAccessExpressionSyntax> variableUses = from access in containingBlockOrExpression.DescendantNodes().OfType<MemberAccessExpressionSyntax>()
-                                       let symbolAccessed = context.SemanticModel.GetSymbolInfo(access.Expression, context.CancellationToken).Symbol
+                                       let symbolAccessed = context.Compilation.GetSemanticModel(access.SyntaxTree).GetSymbolInfo(access.Expression, context.CancellationToken).Symbol
                                        where SymbolEqualityComparer.Default.Equals(symbol, symbolAccessed)
                                        select access;
                     if (!containingBlockOrExpression.DescendantNodes().Any(n => this.IsNonNullCheck(n, symbol, context)))
@@ -216,7 +216,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             private bool IsThrowingNullCheck(SyntaxNode node, ISymbol symbol, SyntaxNodeAnalysisContext context)
             {
                 if (node is InvocationExpressionSyntax invocationExpression &&
-                    context.SemanticModel.GetSymbolInfo(invocationExpression.Expression).Symbol?.OriginalDefinition is { } item &&
+                    context.Compilation.GetSemanticModel(invocationExpression.SyntaxTree).GetSymbolInfo(invocationExpression.Expression).Symbol?.OriginalDefinition is { } item &&
                     this.nullThrowingMethods.Contains(item))
                 {
                     ArgumentSyntax firstArg = invocationExpression.ArgumentList.Arguments.FirstOrDefault();
