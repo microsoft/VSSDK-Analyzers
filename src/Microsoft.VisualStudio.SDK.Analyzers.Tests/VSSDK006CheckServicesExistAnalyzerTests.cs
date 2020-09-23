@@ -923,6 +923,37 @@ class Test : Package {
         await Verify.VerifyAnalyzerAsync(test);
     }
 
+    [Fact]
+    public async Task PartialClass()
+    {
+        var test1 = @"
+using Microsoft;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+
+partial class Test : Package {
+    IVsBuildManagerAccessor svc;
+    protected override void Initialize() {
+        base.Initialize();
+        [|this.svc|] = this.GetService(typeof(SVsBuildManagerAccessor)) as IVsBuildManagerAccessor;
+        svc.BeginDesignTimeBuild();
+        Foo();
+    }
+}
+";
+        var test2 = @"
+using System;
+
+partial class Test {
+    void Foo() {
+        Console.WriteLine();
+    }
+}
+";
+        var test = new Verify.Test { TestState = { Sources = { test1, test2 } } };
+        await test.RunAsync();
+    }
+
     private DiagnosticResult CreateDiagnostic(int line, int column, int length, params (int line, int column, int length)[] additionalLocations)
     {
         DiagnosticResult diagnostic = Verify.Diagnostic().WithSpan(line, column, line, column + length);
