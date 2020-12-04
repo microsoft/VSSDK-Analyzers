@@ -114,14 +114,19 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                         (aes, child) => aes.Right == child)) != null)
                     {
                         ISymbol leftSymbol = context.SemanticModel.GetSymbolInfo(assignment.Left, context.CancellationToken).Symbol;
-                        if (leftSymbol != null)
+                        if (leftSymbol is object)
                         {
                             // If the assigned variable is actually a field, scan this block for Assumes.Present
                             SyntaxNode? parentBlock = Utils.FindFirstAncestorOfTypes(invocationExpression, typeof(BlockSyntax), typeof(ArrowExpressionClauseSyntax));
                             if (!parentBlock?.DescendantNodes().Any(n => this.IsThrowingNullCheck(n, leftSymbol, context)) ?? true)
                             {
-                                // Since we didn't find an Assumes.Present call for this symbol, scan all blocks and expression bodies within this type.
-                                System.Collections.Generic.IEnumerable<Location> derefs = from member in leftSymbol.ContainingType.GetMembers().OfType<IMethodSymbol>()
+                                // Since we didn't find an Assumes.Present call for this symbol,
+                                //    if this is a field or property, scan all blocks and expression bodies within this type.
+                                //    otherwise just scan the blocks under this one.
+                                System.Collections.Generic.IEnumerable<Location> derefs;
+                                if (leftSymbol is IFieldSymbol || leftSymbol is IPropertySymbol)
+                                {
+                                    derefs = from member in leftSymbol.ContainingType.GetMembers().OfType<IMethodSymbol>()
                                              from syntaxRef in member.DeclaringSyntaxReferences
                                              let methodSyntax = syntaxRef.GetSyntax(context.CancellationToken) as MethodDeclarationSyntax
                                              where methodSyntax != null
@@ -129,6 +134,16 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                                              where bodyOrExpression != null
                                              from dref in this.ScanBlockForDereferencesWithoutNullCheck(context, leftSymbol, bodyOrExpression)
                                              select dref;
+                                }
+                                else if (parentBlock is object)
+                                {
+                                    derefs = this.ScanBlockForDereferencesWithoutNullCheck(context, leftSymbol, parentBlock);
+                                }
+                                else
+                                {
+                                    derefs = Enumerable.Empty<Location>();
+                                }
+
                                 if (derefs.Any())
                                 {
                                     context.ReportDiagnostic(Diagnostic.Create(Descriptor, assignment.Left.GetLocation(), derefs));
