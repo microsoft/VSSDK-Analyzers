@@ -954,6 +954,49 @@ partial class Test {
         await test.RunAsync();
     }
 
+    [Fact]
+    public async Task VS()
+    {
+        var test1 = @"
+using System;
+internal partial class Host {
+    private static object s_lockObject = new object();
+}
+";
+        var test2 = @"
+using System;
+internal partial class Host {
+	private static T GetServiceObject<T>(
+		IServiceProvider serviceProvider, ref T storage)
+		where T : class, new()
+	{
+		T service = storage;
+		if (service == null)
+		{
+			lock (s_lockObject)
+			{
+				service = storage;
+				if (service == null)
+				{
+					if (serviceProvider != null)
+					{
+						service = serviceProvider.GetService(typeof(T)) as T;
+					}
+					if (service == null)
+					{
+						service = storage = new T();
+					}
+				}
+			}
+		}
+		return service;
+	}
+}
+";
+        var test = new Verify.Test { TestState = { Sources = { test1, test2 } } };
+        await test.RunAsync();
+    }
+
     private DiagnosticResult CreateDiagnostic(int line, int column, int length, params (int line, int column, int length)[] additionalLocations)
     {
         DiagnosticResult diagnostic = Verify.Diagnostic().WithSpan(line, column, line, column + length);
