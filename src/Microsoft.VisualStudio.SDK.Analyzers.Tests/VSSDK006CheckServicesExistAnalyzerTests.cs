@@ -954,6 +954,36 @@ partial class Test {
         await test.RunAsync();
     }
 
+    [Fact]
+    public async Task PartialWithMemberThatChecksOtherField()
+    {
+        var test1 = @"
+internal partial class Host {
+    private static object s_lockObject = new object();
+
+    void Close()
+    {
+        if (s_lockObject != null)
+        {
+        }
+    }
+}
+";
+        var test2 = @"
+using System;
+internal partial class Host {
+    private static T GetServiceObject<T>(IServiceProvider serviceProvider)
+    {
+        T service;
+        service = (T)serviceProvider.GetService(typeof(T));
+        return service;
+    }
+}
+";
+        var test = new Verify.Test { TestState = { Sources = { test1, test2 } } };
+        await test.RunAsync();
+    }
+
     private DiagnosticResult CreateDiagnostic(int line, int column, int length, params (int line, int column, int length)[] additionalLocations)
     {
         DiagnosticResult diagnostic = Verify.Diagnostic().WithSpan(line, column, line, column + length);
