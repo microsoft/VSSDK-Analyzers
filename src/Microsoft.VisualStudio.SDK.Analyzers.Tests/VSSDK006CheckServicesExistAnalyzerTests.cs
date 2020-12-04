@@ -955,42 +955,29 @@ partial class Test {
     }
 
     [Fact]
-    public async Task VS()
+    public async Task PartialWithMemberThatChecksOtherField()
     {
         var test1 = @"
-using System;
 internal partial class Host {
     private static object s_lockObject = new object();
+
+    void Close()
+    {
+        if (s_lockObject != null)
+        {
+        }
+    }
 }
 ";
         var test2 = @"
 using System;
 internal partial class Host {
-	private static T GetServiceObject<T>(
-		IServiceProvider serviceProvider, ref T storage)
-		where T : class, new()
-	{
-		T service = storage;
-		if (service == null)
-		{
-			lock (s_lockObject)
-			{
-				service = storage;
-				if (service == null)
-				{
-					if (serviceProvider != null)
-					{
-						service = serviceProvider.GetService(typeof(T)) as T;
-					}
-					if (service == null)
-					{
-						service = storage = new T();
-					}
-				}
-			}
-		}
-		return service;
-	}
+    private static T GetServiceObject<T>(IServiceProvider serviceProvider)
+    {
+        T service;
+        service = (T)serviceProvider.GetService(typeof(T));
+        return service;
+    }
 }
 ";
         var test = new Verify.Test { TestState = { Sources = { test1, test2 } } };

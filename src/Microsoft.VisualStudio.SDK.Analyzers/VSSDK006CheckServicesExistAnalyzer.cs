@@ -183,7 +183,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             /// </summary>
             private bool IsNonNullCheck(SyntaxNode node, ISymbol symbol, SyntaxNodeAnalysisContext context)
             {
-                bool IsSymbol(SyntaxNode n) => SymbolEqualityComparer.Default.Equals(symbol, context.SemanticModel.GetSymbolInfo(n, context.CancellationToken).Symbol);
+                bool IsSymbol(SyntaxNode n) => SymbolEqualityComparer.Default.Equals(symbol, context.Compilation.GetSemanticModel(n.SyntaxTree).GetSymbolInfo(n, context.CancellationToken).Symbol);
                 bool IsEqualsOrExclamationEqualsCheck(BinaryExpressionSyntax o) => (o.OperatorToken.IsKind(SyntaxKind.EqualsEqualsToken) || o.OperatorToken.IsKind(SyntaxKind.ExclamationEqualsToken))
                                                                                     && (o.Left.IsKind(SyntaxKind.NullLiteralExpression) || o.Right.IsKind(SyntaxKind.NullLiteralExpression))
                                                                                     && (IsSymbol(o.Left) || IsSymbol(o.Right));
