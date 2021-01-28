@@ -16,4 +16,4 @@ This analyzer package also depends on the [Microsoft.VisualStudio.Threading.Anal
 
 [1]: https://nuget.org/packages/microsoft.visualstudio.sdk.analyzers
 [2]: https://nuget.org/packages/microsoft.visualstudio.threading.analyzers
-[3]: https://github.com/Microsoft/vs-threading/blob/master/doc/analyzers/index.md
+[3]: https://github.com/Microsoft/vs-threading/blob/main/doc/analyzers/index.md
