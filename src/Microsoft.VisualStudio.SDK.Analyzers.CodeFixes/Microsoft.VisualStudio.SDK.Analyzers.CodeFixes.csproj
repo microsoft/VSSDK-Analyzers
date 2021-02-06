@@ -1,9 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <CodeAnalysisRuleSet>..\Microsoft.VisualStudio.SDK.Analyzers\Microsoft.VisualStudio.SDK.Analyzers.ruleset</CodeAnalysisRuleSet>
-
     <PackageId>Microsoft.VisualStudio.SDK.Analyzers</PackageId>
     <PackageTags>analyzers visualstudio vssdk sdk</PackageTags>
     <PackageReleaseNotes></PackageReleaseNotes>

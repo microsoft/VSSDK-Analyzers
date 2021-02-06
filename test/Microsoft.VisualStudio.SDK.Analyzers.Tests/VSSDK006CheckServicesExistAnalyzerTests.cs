@@ -984,12 +984,12 @@ internal partial class Host {
         await test.RunAsync();
     }
 
-    private DiagnosticResult CreateDiagnostic(int line, int column, int length, params (int line, int column, int length)[] additionalLocations)
+    private DiagnosticResult CreateDiagnostic(int line, int column, int length, params (int Line, int Column, int Length)[] additionalLocations)
     {
         DiagnosticResult diagnostic = Verify.Diagnostic().WithSpan(line, column, line, column + length);
-        foreach ((int line, int column, int length) location in additionalLocations)
+        foreach ((int Line, int Column, int Length) location in additionalLocations)
         {
-            diagnostic = diagnostic.WithSpan(location.line, location.column, location.line, location.column + location.length);
+            diagnostic = diagnostic.WithSpan(location.Line, location.Column, location.Line, location.Column + location.Length);
         }
 
         return diagnostic;

@@ -2,17 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
-    <IsPackable>false</IsPackable>
-    <NoWarn>$(NoWarn);CS1591</NoWarn>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    <CodeAnalysisRuleSet>Microsoft.VisualStudio.SDK.Analyzers.Tests.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="coverlet.msbuild" Version="2.9.0" />
-    <PackageReference Include="MicroBuild.NonShipping" Version="$(MicroBuildVersion)" />
+    <PackageReference Include="coverlet.msbuild" Version="3.0.2" />
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="16.6.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing.XUnit" Version="1.0.1-beta1.20178.1" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing.XUnit" Version="1.0.1-beta1.20374.2" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.3.1" PrivateAssets="all" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.3" />
     <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="16.7.30021.50" PrivateAssets="all" />
@@ -23,8 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Microsoft.VisualStudio.SDK.Analyzers.CodeFixes\Microsoft.VisualStudio.SDK.Analyzers.CodeFixes.csproj" />
-    <ProjectReference Include="..\Microsoft.VisualStudio.SDK.Analyzers\Microsoft.VisualStudio.SDK.Analyzers.csproj" />
+    <ProjectReference Include="..\..\src\Microsoft.VisualStudio.SDK.Analyzers.CodeFixes\Microsoft.VisualStudio.SDK.Analyzers.CodeFixes.csproj" />
+    <ProjectReference Include="..\..\src\Microsoft.VisualStudio.SDK.Analyzers\Microsoft.VisualStudio.SDK.Analyzers.csproj" />
   </ItemGroup>
 
   <ItemGroup>

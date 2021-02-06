@@ -3,21 +3,35 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29313.133
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.VisualStudio.SDK.Analyzers", "Microsoft.VisualStudio.SDK.Analyzers\Microsoft.VisualStudio.SDK.Analyzers.csproj", "{C01185FA-A307-4EE5-8DB4-7BE702B16E77}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.VisualStudio.SDK.Analyzers", "src\Microsoft.VisualStudio.SDK.Analyzers\Microsoft.VisualStudio.SDK.Analyzers.csproj", "{C01185FA-A307-4EE5-8DB4-7BE702B16E77}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.VisualStudio.SDK.Analyzers.Tests", "Microsoft.VisualStudio.SDK.Analyzers.Tests\Microsoft.VisualStudio.SDK.Analyzers.Tests.csproj", "{91513758-87A5-43C2-8383-0CEC8B5A3C27}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.VisualStudio.SDK.Analyzers.Tests", "test\Microsoft.VisualStudio.SDK.Analyzers.Tests\Microsoft.VisualStudio.SDK.Analyzers.Tests.csproj", "{91513758-87A5-43C2-8383-0CEC8B5A3C27}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.VisualStudio.SDK.Analyzers.CodeFixes", "Microsoft.VisualStudio.SDK.Analyzers.CodeFixes\Microsoft.VisualStudio.SDK.Analyzers.CodeFixes.csproj", "{86A92AAF-1454-4F29-98B3-BA2D90354DD3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.VisualStudio.SDK.Analyzers.CodeFixes", "src\Microsoft.VisualStudio.SDK.Analyzers.CodeFixes\Microsoft.VisualStudio.SDK.Analyzers.CodeFixes.csproj", "{86A92AAF-1454-4F29-98B3-BA2D90354DD3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F9587E87-F435-476A-8DEE-C010D5C21FB2}"
 	ProjectSection(SolutionItems) = preProject
-		..\.editorconfig = ..\.editorconfig
+		.editorconfig = .editorconfig
 		Directory.Build.props = Directory.Build.props
 		Directory.Build.targets = Directory.Build.targets
-		..\global.json = ..\global.json
-		..\nuget.config = ..\nuget.config
+		global.json = global.json
+		nuget.config = nuget.config
 		stylecop.json = stylecop.json
-		..\version.json = ..\version.json
+		version.json = version.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{C8EC5546-9AAD-4874-92CF-C514F1089DDB}"
+	ProjectSection(SolutionItems) = preProject
+		src\.editorconfig = src\.editorconfig
+		src\Directory.Build.props = src\Directory.Build.props
+		src\Directory.Build.targets = src\Directory.Build.targets
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{13499CEA-559B-4768-9550-BE43BB5CECD6}"
+	ProjectSection(SolutionItems) = preProject
+		test\.editorconfig = test\.editorconfig
+		test\Directory.Build.props = test\Directory.Build.props
+		test\Directory.Build.targets = test\Directory.Build.targets
 	EndProjectSection
 EndProject
 Global
@@ -41,6 +55,11 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C01185FA-A307-4EE5-8DB4-7BE702B16E77} = {C8EC5546-9AAD-4874-92CF-C514F1089DDB}
+		{91513758-87A5-43C2-8383-0CEC8B5A3C27} = {13499CEA-559B-4768-9550-BE43BB5CECD6}
+		{86A92AAF-1454-4F29-98B3-BA2D90354DD3} = {C8EC5546-9AAD-4874-92CF-C514F1089DDB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B26EDBEE-6240-419F-9E6C-55AC2F09ADA0}

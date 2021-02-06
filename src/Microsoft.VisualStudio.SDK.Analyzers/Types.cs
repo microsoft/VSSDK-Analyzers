@@ -532,17 +532,17 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             internal enum Values
             {
                 /// <summary>
-                /// Indicates synchronous load in all versions of Visual Studio
+                /// Indicates synchronous load in all versions of Visual Studio.
                 /// </summary>
                 None = 0,
 
                 /// <summary>
-                /// Indicates auto load request should be ignored when Visual Studio has UIContextRules feature
+                /// Indicates auto load request should be ignored when Visual Studio has UIContextRules feature.
                 /// </summary>
                 SkipWhenUIContextRulesActive = 1,
 
                 /// <summary>
-                /// Indicates auto load should be requested asynchronously
+                /// Indicates auto load should be requested asynchronously.
                 /// </summary>
                 BackgroundLoad = 2,
             }

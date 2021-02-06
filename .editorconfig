@@ -9,6 +9,10 @@ indent_style = space
 
 # (Please don't specify an indent_size here; that has too many unintended consequences.)
 
+[*.yml]
+indent_size = 2
+indent_style = space
+
 # Code files
 [*.{cs,csx,vb,vbx,h,cpp,idl}]
 indent_size = 4
@@ -16,7 +20,7 @@ insert_final_newline = true
 trim_trailing_whitespace = true
 
 # Xml project files
-[*.{csproj,vbproj,vcxproj,vcxproj.filters,proj,projitems,shproj}]
+[*.{csproj,vbproj,vcxproj,vcxproj.filters,proj,projitems,shproj,runsettings}]
 indent_size = 2
 
 # Xml config files
@@ -155,3 +159,12 @@ csharp_new_line_before_members_in_anonymous_types = true
 
 # Blocks are allowed
 csharp_prefer_braces = true:silent
+
+# SA1130: Use lambda syntax
+dotnet_diagnostic.SA1130.severity = silent
+
+# CA1508: Avoid dead conditional code
+dotnet_diagnostic.CA1508.severity = warning
+
+[*.sln]
+indent_style = tab
