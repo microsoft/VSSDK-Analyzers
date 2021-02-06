@@ -43,19 +43,19 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         }
 
         /// <summary>
-        /// Describes the <see cref="Microsoft.VisualStudio.OLE.Interop.IServiceProvider"/> type.
+        /// Describes the Microsoft.VisualStudio.OLE.Interop.IServiceProvider type.
         /// </summary>
         internal static class IOleServiceProvider
         {
             /// <summary>
-            /// Gets the simple name of the <see cref="Microsoft.VisualStudio.OLE.Interop.IServiceProvider"/> type.
+            /// Gets the simple name of the Microsoft.VisualStudio.OLE.Interop.IServiceProvider type.
             /// </summary>
-            internal const string TypeName = nameof(OLE.Interop.IServiceProvider);
+            internal const string TypeName = "IServiceProvider";
 
             /// <summary>
             /// The name of the QueryService method.
             /// </summary>
-            internal const string QueryService = nameof(OLE.Interop.IServiceProvider.QueryService);
+            internal const string QueryService = "QueryService";
 
             /// <summary>
             /// Gets an array of the nesting namespaces for this type.

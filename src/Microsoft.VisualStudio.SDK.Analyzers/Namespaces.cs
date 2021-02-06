@@ -45,8 +45,8 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         {
             nameof(Microsoft),
             nameof(VisualStudio),
-            nameof(OLE),
-            nameof(OLE.Interop),
+            "OLE",
+            "Interop",
         };
 
         /// <summary>
