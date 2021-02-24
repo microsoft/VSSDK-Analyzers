@@ -10,7 +10,7 @@
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.3.1" PrivateAssets="all" />
     <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="16.9.31004.209" PrivateAssets="all" />
     <PackageReference Include="Microsoft.VisualStudio.Shell.Framework" Version="16.9.31004.209" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.VisualStudio.Threading" Version="16.10.21-alpha" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.VisualStudio.Threading" Version="16.9.60" PrivateAssets="all" />
   </ItemGroup>
 
 </Project>
