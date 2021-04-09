@@ -90,22 +90,55 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             TypedConstant? firstParameter = packageRegistrationInstance?.ConstructorArguments.FirstOrDefault();
             if (firstParameter.HasValue && firstParameter.Value.Kind == TypedConstantKind.Type && firstParameter.Value.Value is INamedTypeSymbol typeOfUserToolWindow)
             {
+                // If the tool window has a constructor that takes a parameter,
+                // then the tool window is probably created asynchronously, because you 
+                // cannot easily pass a parameter when creating a synchronous tool window.
                 bool toolWindowHasCtorWithOneParameter = typeOfUserToolWindow.GetMembers(ConstructorInfo.ConstructorName).OfType<IMethodSymbol>().Any(c => c.Parameters.Length == 1);
-                if (!toolWindowHasCtorWithOneParameter)
+                if (toolWindowHasCtorWithOneParameter)
                 {
-                    if (packageRegistrationInstance!.ApplicationSyntaxReference?.GetSyntax(context.CancellationToken) is AttributeSyntax attributeSyntax)
-                    {
-                        AttributeArgumentSyntax firstArgumentSyntax = attributeSyntax.ArgumentList.Arguments.First();
-                        Location diagnosticLocation = firstArgumentSyntax.GetLocation();
-                        if (firstArgumentSyntax.Expression is TypeOfExpressionSyntax typeOfArg)
-                        {
-                            diagnosticLocation = typeOfArg.Type.GetLocation();
-                        }
+                    return;
+                }
 
-                        context.ReportDiagnostic(Diagnostic.Create(Descriptor, diagnosticLocation));
+                // If the `GetAsyncToolWindowFactory` method has been overridden,
+                // then it's highly likely that the tool window will be created asynchronously.
+                var packageSymbol = context.SemanticModel.GetDeclaredSymbol(declaration, context.CancellationToken)?.OriginalDefinition as ITypeSymbol;
+                if (this.IsGetAsyncToolWindowFactoryOverridden(packageSymbol, asyncPackageType))
+                {
+                    return;
+                }
+
+                if (packageRegistrationInstance!.ApplicationSyntaxReference?.GetSyntax(context.CancellationToken) is AttributeSyntax attributeSyntax)
+                {
+                    AttributeArgumentSyntax firstArgumentSyntax = attributeSyntax.ArgumentList.Arguments.First();
+                    Location diagnosticLocation = firstArgumentSyntax.GetLocation();
+                    if (firstArgumentSyntax.Expression is TypeOfExpressionSyntax typeOfArg)
+                    {
+                        diagnosticLocation = typeOfArg.Type.GetLocation();
                     }
+
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, diagnosticLocation));
                 }
             }
+        }
+
+        private bool IsGetAsyncToolWindowFactoryOverridden(ITypeSymbol? packageTypeSymbol, INamedTypeSymbol asyncPackageType)
+        {
+            // Step up through the type hierarchy of the package class until we reach
+            // the `AsyncPackage` type. Once we reach the `AsyncPackage` type, then the
+            // `GetAsyncToolWindowFactory` method cannot be overridden.
+            while (!SymbolEqualityComparer.Default.Equals(packageTypeSymbol?.OriginalDefinition, asyncPackageType))
+            {
+                IMethodSymbol? getAsyncToolWindowFactoryMethod = packageTypeSymbol?.GetMembers(Types.AsyncPackage.GetAsyncToolWindowFactory).OfType<IMethodSymbol>().FirstOrDefault();
+
+                if (getAsyncToolWindowFactoryMethod != null && getAsyncToolWindowFactoryMethod.IsOverride)
+                {
+                    return true;
+                }
+
+                packageTypeSymbol = packageTypeSymbol?.BaseType;
+            }
+
+            return false;
         }
     }
 }
