@@ -91,7 +91,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             if (firstParameter.HasValue && firstParameter.Value.Kind == TypedConstantKind.Type && firstParameter.Value.Value is INamedTypeSymbol typeOfUserToolWindow)
             {
                 // If the tool window has a constructor that takes a parameter,
-                // then the tool window is probably created asynchronously, because you 
+                // then the tool window is probably created asynchronously, because you
                 // cannot easily pass a parameter when creating a synchronous tool window.
                 bool toolWindowHasCtorWithOneParameter = typeOfUserToolWindow.GetMembers(ConstructorInfo.ConstructorName).OfType<IMethodSymbol>().Any(c => c.Parameters.Length == 1);
                 if (toolWindowHasCtorWithOneParameter)
