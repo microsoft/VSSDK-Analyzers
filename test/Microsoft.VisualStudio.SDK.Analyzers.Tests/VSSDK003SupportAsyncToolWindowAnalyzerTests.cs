@@ -235,4 +235,66 @@ public class ProtocolPackage : Microsoft.VisualStudio.Shell.AsyncPackage
     ";
         await Verify.VerifyAnalyzerAsync(package);
     }
+
+    [Fact]
+    public async Task OverriddenGetAsyncToolWindowFactory_ToolWindowWithParameterlessConstructor_ProducesNoDiagnosticAsync()
+    {
+        var package = @"
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+using Task = System.Threading.Tasks.Task;
+
+public abstract class ToolkitPackage : AsyncPackage
+{
+    private List<object> _toolWindowProviders;
+
+    public override IVsAsyncToolWindowFactory? GetAsyncToolWindowFactory(Guid toolWindowType)
+    {
+        return this;
+    }
+
+    protected override string GetToolWindowTitle(Type toolWindowType, int id)
+    {
+        return base.GetToolWindowTitle(toolWindowType, id);
+    }
+
+    protected override async Task<object> InitializeToolWindowAsync(Type toolWindowType, int id, CancellationToken cancellationToken)
+    {
+        return new object();
+    }
+
+    protected override WindowPane InstantiateToolWindow(Type toolWindowType, object context)
+    {
+        return base.InstantiateToolWindow(toolWindowType, ToolWindowCreationContext.Unspecified);
+    }
+}
+
+[ProvideToolWindow(typeof(ToolWindow1))]
+class ToolWindow1Package : ToolkitPackage
+{
+}
+";
+        var toolWindow = @"
+using System.Runtime.InteropServices;
+using System.Windows.Controls;
+using Microsoft.VisualStudio.Shell;
+
+[Guid(""bd7b3e0c-f79e-46c1-8a04-12cbb8161ce5"")]
+public class ToolWindow1
+{
+}
+";
+
+        await new Verify.Test
+        {
+            TestState =
+            {
+                Sources = { package, toolWindow },
+            },
+        }.RunAsync();
+    }
 }
