@@ -47,4 +47,3 @@ jobs:
     parameters:
       initArgs: -NoRestore
   - template: publish-codecoverage.yml
-  - template: publish-deployables.yml
