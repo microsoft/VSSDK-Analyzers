@@ -340,6 +340,11 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             /// Gets the <see cref="Microsoft.CodeAnalysis.CSharp.Syntax.TypeSyntax"/> for this type.
             /// </summary>
             internal static TypeSyntax TypeSyntax { get; } = Utils.QualifyName(Namespace, SyntaxFactory.IdentifierName(TypeName));
+
+            /// <summary>
+            /// Gets the fully-qualified name of this type as a string.
+            /// </summary>
+            internal static string FullName => string.Join(".", Namespace) + "." + TypeName;
         }
 
         /// <summary>
@@ -374,9 +379,45 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         internal static class JoinableTaskFactory
         {
             /// <summary>
+            /// Gets the simple name of the <see cref="Threading.JoinableTaskFactory"/> type.
+            /// </summary>
+            internal const string TypeName = "JoinableTaskFactory";
+
+            /// <summary>
             /// The name of the <see cref="JoinableTaskFactory.SwitchToMainThreadAsync"/> method.
             /// </summary>
             internal const string SwitchToMainThreadAsync = nameof(JoinableTaskFactory.SwitchToMainThreadAsync);
+
+            /// <summary>
+            /// The name of the <see cref="JoinableTaskFactory.RunAsync"/> method.
+            /// </summary>
+            internal const string RunAsync = "RunAsync";
+
+            /// <summary>
+            /// Gets an array of the nesting namespaces for this type.
+            /// </summary>
+            internal static readonly IReadOnlyList<string> Namespace = Namespaces.MicrosoftVisualStudioThreading;
+        }
+
+        /// <summary>
+        /// Describes the <see cref="Threading.JoinableTask"/> type.
+        /// </summary>
+        internal static class JoinableTask
+        {
+            /// <summary>
+            /// Gets the simple name of the <see cref="Threading.JoinableTask"/> type.
+            /// </summary>
+            internal const string TypeName = "JoinableTask";
+
+            /// <summary>
+            /// The name of the <see cref="Threading.JoinableTask.Join"/> method.
+            /// </summary>
+            internal const string Join = "Join";
+
+            /// <summary>
+            /// The name of the <see cref="Threading.JoinableTask.JoinAsync"/> method.
+            /// </summary>
+            internal const string JoinAsync = "JoinAsync";
         }
 
         /// <summary>

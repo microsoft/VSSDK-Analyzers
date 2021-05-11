@@ -10,3 +10,4 @@ VSSDK003 | Performance | Info | VSSDK003SupportAsyncToolWindowAnalyzer
 VSSDK004 | Performance | Warning | VSSDK004ProvideAutoLoadAttributeAnalyzer
 VSSDK005 | Reliability | Error | VSSDK005UseJoinableTaskContextSingletonAnalyzer
 VSSDK006 | Reliability | Warning | VSSDK006CheckServicesExistAnalyzer
+VSSDK007 | Reliability | Warning | VSSDK007ThreadHelperJTFRunAsync
