@@ -80,36 +80,6 @@ namespace ConsoleApplication1
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
-    /*[Fact]
-    public async Task RunAsync_CommunityToolkit_ForgetAndLogOnFailure_Warning()
-    {
-        var src = @"
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Threading;
-using Community.VisualStudio.Toolkit;
-namespace ConsoleApplication1
-{
-    class Test
-    {
-        static void Foo()
-        {
-            ThreadHelper.JoinableTaskFactory.{|#0:RunAsync|}(async () =>
-            {
-                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-            }).ForgetAndLogOnFailure();
-        }
-    }
-}";
-        Verify.Test test = new()
-        {
-            TestCode = src,
-            IncludeCommunityToolkit = true
-        };
-
-        DiagnosticResult expected = Verify.Diagnostic().WithLocation(0);
-        await Verify.VerifyAnalyzerAsync(test, expected);
-    }*/
-
     [Fact]
     public async Task RunAsync_Awaited_NoWarning()
     {
