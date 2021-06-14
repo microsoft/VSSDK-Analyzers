@@ -39,7 +39,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             /// <summary>
             /// Gets the fully-qualified name of this type as a string.
             /// </summary>
-            internal static string FullName => string.Join(".", Namespace) + "." + TypeName;
+            internal static string FullName { get; } = string.Join(".", Namespace) + "." + TypeName;
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             /// <summary>
             /// Gets the fully-qualified name of this type as a string.
             /// </summary>
-            internal static string FullName => string.Join(".", Namespace) + "." + TypeName;
+            internal static string FullName { get; } = string.Join(".", Namespace) + "." + TypeName;
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             /// <summary>
             /// Gets the fully-qualified name of this type as a string.
             /// </summary>
-            internal static string FullName => string.Join(".", Namespace) + "." + TypeName;
+            internal static string FullName { get; } = string.Join(".", Namespace) + "." + TypeName;
         }
 
         /// <summary>
@@ -132,7 +132,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             /// <summary>
             /// Gets the fully-qualified name of this type as a string.
             /// </summary>
-            internal static string FullName => string.Join(".", Namespace) + "." + TypeName;
+            internal static string FullName { get; } = string.Join(".", Namespace) + "." + TypeName;
         }
 
         /// <summary>
@@ -163,7 +163,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             /// <summary>
             /// Gets the fully-qualified name of this type as a string.
             /// </summary>
-            internal static string FullName => string.Join(".", Namespace) + "." + TypeName;
+            internal static string FullName { get; } = string.Join(".", Namespace) + "." + TypeName;
         }
 
         /// <summary>
@@ -204,7 +204,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             /// <summary>
             /// Gets the fully-qualified name of this type as a string.
             /// </summary>
-            internal static string FullName => string.Join(".", Namespace) + "." + TypeName;
+            internal static string FullName { get; } = string.Join(".", Namespace) + "." + TypeName;
         }
 
         /// <summary>
@@ -240,7 +240,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             /// <summary>
             /// Gets the fully-qualified name of this type as a string.
             /// </summary>
-            internal static string FullName => string.Join(".", Namespace) + "." + TypeName;
+            internal static string FullName { get; } = string.Join(".", Namespace) + "." + TypeName;
         }
 
         /// <summary>
@@ -271,7 +271,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             /// <summary>
             /// Gets the fully-qualified name of this type as a string.
             /// </summary>
-            internal static string FullName => string.Join(".", Namespace) + "." + TypeName;
+            internal static string FullName { get; } = string.Join(".", Namespace) + "." + TypeName;
         }
 
         /// <summary>
@@ -344,7 +344,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             /// <summary>
             /// Gets the fully-qualified name of this type as a string.
             /// </summary>
-            internal static string FullName => string.Join(".", Namespace) + "." + TypeName;
+            internal static string FullName { get; } = string.Join(".", Namespace) + "." + TypeName;
         }
 
         /// <summary>
@@ -370,7 +370,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             /// <summary>
             /// Gets the fully-qualified name of this type as a string.
             /// </summary>
-            internal static string FullName => string.Join(".", Namespace) + "." + TypeName;
+            internal static string FullName { get; } = string.Join(".", Namespace) + "." + TypeName;
         }
 
         /// <summary>
@@ -497,7 +497,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             /// <summary>
             /// Gets the fully-qualified name of this type as a string.
             /// </summary>
-            internal static string FullName => string.Join(".", Namespace) + "." + TypeName;
+            internal static string FullName { get; } = string.Join(".", Namespace) + "." + TypeName;
         }
 
         /// <summary>
@@ -523,7 +523,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             /// <summary>
             /// Gets the fully-qualified name of this type as a string.
             /// </summary>
-            internal static string FullName => string.Join(".", Namespace) + "." + TypeName;
+            internal static string FullName { get; } = string.Join(".", Namespace) + "." + TypeName;
         }
 
         /// <summary>
@@ -549,7 +549,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             /// <summary>
             /// Gets the fully-qualified name of this type as a string.
             /// </summary>
-            internal static string FullName => string.Join(".", Namespace) + "." + TypeName;
+            internal static string FullName { get; } = string.Join(".", Namespace) + "." + TypeName;
         }
 
         /// <summary>
@@ -596,7 +596,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             /// <summary>
             /// Gets the fully-qualified name of this type as a string.
             /// </summary>
-            internal static string FullName => string.Join(".", Namespace) + "." + TypeName;
+            internal static string FullName { get; } = string.Join(".", Namespace) + "." + TypeName;
         }
     }
 }
