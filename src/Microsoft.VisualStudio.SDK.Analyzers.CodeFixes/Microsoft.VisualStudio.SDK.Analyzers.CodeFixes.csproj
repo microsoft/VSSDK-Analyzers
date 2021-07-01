@@ -5,6 +5,7 @@
     <PackageTags>analyzers visualstudio vssdk sdk</PackageTags>
     <PackageReleaseNotes></PackageReleaseNotes>
     <Description>A collection of analyzers to help Visual Studio extension developers write quality code.</Description>
+    <DevelopmentDependency>true</DevelopmentDependency>
 
     <!-- Analyzers should not be added to the lib folder. -->
     <IncludeBuildOutput>false</IncludeBuildOutput>
