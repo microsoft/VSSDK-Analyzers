@@ -1,2 +1,2 @@
 ﻿P:System.Net.ServicePointManager.SecurityProtocol; Modifying this would affect Visual Studio's process wide networking state.
-M:Microsoft.VisualStudio.Shell.Interop.IVsOutputWindowPane.OutputStringThreadSafe(System.String); Use OutputString instead, which is also thread-safe but does not run a message pump.
+M:Microsoft.VisualStudio.Shell.Interop.IVsOutputWindowPane.OutputString(System.String); Use OutputStringThreadSafe instead, which is not any more free-threaded but runs a more limited message pump. Using IVsOutputWindowPaneNoPump.OutputStringNoPump is even better.
