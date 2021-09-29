@@ -1,3 +1,4 @@
+![Microsoft.VisualStudio.Shell.ServiceProvider]::GlobalProvider
 ![Microsoft.VisualStudio.Shell.ServiceProvider]::GetGlobalServiceAsync
 [Microsoft.VisualStudio.Shell.ServiceProvider]
 [Microsoft.VisualStudio.Shell.Interop.*]
