@@ -7,6 +7,10 @@
 ![Microsoft.VisualStudio.Shell.Interop.IAsyncServiceProvider]
 [Microsoft.VisualStudio.Shell.Package]::GetService
 [EnvDTE.*]
+[EnvDTE80.*]
+[EnvDTE90.*]
+[EnvDTE90a.*]
+[EnvDTE100.*]
 ![Microsoft.VisualStudio.Shell.Interop.IVsAppContainerBootstrapper]
 ![Microsoft.VisualStudio.Shell.Interop.IVsAppContainerBootstrapper2]
 ![Microsoft.VisualStudio.Shell.Interop.IVsAppContainerBootstrapper3]
