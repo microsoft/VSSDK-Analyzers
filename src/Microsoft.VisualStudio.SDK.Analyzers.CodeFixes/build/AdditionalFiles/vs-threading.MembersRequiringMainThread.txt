@@ -1,5 +1,6 @@
 ![Microsoft.VisualStudio.Shell.ServiceProvider]::GlobalProvider
 ![Microsoft.VisualStudio.Shell.ServiceProvider]::GetGlobalServiceAsync
+![Microsoft.VisualStudio.Shell.Interop.IVsActivityLog]
 [Microsoft.VisualStudio.Shell.ServiceProvider]
 [Microsoft.VisualStudio.Shell.Interop.*]
 [Microsoft.VisualStudio.OLE.Interop.*]
