@@ -1,4 +1,5 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.VisualStudio.SDK.Analyzers
 {
@@ -27,7 +28,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: Id,
             title: "Avoid instantiating JoinableTaskContext",
-            messageFormat: "Use the ThreadHelper.JoinableTaskContext singleton rather than instantiating your own to avoid deadlocks.",
+            messageFormat: "Use the ThreadHelper.JoinableTaskContext singleton rather than instantiating your own to avoid deadlocks",
             helpLinkUri: Utils.GetHelpLink(Id),
             category: "Reliability",
             defaultSeverity: DiagnosticSeverity.Error,

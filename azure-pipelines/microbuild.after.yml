@@ -1,18 +1,26 @@
+parameters:
+- name: EnableAPIScan
+  type: boolean
+
 steps:
 - task: MicroBuildCodesignVerify@3
   displayName: Verify Signed Files
   inputs:
     TargetFolders: |
       $(Build.SourcesDirectory)/bin/Packages/$(BuildConfiguration)/NuGet
-    WhiteListPathForSigs: azure-pipelines/no_strongname.txt
 
 - task: MicroBuildCleanup@1
   condition: succeededOrFailed()
   displayName: MicroBuild Cleanup
 
-- task: ComponentGovernanceComponentDetection@0
-  displayName: Component Detection
-  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+- task: ManifestGeneratorTask@0
+  displayName: Software Bill of Materials generation
+  inputs:
+    BuildDropPath: $(System.DefaultWorkingDirectory)/bin/Microsoft.VisualStudio.SDK.Analyzers.CodeFixes/$(BuildConfiguration)
+    BuildComponentPath: $(System.DefaultWorkingDirectory)/obj/src/Microsoft.VisualStudio.SDK.Analyzers.CodeFixes
+
+- powershell: Copy-Item -Recurse -Verbose "$(System.DefaultWorkingDirectory)/bin/Microsoft.VisualStudio.SDK.Analyzers.CodeFixes/$(BuildConfiguration)/_manifest" "$(System.DefaultWorkingDirectory)/bin/Packages/$(BuildConfiguration)/NuGet"
+  displayName: Publish Software Bill of Materials
 
 - task: Ref12Analyze@0
   displayName: Ref12 (Codex) Analyze
@@ -28,3 +36,5 @@ steps:
   continueOnError: true
 
 - template: secure-development-tools.yml
+  parameters:
+    EnableAPIScan: ${{ parameters.EnableAPIScan }}

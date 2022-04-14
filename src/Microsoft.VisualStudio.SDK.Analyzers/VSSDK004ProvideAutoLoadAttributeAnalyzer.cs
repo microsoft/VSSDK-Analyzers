@@ -1,4 +1,5 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.VisualStudio.SDK.Analyzers
 {
@@ -26,8 +27,8 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         /// </summary>
         internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: Id,
-            title: "Use BackgroundLoad flag in ProvideAutoLoad attribute for asynchronous auto load.",
-            messageFormat: "Synchronous auto loads will be deprecated in future versions, consider using BackgroundLoad flag and AsyncPackage base class.",
+            title: "Use BackgroundLoad flag in ProvideAutoLoad attribute for asynchronous auto load",
+            messageFormat: "Synchronous auto loads will be deprecated in future versions, consider using BackgroundLoad flag and AsyncPackage base class",
             helpLinkUri: Utils.GetHelpLink(Id),
             category: "Performance",
             defaultSeverity: DiagnosticSeverity.Warning,

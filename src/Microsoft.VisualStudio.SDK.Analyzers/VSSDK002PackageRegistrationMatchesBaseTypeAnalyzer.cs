@@ -1,4 +1,5 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.VisualStudio.SDK.Analyzers
 {
@@ -36,7 +37,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: Id,
             title: "PackageRegistration matches Package",
-            messageFormat: "The PackageRegistrationAttribute.AllowsBackgroundLoading should be set to true if and only if the package derives from AsyncPackage.",
+            messageFormat: "The PackageRegistrationAttribute.AllowsBackgroundLoading should be set to true if and only if the package derives from AsyncPackage",
             helpLinkUri: Utils.GetHelpLink(Id),
             category: "Performance",
             defaultSeverity: DiagnosticSeverity.Error,

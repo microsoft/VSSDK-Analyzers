@@ -1,12 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>Microsoft.VisualStudio.SDK.Just.Analyzers</PackageId>
     <IsPackable>false</IsPackable>
+    <!-- Buggy analyzer -->
+    <NoWarn>$(NoWarn);RS2002</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.0.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.3.1" PrivateAssets="all" />
     <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="16.9.31004.209" PrivateAssets="all" />
     <PackageReference Include="Microsoft.VisualStudio.Shell.Framework" Version="16.9.31004.209" PrivateAssets="all" />
