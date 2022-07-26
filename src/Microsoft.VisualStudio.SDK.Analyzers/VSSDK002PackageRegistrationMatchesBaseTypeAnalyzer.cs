@@ -85,8 +85,8 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
 
             if (Utils.IsEqualToOrDerivedFrom(baseTypeSymbol, packageType))
             {
-                INamedTypeSymbol packageRegistrationType = context.Compilation.GetTypeByMetadataName(Types.PackageRegistrationAttribute.FullName);
-                INamedTypeSymbol userClassSymbol = context.SemanticModel.GetDeclaredSymbol(declaration, context.CancellationToken);
+                INamedTypeSymbol? packageRegistrationType = context.Compilation.GetTypeByMetadataName(Types.PackageRegistrationAttribute.FullName);
+                INamedTypeSymbol? userClassSymbol = context.SemanticModel.GetDeclaredSymbol(declaration, context.CancellationToken);
                 AttributeData? packageRegistrationInstance = userClassSymbol?.GetAttributes().FirstOrDefault(a => SymbolEqualityComparer.Default.Equals(a.AttributeClass, packageRegistrationType));
                 if (packageRegistrationInstance == null)
                 {
@@ -102,12 +102,12 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
 
                 if (isAsyncPackageBaseType != allowsBackgroundLoading)
                 {
-                    var attributeSyntax = packageRegistrationInstance.ApplicationSyntaxReference.GetSyntax(context.CancellationToken) as AttributeSyntax;
+                    var attributeSyntax = packageRegistrationInstance.ApplicationSyntaxReference?.GetSyntax(context.CancellationToken) as AttributeSyntax;
                     if (attributeSyntax is object)
                     {
-                        AttributeArgumentSyntax? allowBackgroundLoadingSyntax = attributeSyntax.ArgumentList.Arguments.FirstOrDefault(a => a.NameEquals?.Name?.Identifier.Text == Types.PackageRegistrationAttribute.AllowsBackgroundLoading);
+                        AttributeArgumentSyntax? allowBackgroundLoadingSyntax = attributeSyntax.ArgumentList?.Arguments.FirstOrDefault(a => a.NameEquals?.Name?.Identifier.Text == Types.PackageRegistrationAttribute.AllowsBackgroundLoading);
                         Location location = allowBackgroundLoadingSyntax?.GetLocation() ?? attributeSyntax.GetLocation();
-                        ImmutableDictionary<string, string> properties = ImmutableDictionary.Create<string, string>()
+                        ImmutableDictionary<string, string?> properties = ImmutableDictionary.Create<string, string?>()
                             .Add(BaseTypeDiagnosticPropertyName, isAsyncPackageBaseType ? Types.AsyncPackage.TypeName : Types.Package.TypeName);
                         context.ReportDiagnostic(Diagnostic.Create(Descriptor, location, properties));
                     }

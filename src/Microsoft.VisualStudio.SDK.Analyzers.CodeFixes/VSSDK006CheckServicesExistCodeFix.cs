@@ -36,22 +36,29 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         public override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             Diagnostic diagnostic = context.Diagnostics.First();
-            SyntaxNode root = await context.Document.GetSyntaxRootAsync(context.CancellationToken);
-            SyntaxNode? node = root.FindNode(diagnostic.Location.SourceSpan, getInnermostNodeForTie: true);
-            SyntaxNode? presentArgument = node is VariableDeclaratorSyntax declaratorSyntax ? SyntaxFactory.IdentifierName(declaratorSyntax.Identifier)
-                : node.Parent is InvocationExpressionSyntax ? null // direct GetService result invocation
-                : node is NameSyntax ? node
-                : node is MemberAccessExpressionSyntax ? node
-                : null;
-
-            if (presentArgument != null)
+            SyntaxNode? root = await context.Document.GetSyntaxRootAsync(context.CancellationToken);
+            SyntaxNode? node = root?.FindNode(diagnostic.Location.SourceSpan, getInnermostNodeForTie: true);
+            if (node != null)
             {
-                context.RegisterCodeFix(
-                    CodeAction.Create(
-                        "Add Assumes.Present after assignment",
-                        ct => AppendAfterAssignmentAsync(context, node.FirstAncestorOrSelf<StatementSyntax>(), presentArgument, ct),
-                        "After"),
-                    diagnostic);
+                SyntaxNode? presentArgument = node is VariableDeclaratorSyntax declaratorSyntax ? SyntaxFactory.IdentifierName(declaratorSyntax.Identifier)
+                    : node.Parent is InvocationExpressionSyntax ? null // direct GetService result invocation
+                    : node is NameSyntax ? node
+                    : node is MemberAccessExpressionSyntax ? node
+                    : null;
+
+                if (presentArgument != null)
+                {
+                    StatementSyntax? statementSyntax = node.FirstAncestorOrSelf<StatementSyntax>();
+                    if (statementSyntax != null)
+                    {
+                        context.RegisterCodeFix(
+                            CodeAction.Create(
+                                "Add Assumes.Present after assignment",
+                                ct => AppendAfterAssignmentAsync(context, statementSyntax, presentArgument, ct),
+                                "After"),
+                            diagnostic);
+                    }
+                }
             }
         }
 
@@ -59,7 +66,8 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         {
             DocumentEditor editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken);
             Document document = context.Document;
-            SyntaxNode root = await document.GetSyntaxRootAsync(cancellationToken);
+            SyntaxNode? root = await document.GetSyntaxRootAsync(cancellationToken);
+            Assumes.NotNull(root);
             SyntaxNode assumesStatement = CreateAssumesPresentStatement(editor.Generator, presentArgument);
             root = root.InsertNodesAfter(relativeTo, new SyntaxNode[] { assumesStatement });
             document = document.WithSyntaxRoot(root);

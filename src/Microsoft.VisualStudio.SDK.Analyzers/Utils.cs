@@ -199,7 +199,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 return default;
             }
 
-            SyntaxNode current = syntaxNode.Parent;
+            SyntaxNode? current = syntaxNode.Parent;
             SyntaxNode child = syntaxNode;
             while (current != null)
             {

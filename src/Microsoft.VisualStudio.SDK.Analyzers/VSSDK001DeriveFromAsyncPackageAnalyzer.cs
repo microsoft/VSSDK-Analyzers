@@ -51,9 +51,9 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             // Register for compilation first so that we only activate the analyzer for applicable compilations
             context.RegisterCompilationStartAction(compilationContext =>
             {
-                INamedTypeSymbol packageType = compilationContext.Compilation.GetTypeByMetadataName(Types.Package.FullName);
-                INamedTypeSymbol asyncPackage = compilationContext.Compilation.GetTypeByMetadataName(Types.AsyncPackage.FullName);
-                if (asyncPackage != null)
+                INamedTypeSymbol? packageType = compilationContext.Compilation.GetTypeByMetadataName(Types.Package.FullName);
+                INamedTypeSymbol? asyncPackage = compilationContext.Compilation.GetTypeByMetadataName(Types.AsyncPackage.FullName);
+                if (asyncPackage != null && packageType != null)
                 {
                     // Reuse the type symbols we looked up so that we don't have to look them up for every single class declaration.
                     compilationContext.RegisterSyntaxNodeAction(Utils.DebuggableWrapper(ctxt => this.AnalyzeClassDeclaration(ctxt, packageType)), SyntaxKind.ClassDeclaration);

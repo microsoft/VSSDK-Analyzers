@@ -32,8 +32,8 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         {
             Diagnostic diagnostic = context.Diagnostics.First();
 
-            SyntaxNode root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
-            ClassDeclarationSyntax classDeclarationSyntax = root.FindNode(diagnostic.Location.SourceSpan).FirstAncestorOrSelf<ClassDeclarationSyntax>();
+            SyntaxNode? root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
+            ClassDeclarationSyntax? classDeclarationSyntax = root?.FindNode(diagnostic.Location.SourceSpan).FirstAncestorOrSelf<ClassDeclarationSyntax>();
             if (classDeclarationSyntax != null)
             {
                 context.RegisterCodeFix(
@@ -50,7 +50,8 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             bool isAsyncPackage = diagnostic.Properties[VSSDK002PackageRegistrationMatchesBaseTypeAnalyzer.BaseTypeDiagnosticPropertyName] == Types.AsyncPackage.TypeName;
             LiteralExpressionSyntax appropriateArgument = SyntaxFactory.LiteralExpression(isAsyncPackage ? SyntaxKind.TrueLiteralExpression : SyntaxKind.FalseLiteralExpression);
 
-            SyntaxNode root = await context.Document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
+            SyntaxNode? root = await context.Document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
+            Assumes.NotNull(root);
             switch (root.FindNode(diagnostic.Location.SourceSpan))
             {
                 case AttributeSyntax packageRegistrationSyntax:
@@ -64,13 +65,13 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                     if (isAsyncPackage)
                     {
                         // We need to update this argument on the attribute.
-                        AttributeSyntax originalAttribute = allowBackgroundLoadingSyntax.FirstAncestorOrSelf<AttributeSyntax>();
                         root = root.ReplaceNode(allowBackgroundLoadingSyntax, allowBackgroundLoadingSyntax.WithExpression(appropriateArgument));
                     }
                     else
                     {
                         // Let's just remove it since false is its default value.
                         root = root.RemoveNode(allowBackgroundLoadingSyntax, SyntaxRemoveOptions.KeepNoTrivia);
+                        Assumes.NotNull(root);
                     }
 
                     break;

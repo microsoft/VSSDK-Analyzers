@@ -114,7 +114,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                         n => n is CastExpressionSyntax || n is EqualsValueClauseSyntax || n is AwaitExpressionSyntax || (n is BinaryExpressionSyntax be && be.OperatorToken.IsKind(SyntaxKind.AsKeyword)),
                         (aes, child) => aes.Right == child)) != null)
                     {
-                        ISymbol leftSymbol = context.SemanticModel.GetSymbolInfo(assignment.Left, context.CancellationToken).Symbol;
+                        ISymbol? leftSymbol = context.SemanticModel.GetSymbolInfo(assignment.Left, context.CancellationToken).Symbol;
                         if (leftSymbol is object)
                         {
                             // If the assigned variable is actually a field, scan this block for Assumes.Present
@@ -131,7 +131,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                                              from syntaxRef in member.DeclaringSyntaxReferences
                                              let methodSyntax = syntaxRef.GetSyntax(context.CancellationToken) as MethodDeclarationSyntax
                                              where methodSyntax != null
-                                             let bodyOrExpression = (SyntaxNode)methodSyntax.Body ?? methodSyntax.ExpressionBody
+                                             let bodyOrExpression = (SyntaxNode?)methodSyntax.Body ?? methodSyntax.ExpressionBody
                                              where bodyOrExpression != null
                                              from dref in this.ScanBlockForDereferencesWithoutNullCheck(context, leftSymbol, bodyOrExpression)
                                              select dref;
@@ -161,11 +161,14 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                         var leftSymbol = context.SemanticModel.GetDeclaredSymbol(variableDeclarator, context.CancellationToken) as ILocalSymbol;
                         if (leftSymbol != null)
                         {
-                            BlockSyntax containingBlock = context.Node.FirstAncestorOrSelf<BlockSyntax>();
-                            ImmutableArray<Location> derefs = this.ScanBlockForDereferencesWithoutNullCheck(context, leftSymbol, containingBlock);
-                            if (derefs.Any())
+                            BlockSyntax? containingBlock = context.Node.FirstAncestorOrSelf<BlockSyntax>();
+                            if (containingBlock != null)
                             {
-                                context.ReportDiagnostic(Diagnostic.Create(Descriptor, variableDeclarator.Identifier.GetLocation(), derefs));
+                                ImmutableArray<Location> derefs = this.ScanBlockForDereferencesWithoutNullCheck(context, leftSymbol, containingBlock);
+                                if (derefs.Any())
+                                {
+                                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, variableDeclarator.Identifier.GetLocation(), derefs));
+                                }
                             }
                         }
                     }
@@ -235,7 +238,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                     context.Compilation.GetSemanticModel(invocationExpression.SyntaxTree).GetSymbolInfo(invocationExpression.Expression).Symbol?.OriginalDefinition is { } item &&
                     this.nullThrowingMethods.Contains(item))
                 {
-                    ArgumentSyntax firstArg = invocationExpression.ArgumentList.Arguments.FirstOrDefault();
+                    ArgumentSyntax? firstArg = invocationExpression.ArgumentList.Arguments.FirstOrDefault();
                     if (firstArg != null && SymbolEqualityComparer.Default.Equals(symbol, context.SemanticModel.GetSymbolInfo(firstArg.Expression, context.CancellationToken).Symbol))
                     {
                         return true;

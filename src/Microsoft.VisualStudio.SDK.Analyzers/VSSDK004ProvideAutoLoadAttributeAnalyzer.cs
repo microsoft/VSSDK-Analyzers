@@ -46,15 +46,17 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             // Register for compilation first so that we only activate the analyzer for applicable compilations
             context.RegisterCompilationStartAction(compilationContext =>
             {
-                INamedTypeSymbol package = compilationContext.Compilation.GetTypeByMetadataName(Types.Package.FullName);
-                INamedTypeSymbol asyncPackage = compilationContext.Compilation.GetTypeByMetadataName(Types.AsyncPackage.FullName);
-                if (asyncPackage != null)
+                INamedTypeSymbol? package = compilationContext.Compilation.GetTypeByMetadataName(Types.Package.FullName);
+                INamedTypeSymbol? asyncPackage = compilationContext.Compilation.GetTypeByMetadataName(Types.AsyncPackage.FullName);
+                if (asyncPackage != null && package != null)
                 {
-                    INamedTypeSymbol autoLoadAttribute = compilationContext.Compilation.GetTypeByMetadataName(Types.ProvideAutoLoadAttribute.FullName);
-                    INamedTypeSymbol packageAutoLoadFlags = compilationContext.Compilation.GetTypeByMetadataName(Types.PackageAutoLoadFlags.FullName);
-
-                    // Reuse the type symbols we looked up so that we don't have to look them up for every single class declaration.
-                    compilationContext.RegisterSyntaxNodeAction(Utils.DebuggableWrapper(ctxt => this.AnalyzeClassDeclaration(ctxt, autoLoadAttribute, packageAutoLoadFlags, package, asyncPackage)), SyntaxKind.ClassDeclaration);
+                    INamedTypeSymbol? autoLoadAttribute = compilationContext.Compilation.GetTypeByMetadataName(Types.ProvideAutoLoadAttribute.FullName);
+                    INamedTypeSymbol? packageAutoLoadFlags = compilationContext.Compilation.GetTypeByMetadataName(Types.PackageAutoLoadFlags.FullName);
+                    if (autoLoadAttribute != null && packageAutoLoadFlags != null)
+                    {
+                        // Reuse the type symbols we looked up so that we don't have to look them up for every single class declaration.
+                        compilationContext.RegisterSyntaxNodeAction(Utils.DebuggableWrapper(ctxt => this.AnalyzeClassDeclaration(ctxt, autoLoadAttribute, packageAutoLoadFlags, package, asyncPackage)), SyntaxKind.ClassDeclaration);
+                    }
                 }
             });
         }
@@ -62,7 +64,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         private void AnalyzeClassDeclaration(SyntaxNodeAnalysisContext context, INamedTypeSymbol autoLoadAttributeType, INamedTypeSymbol packageAutoLoadFlagsType, INamedTypeSymbol packageType, INamedTypeSymbol asyncPackageType)
         {
             var declaration = (ClassDeclarationSyntax)context.Node;
-            INamedTypeSymbol userClassSymbol = context.SemanticModel.GetDeclaredSymbol(declaration, context.CancellationToken);
+            INamedTypeSymbol? userClassSymbol = context.SemanticModel.GetDeclaredSymbol(declaration, context.CancellationToken);
 
             BaseTypeSyntax? baseType = declaration.BaseList?.Types.FirstOrDefault();
             if (baseType == null)
@@ -85,7 +87,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 foreach (AttributeData autoLoadInstance in userClassSymbol.GetAttributes().Where(a => SymbolEqualityComparer.Default.Equals(a.AttributeClass, autoLoadAttributeType)))
                 {
                     TypedConstant flagsArgument = autoLoadInstance.ConstructorArguments.FirstOrDefault(p => SymbolEqualityComparer.Default.Equals(p.Type, packageAutoLoadFlagsType));
-                    Types.PackageAutoLoadFlags.Values flagsValue = flagsArgument.IsNull ? Types.PackageAutoLoadFlags.Values.None : (Types.PackageAutoLoadFlags.Values)flagsArgument.Value;
+                    Types.PackageAutoLoadFlags.Values flagsValue = flagsArgument.IsNull ? Types.PackageAutoLoadFlags.Values.None : (Types.PackageAutoLoadFlags.Values)flagsArgument.Value!;
 
                     // Check if AutoLoad attribute applies to VS versions with AsyncPackage support
                     if (flagsValue.HasFlag(Types.PackageAutoLoadFlags.Values.SkipWhenUIContextRulesActive))
@@ -96,9 +98,9 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                     // Check if BackgroundLoad flag is present and base class is AsyncPackage
                     if (!(flagsValue.HasFlag(Types.PackageAutoLoadFlags.Values.BackgroundLoad) && isBaseTypeAsyncPackage))
                     {
-                        var attributeSyntax = (AttributeSyntax)autoLoadInstance.ApplicationSyntaxReference.GetSyntax(context.CancellationToken);
-                        Location location = attributeSyntax.GetLocation();
-                        context.ReportDiagnostic(Diagnostic.Create(Descriptor, attributeSyntax.GetLocation()));
+                        var attributeSyntax = (AttributeSyntax?)autoLoadInstance.ApplicationSyntaxReference?.GetSyntax(context.CancellationToken);
+                        Location? location = attributeSyntax?.GetLocation();
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptor, attributeSyntax?.GetLocation()));
                     }
                 }
             }
