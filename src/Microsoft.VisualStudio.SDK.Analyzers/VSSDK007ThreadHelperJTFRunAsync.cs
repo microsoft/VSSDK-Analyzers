@@ -197,7 +197,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             }
 
             // Look for assignment to new variable:  var myTask = ThreadHelper.JoinableTaskFactory.RunAsync(...)
-            SyntaxNode node = invocationExpr.Parent;
+            SyntaxNode? node = invocationExpr.Parent;
             while (node != null)
             {
                 if (node.IsKind(SyntaxKind.VariableDeclarator))
@@ -218,7 +218,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         /// <summary>
         /// Return the enclosing scope block that contains the given node.
         /// </summary>
-        private static SyntaxNode? GetEnclosingBlock(SyntaxNode node)
+        private static SyntaxNode? GetEnclosingBlock(SyntaxNode? node)
         {
             while (node != null)
             {

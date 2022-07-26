@@ -18,6 +18,9 @@
     <PackageReference Include="xunit.runner.console" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5" />
     <PackageReference Include="xunit" Version="2.4.1" />
+
+    <!-- Avoid dependencies on earlier insecure Newtownsoft.Json -->
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 
   <ItemGroup>

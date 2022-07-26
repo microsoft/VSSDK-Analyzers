@@ -14,6 +14,9 @@
     <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="16.9.31004.209" PrivateAssets="all" />
     <PackageReference Include="Microsoft.VisualStudio.Shell.Framework" Version="16.9.31004.209" PrivateAssets="all" />
     <PackageReference Include="Microsoft.VisualStudio.Threading" Version="16.10.56" PrivateAssets="all" />
+
+    <!-- Avoid dependencies on earlier insecure Newtownsoft.Json, exclude "Compile" assets since we don't package Newtonsoft.Json (or any Microsoft.VisualStudio.* assembly) with the analyzer -->
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" ExcludeAssets="Compile" />
   </ItemGroup>
 
 </Project>

@@ -34,13 +34,16 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         {
             Diagnostic diagnostic = context.Diagnostics.First();
 
-            SyntaxNode root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
-            BaseTypeSyntax baseTypeSyntax = root.FindNode(diagnostic.Location.SourceSpan).FirstAncestorOrSelf<BaseTypeSyntax>();
-            ClassDeclarationSyntax classDeclarationSyntax = baseTypeSyntax.FirstAncestorOrSelf<ClassDeclarationSyntax>();
+            SyntaxNode? root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
+            BaseTypeSyntax? baseTypeSyntax = root?.FindNode(diagnostic.Location.SourceSpan).FirstAncestorOrSelf<BaseTypeSyntax>();
+            ClassDeclarationSyntax? classDeclarationSyntax = baseTypeSyntax?.FirstAncestorOrSelf<ClassDeclarationSyntax>();
 
-            context.RegisterCodeFix(
-                CodeAction.Create("Convert to async package", ct => this.ConvertToAsyncPackageAsync(context, diagnostic, ct), "only one"),
-                diagnostic);
+            if (classDeclarationSyntax != null)
+            {
+                context.RegisterCodeFix(
+                    CodeAction.Create("Convert to async package", ct => this.ConvertToAsyncPackageAsync(context, diagnostic, ct), "only one"),
+                    diagnostic);
+            }
         }
 
         /// <inheritdoc />
@@ -48,13 +51,15 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
 
         private async Task<Document> ConvertToAsyncPackageAsync(CodeFixContext context, Diagnostic diagnostic, CancellationToken cancellationToken)
         {
-            SemanticModel semanticModel = await context.Document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
+            SemanticModel semanticModel = (await context.Document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false))!;
             Compilation? compilation = await context.Document.Project.GetCompilationAsync(cancellationToken).ConfigureAwait(false);
             Assumes.NotNull(compilation);
-            SyntaxNode root = await context.Document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
-            BaseTypeSyntax baseTypeSyntax = root.FindNode(diagnostic.Location.SourceSpan).FirstAncestorOrSelf<BaseTypeSyntax>();
-            ClassDeclarationSyntax classDeclarationSyntax = baseTypeSyntax.FirstAncestorOrSelf<ClassDeclarationSyntax>();
-            MethodDeclarationSyntax initializeMethodSyntax = classDeclarationSyntax.DescendantNodes()
+            SyntaxNode? root = await context.Document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
+            BaseTypeSyntax? baseTypeSyntax = root?.FindNode(diagnostic.Location.SourceSpan).FirstAncestorOrSelf<BaseTypeSyntax>();
+            ClassDeclarationSyntax? classDeclarationSyntax = baseTypeSyntax?.FirstAncestorOrSelf<ClassDeclarationSyntax>();
+            Assumes.NotNull(classDeclarationSyntax);
+
+            MethodDeclarationSyntax? initializeMethodSyntax = classDeclarationSyntax.DescendantNodes()
                 .OfType<MethodDeclarationSyntax>()
                 .FirstOrDefault(method => method.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.OverrideKeyword)) && method.Identifier.Text == Types.Package.Initialize);
             InvocationExpressionSyntax? baseInitializeInvocationSyntax = initializeMethodSyntax?.Body?.DescendantNodes()
@@ -63,9 +68,9 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             var getServiceInvocationsSyntax = new List<InvocationExpressionSyntax>();
             AttributeSyntax? packageRegistrationSyntax = null;
             {
-                INamedTypeSymbol userClassSymbol = semanticModel.GetDeclaredSymbol(classDeclarationSyntax, context.CancellationToken);
-                INamedTypeSymbol packageRegistrationType = compilation.GetTypeByMetadataName(Types.PackageRegistrationAttribute.FullName);
-                AttributeData? packageRegistrationInstance = userClassSymbol?.GetAttributes().FirstOrDefault(a => Equals(a.AttributeClass, packageRegistrationType));
+                INamedTypeSymbol? userClassSymbol = semanticModel.GetDeclaredSymbol(classDeclarationSyntax, context.CancellationToken);
+                INamedTypeSymbol? packageRegistrationType = compilation.GetTypeByMetadataName(Types.PackageRegistrationAttribute.FullName);
+                AttributeData? packageRegistrationInstance = userClassSymbol?.GetAttributes().FirstOrDefault(a => SymbolEqualityComparer.Default.Equals(a.AttributeClass, packageRegistrationType));
                 if (packageRegistrationInstance?.ApplicationSyntaxReference != null)
                 {
                     packageRegistrationSyntax = (AttributeSyntax)await packageRegistrationInstance.ApplicationSyntaxReference.GetSyntaxAsync(cancellationToken).ConfigureAwait(false);
@@ -93,10 +98,11 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             };
             nodesToTrack.AddRange(getServiceInvocationsSyntax);
             nodesToTrack.RemoveAll(n => n == null);
-            SyntaxNode updatedRoot = root.TrackNodes(nodesToTrack);
+            SyntaxNode updatedRoot = root!.TrackNodes(nodesToTrack!);
 
             // Replace the Package base type with AsyncPackage
-            baseTypeSyntax = updatedRoot.GetCurrentNode(baseTypeSyntax);
+            baseTypeSyntax = updatedRoot.GetCurrentNode(baseTypeSyntax!);
+            Assumes.NotNull(baseTypeSyntax);
             SimpleBaseTypeSyntax asyncPackageBaseTypeSyntax = SyntaxFactory.SimpleBaseType(Types.AsyncPackage.TypeSyntax.WithAdditionalAnnotations(Simplifier.Annotation))
                 .WithLeadingTrivia(baseTypeSyntax.GetLeadingTrivia())
                 .WithTrailingTrivia(baseTypeSyntax.GetTrailingTrivia());
@@ -107,7 +113,8 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             {
                 LiteralExpressionSyntax trueExpression = SyntaxFactory.LiteralExpression(SyntaxKind.TrueLiteralExpression);
                 packageRegistrationSyntax = updatedRoot.GetCurrentNode(packageRegistrationSyntax);
-                AttributeArgumentSyntax allowsBackgroundLoadingSyntax = packageRegistrationSyntax.ArgumentList.Arguments.FirstOrDefault(a => a.NameEquals?.Name?.Identifier.Text == Types.PackageRegistrationAttribute.AllowsBackgroundLoading);
+                Assumes.NotNull(packageRegistrationSyntax);
+                AttributeArgumentSyntax? allowsBackgroundLoadingSyntax = packageRegistrationSyntax.ArgumentList?.Arguments.FirstOrDefault(a => a.NameEquals?.Name?.Identifier.Text == Types.PackageRegistrationAttribute.AllowsBackgroundLoading);
                 if (allowsBackgroundLoadingSyntax != null)
                 {
                     updatedRoot = updatedRoot.ReplaceNode(
@@ -129,7 +136,9 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 IdentifierNameSyntax cancellationTokenLocalVarName = SyntaxFactory.IdentifierName("cancellationToken");
                 IdentifierNameSyntax progressLocalVarName = SyntaxFactory.IdentifierName("progress");
                 initializeMethodSyntax = updatedRoot.GetCurrentNode(initializeMethodSyntax);
-                BlockSyntax newBody = initializeMethodSyntax.Body;
+                Assumes.NotNull(initializeMethodSyntax);
+                BlockSyntax? newBody = initializeMethodSyntax.Body;
+                Assumes.NotNull(newBody);
 
                 SyntaxTriviaList leadingTrivia = SyntaxFactory.TriviaList(
                     SyntaxFactory.Comment(@"// When initialized asynchronously, we *may* be on a background thread at this point."),
@@ -169,8 +178,10 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                                 SyntaxFactory.Argument(progressLocalVarName)))
                         .WithLeadingTrivia(baseInitializeInvocationSyntax.GetLeadingTrivia())
                         .WithAdditionalAnnotations(baseInitializeAsyncInvocationBookmark);
-                    newBody = newBody.ReplaceNode(initializeMethodSyntax.GetCurrentNode(baseInitializeInvocationSyntax), baseInitializeAsyncInvocationSyntax);
-                    StatementSyntax baseInvocationStatement = newBody.GetAnnotatedNodes(baseInitializeAsyncInvocationBookmark).First().FirstAncestorOrSelf<StatementSyntax>();
+                    baseInitializeInvocationSyntax = initializeMethodSyntax.GetCurrentNode(baseInitializeInvocationSyntax);
+                    Assumes.NotNull(baseInitializeInvocationSyntax);
+                    newBody = newBody.ReplaceNode(baseInitializeInvocationSyntax, baseInitializeAsyncInvocationSyntax);
+                    StatementSyntax baseInvocationStatement = newBody.GetAnnotatedNodes(baseInitializeAsyncInvocationBookmark).First().FirstAncestorOrSelf<StatementSyntax>()!;
 
                     newBody = newBody.InsertNodesAfter(
                         baseInvocationStatement,

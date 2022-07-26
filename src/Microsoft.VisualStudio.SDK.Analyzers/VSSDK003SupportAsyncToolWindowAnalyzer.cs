@@ -86,7 +86,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 return;
             }
 
-            INamedTypeSymbol userClassSymbol = context.SemanticModel.GetDeclaredSymbol(declaration, context.CancellationToken);
+            INamedTypeSymbol? userClassSymbol = context.SemanticModel.GetDeclaredSymbol(declaration, context.CancellationToken);
             AttributeData? packageRegistrationInstance = userClassSymbol?.GetAttributes().FirstOrDefault(a => SymbolEqualityComparer.Default.Equals(a.AttributeClass, provideToolWindowAttributeType));
             TypedConstant? firstParameter = packageRegistrationInstance?.ConstructorArguments.FirstOrDefault();
             if (firstParameter.HasValue && firstParameter.Value.Kind == TypedConstantKind.Type && firstParameter.Value.Value is INamedTypeSymbol typeOfUserToolWindow)
@@ -110,9 +110,9 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
 
                 if (packageRegistrationInstance!.ApplicationSyntaxReference?.GetSyntax(context.CancellationToken) is AttributeSyntax attributeSyntax)
                 {
-                    AttributeArgumentSyntax firstArgumentSyntax = attributeSyntax.ArgumentList.Arguments.First();
-                    Location diagnosticLocation = firstArgumentSyntax.GetLocation();
-                    if (firstArgumentSyntax.Expression is TypeOfExpressionSyntax typeOfArg)
+                    AttributeArgumentSyntax? firstArgumentSyntax = attributeSyntax.ArgumentList?.Arguments.First();
+                    Location? diagnosticLocation = firstArgumentSyntax?.GetLocation();
+                    if (firstArgumentSyntax?.Expression is TypeOfExpressionSyntax typeOfArg)
                     {
                         diagnosticLocation = typeOfArg.Type.GetLocation();
                     }
