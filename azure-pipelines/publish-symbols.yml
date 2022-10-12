@@ -3,14 +3,14 @@ steps:
   inputs:
     artifact: symbols-Windows
     path: $(Pipeline.Workspace)/symbols/Windows
-  displayName: Download Windows symbols
+  displayName: 🔻 Download Windows symbols
   continueOnError: true
 
 - task: DownloadPipelineArtifact@2
   inputs:
     artifact: test_symbols-Windows
     path: $(Pipeline.Workspace)/test_symbols/Windows
-  displayName: Download Windows test symbols
+  displayName: 🔻 Download Windows test symbols
   continueOnError: true
 
 - task: PublishSymbols@2
@@ -19,7 +19,7 @@ steps:
     SearchPattern: '**/*.pdb'
     IndexSources: false
     SymbolServerType: TeamServices
-  displayName: Publish symbols
+  displayName: 📢 Publish symbols
 
 - task: PublishSymbols@2
   inputs:
@@ -27,7 +27,7 @@ steps:
     SearchPattern: '**/*.pdb'
     IndexSources: false
     SymbolServerType: TeamServices
-  displayName: Publish test symbols
+  displayName: 📢 Publish test symbols
 
 - powershell: azure-pipelines/Publish-Legacy-Symbols.ps1 -Path $(Pipeline.Workspace)/symbols/Windows
-  displayName: Publish symbols for symbol archival
+  displayName: 📢 Publish symbols for symbol archival

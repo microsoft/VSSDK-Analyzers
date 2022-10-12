@@ -20,7 +20,7 @@ You should install the version specified in `global.json` or a later version wit
 the same major.minor.Bxx "hundreds" band.
 For example if 2.2.300 is specified, you may install 2.2.300, 2.2.301, or 2.2.310
 while the 2.2.400 version would not be considered compatible by .NET SDK.
-See [.NET Core Versioning](https://docs.microsoft.com/en-us/dotnet/core/versions/) for more information.
+See [.NET Core Versioning](https://docs.microsoft.com/dotnet/core/versions/) for more information.
 
 All dependencies can be installed by running the `init.ps1` script at the root of the repository
 using Windows PowerShell or [PowerShell Core][pwsh] (on any OS).
@@ -37,11 +37,11 @@ to the feeds that packages for this repo come from, if any.
 
 Building, testing, and packing this repository can be done by using the standard dotnet CLI commands (e.g. `dotnet build`, `dotnet test`, `dotnet pack`, etc.).
 
-[pwsh]: https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell?view=powershell-6
+[pwsh]: https://docs.microsoft.com/powershell/scripting/install/installing-powershell?view=powershell-6
 
 ## Bug reports
 
-If you have a bug report, please file an issue. 
+If you have a bug report, please file an issue.
 If you can send a pull request with a repro of the bug in the form of a unit test, please do submit that PR
 and link to it from the Issue you file.
 
