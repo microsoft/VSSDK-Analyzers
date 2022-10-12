@@ -1,19 +1,19 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections.Immutable;
+using System.Linq;
+using System.Reflection;
+using System.Threading;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.VisualStudio.Shell;
+
 namespace Microsoft.VisualStudio.SDK.Analyzers
 {
-    using System;
-    using System.Collections.Immutable;
-    using System.Linq;
-    using System.Reflection;
-    using System.Threading;
-    using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
-    using Microsoft.CodeAnalysis.Diagnostics;
-    using Microsoft.VisualStudio.Shell;
-
     /// <summary>
     /// Identifies cases where a <see cref="ToolWindowPane" /> is proffered by a VS package without supporting asynchronous initialization.
     /// </summary>
