@@ -10,7 +10,7 @@
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing.XUnit" Version="1.1.1" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.3.1" PrivateAssets="all" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
-    <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="17.4.33011.337" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="17.4.33027.76" PrivateAssets="all" />
     <PackageReference Include="Microsoft.VisualStudio.Designer.Interfaces" Version="17.4.33011.337" PrivateAssets="all" />
     <PackageReference Include="Microsoft.VisualStudio.Validation" Version="17.0.65" PrivateAssets="all" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />

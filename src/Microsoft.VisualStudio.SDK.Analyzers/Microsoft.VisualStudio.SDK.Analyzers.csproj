@@ -11,7 +11,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.3.1" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="17.4.33011.337" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="17.4.33027.76" PrivateAssets="all" />
     <PackageReference Include="Microsoft.VisualStudio.Shell.Framework" Version="17.4.33011.337" PrivateAssets="all" />
     <PackageReference Include="Microsoft.VisualStudio.Threading" Version="17.4.27" PrivateAssets="all" />
 
