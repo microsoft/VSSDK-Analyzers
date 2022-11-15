@@ -6,20 +6,21 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.3.1" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing.XUnit" Version="1.1.1" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.3.1" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
-    <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="17.4.33011.337" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.VisualStudio.Designer.Interfaces" Version="17.4.33011.337" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.VisualStudio.Validation" Version="17.0.65" PrivateAssets="all" />
-    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
-    <PackageReference Include="xunit.runner.console" Version="2.4.2" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5" />
-    <PackageReference Include="xunit" Version="2.4.2" />
+    <PackageReference Include="Microsoft.CodeCoverage" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing.XUnit" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.VisualStudio.Designer.Interfaces" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.VisualStudio.Validation" PrivateAssets="all" />
+    <PackageReference Include="System.ValueTuple" />
+    <PackageReference Include="xunit.runner.console" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="xunit" />
 
     <!-- Avoid dependencies on earlier insecure Newtownsoft.Json -->
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Newtonsoft.Json" />
   </ItemGroup>
 
   <ItemGroup>
