@@ -9,7 +9,7 @@
     <PackageVersion Include="Microsoft.Build.Utilities.Core" Version="17.3.1" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing.XUnit" Version="1.1.1" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.3.1" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.4.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="3.3.1" />
     <PackageVersion Include="Microsoft.CodeCoverage" Version="17.5.0-preview-20221109-01" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
