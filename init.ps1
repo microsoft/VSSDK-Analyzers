@@ -32,6 +32,8 @@
     Install the MicroBuild signing plugin for building test-signed builds on desktop machines.
 .PARAMETER AccessToken
     An optional access token for authenticating to Azure Artifacts authenticated feeds.
+.PARAMETER Interactive
+    Runs NuGet restore in interactive mode. This can turn authentication failures into authentication challenges.
 #>
 [CmdletBinding(SupportsShouldProcess = $true)]
 Param (
@@ -48,7 +50,9 @@ Param (
     [Parameter()]
     [switch]$Signing,
     [Parameter()]
-    [string]$AccessToken
+    [string]$AccessToken,
+    [Parameter()]
+    [switch]$Interactive
 )
 
 $EnvVars = @{}
@@ -80,14 +84,20 @@ try {
     $HeaderColor = 'Green'
 
     if (!$NoRestore -and $PSCmdlet.ShouldProcess("NuGet packages", "Restore")) {
+        $RestoreArguments = @()
+        if ($Interactive)
+        {
+            $RestoreArguments += '--interactive'
+        }
+
         Write-Host "Restoring NuGet packages" -ForegroundColor $HeaderColor
-        dotnet restore
+        dotnet restore @RestoreArguments
         if ($lastexitcode -ne 0) {
             throw "Failure while restoring packages."
         }
     }
 
-    $InstallNuGetPkgScriptPath = ".\azure-pipelines\Install-NuGetPackage.ps1"
+    $InstallNuGetPkgScriptPath = "$PSScriptRoot\azure-pipelines\Install-NuGetPackage.ps1"
     $nugetVerbosity = 'quiet'
     if ($Verbose) { $nugetVerbosity = 'normal' }
     $MicroBuildPackageSource = 'https://pkgs.dev.azure.com/devdiv/_packaging/MicroBuildToolset%40Local/nuget/v3/index.json'
