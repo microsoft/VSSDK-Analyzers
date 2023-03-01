@@ -14,7 +14,7 @@
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="3.3.1" />
     <PackageVersion Include="Microsoft.CodeCoverage" Version="17.5.0-release-20221220-01" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.4.1" />
-    <PackageVersion Include="Microsoft.VisualStudio.Designer.Interfaces" Version="17.4.33011.337" />
+    <PackageVersion Include="Microsoft.VisualStudio.Designer.Interfaces" Version="17.5.33428.366" />
     <PackageVersion Include="Microsoft.VisualStudio.Internal.MicroBuild.NonShipping" Version="$(MicroBuildVersion)" />
     <PackageVersion Include="Microsoft.VisualStudio.Shell.15.0" Version="17.4.33011.337" />
     <PackageVersion Include="Microsoft.VisualStudio.Shell.Framework" Version="17.4.33011.337" />
