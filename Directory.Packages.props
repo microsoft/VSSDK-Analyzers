@@ -4,7 +4,7 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
 
-    <MicroBuildVersion>2.0.93</MicroBuildVersion>
+    <MicroBuildVersion>2.0.113</MicroBuildVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="Microsoft.Build.Utilities.Core" Version="17.4.0" />
@@ -12,8 +12,8 @@
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing.XUnit" Version="1.1.1" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.3.1" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="3.3.1" />
-    <PackageVersion Include="Microsoft.CodeCoverage" Version="17.5.0-release-20221220-01" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.4.1" />
+    <PackageVersion Include="Microsoft.CodeCoverage" Version="17.5.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
     <PackageVersion Include="Microsoft.VisualStudio.Designer.Interfaces" Version="17.4.33011.337" />
     <PackageVersion Include="Microsoft.VisualStudio.Internal.MicroBuild.NonShipping" Version="$(MicroBuildVersion)" />
     <PackageVersion Include="Microsoft.VisualStudio.Shell.15.0" Version="17.4.33011.337" />
@@ -36,7 +36,7 @@
     <GlobalPackageReference Include="StyleCop.Analyzers.Unstable" Version="1.2.0.435" />
   </ItemGroup>
   <ItemGroup>
-    <!-- <GlobalPackageReference Include="Microsoft.SourceLink.AzureRepos.Git" Version="1.0.0" /> -->
+    <!-- <GlobalPackageReference Include="Microsoft.SourceLink.AzureRepos.Git" Version="1.1.1" /> -->
     <GlobalPackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" />
   </ItemGroup>
 </Project>
