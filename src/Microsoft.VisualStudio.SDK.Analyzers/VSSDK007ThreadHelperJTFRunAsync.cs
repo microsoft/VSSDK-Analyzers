@@ -48,6 +48,11 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         /// <inheritdoc />
         public override void Initialize(AnalysisContext context)
         {
+            if (context is null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
             context.EnableConcurrentExecution();
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
 
@@ -126,11 +131,11 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             // Is the JoinableTask returned from RunAsync assigned to a variable? If so, search the enclosing block
             // and check if that variable is awaited/joined.
             if (IsJoinableTaskAssigned(invocationExpr, out SyntaxNode? assignedTo, out SyntaxToken? assignedToToken) &&
-                assignedTo != null &&
-                assignedToToken != null)
+                assignedTo is not null &&
+                assignedToToken is not null)
             {
                 SyntaxNode? enclosingBlock = GetEnclosingBlock(assignedTo);
-                if (enclosingBlock != null)
+                if (enclosingBlock is not null)
                 {
                     if (IsVariableAwaitedOrJoined(context, assignedToToken.Value.ValueText, enclosingBlock))
                     {
@@ -153,7 +158,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 n => n is MemberAccessExpressionSyntax || n is InvocationExpressionSyntax,
                 (aes, child) => aes.Expression == child);
 
-            return foundAwait != null;
+            return foundAwait is not null;
         }
 
         /// <summary>
@@ -161,7 +166,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         /// </summary>
         private static bool IsSynchronouslyJoined(SyntaxNodeAnalysisContext context, InvocationExpressionSyntax invocationExpr)
         {
-            if (invocationExpr.Parent == null ||
+            if (invocationExpr.Parent is null ||
                 invocationExpr.Parent is not MemberAccessExpressionSyntax ||
                 context.SemanticModel.GetSymbolInfo(invocationExpr.Parent, context.CancellationToken).Symbol is not IMethodSymbol methodSymbol ||
                 methodSymbol.Name != Types.JoinableTask.Join)
@@ -180,7 +185,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         /// </summary>
         private static bool IsJoinableTaskAssigned(InvocationExpressionSyntax invocationExpr, out SyntaxNode? assignedToNode, out SyntaxToken? assignedToToken)
         {
-            if (invocationExpr.Parent == null)
+            if (invocationExpr.Parent is null)
             {
                 assignedToNode = null;
                 assignedToToken = null;
@@ -279,7 +284,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             foreach (InvocationExpressionSyntax? passedToMethodInvocation in passedToMethodList)
             {
                 if (VariablePassedAsArgumentToInvokedMethod(variableName, passedToMethodInvocation, out IdentifierNameSyntax? methodName, out var argIndex) &&
-                    methodName != null &&
+                    methodName is not null &&
                     argIndex != null)
                 {
                     if (context.SemanticModel.GetSymbolInfo(methodName, context.CancellationToken).Symbol is not IMethodSymbol methodSymbol)
@@ -291,7 +296,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                     {
                         IParameterSymbol? param = methodSymbol.Parameters[argIndex.Value];
                         SyntaxNode? methodEnclosingBlock = GetMethodDeclarationBlockNode(methodSymbol);
-                        if (methodEnclosingBlock == null)
+                        if (methodEnclosingBlock is null)
                         {
                             return false;
                         }
@@ -358,7 +363,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             }
 
             ArgumentListSyntax? argList = invocationExpr.ChildNodes().OfType<ArgumentListSyntax>().FirstOrDefault();
-            if (argList == null)
+            if (argList is null)
             {
                 methodName = null;
                 argumentIndex = 0;
