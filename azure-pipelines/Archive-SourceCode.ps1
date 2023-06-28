@@ -135,7 +135,7 @@ if (!$Requester) {
         $Requester = $env:USERNAME
     }
     if (!$Requester) {
-        Write-Error "Unable to determine default value for -Requester."
+        $Requester = $OwnerAlias
     }
 }
 
@@ -155,7 +155,7 @@ if (!$RepoUrl) {
 }
 
 Push-Location $PSScriptRoot
-$versionsObj = dotnet tool run nbgv get-version -f json | ConvertFrom-Json
+$versionsObj = dotnet nbgv get-version -f json | ConvertFrom-Json
 Pop-Location
 
 $ReleaseDateString = $ReleaseDate.ToShortDateString()
