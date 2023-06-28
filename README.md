@@ -1,7 +1,10 @@
-# Analyzers for VS extensions
+# vssdk-analyzers
 
 [![Build Status](https://dev.azure.com/azure-public/vside/_apis/build/status/vssdk-analyzers)](https://dev.azure.com/azure-public/vside/_build/latest?definitionId=14)
 [![codecov](https://codecov.io/gh/microsoft/vssdk-analyzers/branch/main/graph/badge.svg)](https://codecov.io/gh/microsoft/vssdk-analyzers)
+
+## Microsoft.VisualStudio.SDK.Analyzers
+
 [![NuGet](https://img.shields.io/nuget/v/Microsoft.VisualStudio.SDK.Analyzers.svg)](https://nuget.org/packages/Microsoft.VisualStudio.SDK.Analyzers)
 
 This project is meant to provide a set of Roslyn Analyzers that makes it easy to catch, discover and implement a wide array of best practices when building Visual Studio extensions.
@@ -10,7 +13,9 @@ Check out our [exhaustive list of analyzers](doc/index.md) defined in this proje
 
 If you have an idea for a rule that would constitute a best practice for extension authors to follow, please open an issue with the description.
 
-# Contributing
+[Learn more about this package](src/Microsoft.VisualStudio.SDK.Analyzers.CodeFixes/README.md).
+
+## Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
