@@ -43,6 +43,26 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         /// </summary>
         /// <param name="handler">The handler to wrap.</param>
         /// <returns>The debug-ready handler.</returns>
+        internal static Action<OperationAnalysisContext> DebuggableWrapper(Action<OperationAnalysisContext> handler)
+        {
+            return ctxt =>
+            {
+                try
+                {
+                    handler(ctxt);
+                }
+                catch (Exception ex) when (LaunchDebuggerExceptionFilter())
+                {
+                    throw new Exception($"Analyzer failure while processing symbol {ctxt.Operation} at {ctxt.Operation.Syntax.GetLocation().SourceTree?.FilePath}({ctxt.Operation.Syntax.GetLocation().GetLineSpan().StartLinePosition.Line},{ctxt.Operation.Syntax.GetLocation().GetLineSpan().StartLinePosition.Character}): {ex.GetType()} {ex.Message}", ex);
+                }
+            };
+        }
+
+        /// <summary>
+        /// Wraps an analyzer processor with a Debugger.Launch call in an exception filter for debug builds.
+        /// </summary>
+        /// <param name="handler">The handler to wrap.</param>
+        /// <returns>The debug-ready handler.</returns>
         internal static Action<SymbolAnalysisContext> DebuggableWrapper(Action<SymbolAnalysisContext> handler)
         {
             return ctxt =>
