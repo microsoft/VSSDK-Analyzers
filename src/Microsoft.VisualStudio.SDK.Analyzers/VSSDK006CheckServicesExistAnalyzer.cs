@@ -8,6 +8,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis.Operations;
 
 namespace Microsoft.VisualStudio.SDK.Analyzers
 {
@@ -63,7 +64,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                         start.Compilation.GetTypeByMetadataName(Types.Assumes.FullName)?.GetMembers(Types.Assumes.Present)));
                 if (state.ShouldAnalyze)
                 {
-                    start.RegisterSyntaxNodeAction(Utils.DebuggableWrapper(state.AnalyzeInvocationExpression), SyntaxKind.InvocationExpression);
+                    start.RegisterOperationAction(Utils.DebuggableWrapper(state.AnalyzeInvocationExpression), OperationKind.Invocation);
                 }
             });
         }
@@ -90,16 +91,21 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
 
             internal bool ShouldAnalyze => !this.getServiceMethods.IsEmpty;
 
-            internal void AnalyzeInvocationExpression(SyntaxNodeAnalysisContext context)
+            internal void AnalyzeInvocationExpression(OperationAnalysisContext context)
             {
-                var invocationExpression = (InvocationExpressionSyntax)context.Node;
-                var invokedMethod = context.SemanticModel.GetSymbolInfo(invocationExpression.Expression, context.CancellationToken).Symbol as IMethodSymbol;
-                if (invokedMethod != null && this.getServiceMethods.Contains(invokedMethod.ReducedFrom ?? invokedMethod))
+                var invocationExpression = (IInvocationOperation)context.Operation;
+                IMethodSymbol invokedMethod = invocationExpression.TargetMethod;
+                if (invokedMethod.IsGenericMethod)
+                {
+                    invokedMethod = invokedMethod.OriginalDefinition;
+                }
+
+                if (this.getServiceMethods.Contains(invokedMethod.ReducedFrom ?? invokedMethod))
                 {
                     bool isTask = Utils.IsTask(invokedMethod.ReturnType);
                     SyntaxNode? startWalkFrom = isTask
-                        ? (SyntaxNode?)Utils.FindAncestor<AwaitExpressionSyntax>(invocationExpression, n => n is MemberAccessExpressionSyntax || n is InvocationExpressionSyntax, (aes, child) => aes.Expression == child)
-                        : invocationExpression;
+                        ? (SyntaxNode?)Utils.FindAncestor<AwaitExpressionSyntax>(invocationExpression.Syntax, n => n is MemberAccessExpressionSyntax || n is InvocationExpressionSyntax, (aes, child) => aes.Expression == child)
+                        : invocationExpression.Syntax;
                     if (startWalkFrom == null)
                     {
                         return;
@@ -112,19 +118,20 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                         n => n is CastExpressionSyntax || n is ParenthesizedExpressionSyntax || n is AwaitExpressionSyntax,
                         (mae, child) => mae.Expression == child) != null)
                     {
-                        context.ReportDiagnostic(Diagnostic.Create(Descriptor, invocationExpression.Expression.GetLocation()));
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptor, ((InvocationExpressionSyntax)invocationExpression.Syntax).Expression.GetLocation()));
                     }
                     else if ((assignment = Utils.FindAncestor<AssignmentExpressionSyntax>(
                         startWalkFrom,
                         n => n is CastExpressionSyntax || n is EqualsValueClauseSyntax || n is AwaitExpressionSyntax || (n is BinaryExpressionSyntax be && be.OperatorToken.IsKind(SyntaxKind.AsKeyword)),
                         (aes, child) => aes.Right == child)) != null)
                     {
-                        ISymbol? leftSymbol = context.SemanticModel.GetSymbolInfo(assignment.Left, context.CancellationToken).Symbol;
+                        SemanticModel semanticModel = context.Compilation.GetSemanticModel(assignment.SyntaxTree);
+                        ISymbol? leftSymbol = semanticModel.GetSymbolInfo(assignment.Left, context.CancellationToken).Symbol;
                         if (leftSymbol is object)
                         {
                             // If the assigned variable is actually a field, scan this block for Assumes.Present
-                            SyntaxNode? parentBlock = Utils.FindFirstAncestorOfTypes(invocationExpression, typeof(BlockSyntax), typeof(ArrowExpressionClauseSyntax));
-                            if (!parentBlock?.DescendantNodes().Any(n => this.IsThrowingNullCheck(n, leftSymbol, context)) ?? true)
+                            SyntaxNode? parentBlock = Utils.FindFirstAncestorOfTypes(invocationExpression.Syntax, typeof(BlockSyntax), typeof(ArrowExpressionClauseSyntax));
+                            if (!parentBlock?.DescendantNodes().Any(n => this.IsThrowingNullCheck(n, leftSymbol, semanticModel, context.CancellationToken)) ?? true)
                             {
                                 // Since we didn't find an Assumes.Present call for this symbol,
                                 //    if this is a field or property, scan all blocks and expression bodies within this type.
@@ -138,12 +145,12 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                                              where methodSyntax != null
                                              let bodyOrExpression = (SyntaxNode?)methodSyntax.Body ?? methodSyntax.ExpressionBody
                                              where bodyOrExpression != null
-                                             from dref in this.ScanBlockForDereferencesWithoutNullCheck(context, leftSymbol, bodyOrExpression)
+                                             from dref in this.ScanBlockForDereferencesWithoutNullCheck(context.Compilation.GetSemanticModel(bodyOrExpression.SyntaxTree), leftSymbol, bodyOrExpression, context.CancellationToken)
                                              select dref;
                                 }
                                 else if (parentBlock is object)
                                 {
-                                    derefs = this.ScanBlockForDereferencesWithoutNullCheck(context, leftSymbol, parentBlock);
+                                    derefs = this.ScanBlockForDereferencesWithoutNullCheck(semanticModel, leftSymbol, parentBlock, context.CancellationToken);
                                 }
                                 else
                                 {
@@ -162,14 +169,16 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                         n => n is CastExpressionSyntax || n is EqualsValueClauseSyntax || n is AwaitExpressionSyntax || (n is BinaryExpressionSyntax be && be.OperatorToken.IsKind(SyntaxKind.AsKeyword)),
                         (vds, child) => vds.Initializer == child)) != null)
                     {
+                        SemanticModel semanticModel = context.Compilation.GetSemanticModel(context.Operation.Syntax.SyntaxTree);
+
                         // The GetService call was assigned via an initializer to a new local variable. Search the code block for uses and null checks.
-                        var leftSymbol = context.SemanticModel.GetDeclaredSymbol(variableDeclarator, context.CancellationToken) as ILocalSymbol;
+                        var leftSymbol = semanticModel.GetDeclaredSymbol(variableDeclarator, context.CancellationToken) as ILocalSymbol;
                         if (leftSymbol != null)
                         {
-                            BlockSyntax? containingBlock = context.Node.FirstAncestorOrSelf<BlockSyntax>();
+                            BlockSyntax? containingBlock = context.Operation.Syntax.FirstAncestorOrSelf<BlockSyntax>();
                             if (containingBlock != null)
                             {
-                                ImmutableArray<Location> derefs = this.ScanBlockForDereferencesWithoutNullCheck(context, leftSymbol, containingBlock);
+                                ImmutableArray<Location> derefs = this.ScanBlockForDereferencesWithoutNullCheck(semanticModel, leftSymbol, containingBlock, context.CancellationToken);
                                 if (derefs.Any())
                                 {
                                     context.ReportDiagnostic(Diagnostic.Create(Descriptor, variableDeclarator.Identifier.GetLocation(), derefs));
@@ -180,7 +189,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 }
             }
 
-            private ImmutableArray<Location> ScanBlockForDereferencesWithoutNullCheck(SyntaxNodeAnalysisContext context, ISymbol symbol, SyntaxNode containingBlockOrExpression)
+            private ImmutableArray<Location> ScanBlockForDereferencesWithoutNullCheck(SemanticModel semanticModel, ISymbol symbol, SyntaxNode containingBlockOrExpression, CancellationToken cancellationToken)
             {
                 if (containingBlockOrExpression == null)
                 {
@@ -190,10 +199,10 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 if (symbol != null)
                 {
                     System.Collections.Generic.IEnumerable<MemberAccessExpressionSyntax> variableUses = from access in containingBlockOrExpression.DescendantNodes().OfType<MemberAccessExpressionSyntax>()
-                                       let symbolAccessed = context.Compilation.GetSemanticModel(access.SyntaxTree).GetSymbolInfo(access.Expression, context.CancellationToken).Symbol
+                                       let symbolAccessed = semanticModel.GetSymbolInfo(access.Expression, cancellationToken).Symbol
                                        where SymbolEqualityComparer.Default.Equals(symbol, symbolAccessed)
                                        select access;
-                    if (!containingBlockOrExpression.DescendantNodes().Any(n => this.IsNonNullCheck(n, symbol, context)))
+                    if (!containingBlockOrExpression.DescendantNodes().Any(n => this.IsNonNullCheck(n, symbol, semanticModel, cancellationToken)))
                     {
                         return variableUses.Select(vu => vu.Expression.GetLocation()).ToImmutableArray();
                     }
@@ -205,9 +214,9 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             /// <summary>
             /// Checks whether the given syntax node determines whether the given symbol is null.
             /// </summary>
-            private bool IsNonNullCheck(SyntaxNode node, ISymbol symbol, SyntaxNodeAnalysisContext context)
+            private bool IsNonNullCheck(SyntaxNode node, ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
             {
-                bool IsSymbol(SyntaxNode n) => SymbolEqualityComparer.Default.Equals(symbol, context.Compilation.GetSemanticModel(n.SyntaxTree).GetSymbolInfo(n, context.CancellationToken).Symbol);
+                bool IsSymbol(SyntaxNode n) => SymbolEqualityComparer.Default.Equals(symbol, semanticModel.GetSymbolInfo(n, cancellationToken).Symbol);
                 bool IsEqualsOrExclamationEqualsCheck(BinaryExpressionSyntax o) => (o.OperatorToken.IsKind(SyntaxKind.EqualsEqualsToken) || o.OperatorToken.IsKind(SyntaxKind.ExclamationEqualsToken))
                                                                                     && (o.Left.IsKind(SyntaxKind.NullLiteralExpression) || o.Right.IsKind(SyntaxKind.NullLiteralExpression))
                                                                                     && (IsSymbol(o.Left) || IsSymbol(o.Right));
@@ -229,7 +238,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                     }
                 }
 
-                if (this.IsThrowingNullCheck(node, symbol, context))
+                if (this.IsThrowingNullCheck(node, symbol, semanticModel, cancellationToken))
                 {
                     return true;
                 }
@@ -237,14 +246,14 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 return false;
             }
 
-            private bool IsThrowingNullCheck(SyntaxNode node, ISymbol symbol, SyntaxNodeAnalysisContext context)
+            private bool IsThrowingNullCheck(SyntaxNode node, ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
             {
                 if (node is InvocationExpressionSyntax invocationExpression &&
-                    context.Compilation.GetSemanticModel(invocationExpression.SyntaxTree).GetSymbolInfo(invocationExpression.Expression).Symbol?.OriginalDefinition is { } item &&
+                    semanticModel.GetSymbolInfo(invocationExpression.Expression).Symbol?.OriginalDefinition is { } item &&
                     this.nullThrowingMethods.Contains(item))
                 {
                     ArgumentSyntax? firstArg = invocationExpression.ArgumentList.Arguments.FirstOrDefault();
-                    if (firstArg != null && SymbolEqualityComparer.Default.Equals(symbol, context.SemanticModel.GetSymbolInfo(firstArg.Expression, context.CancellationToken).Symbol))
+                    if (firstArg != null && SymbolEqualityComparer.Default.Equals(symbol, semanticModel.GetSymbolInfo(firstArg.Expression, cancellationToken).Symbol))
                     {
                         return true;
                     }
