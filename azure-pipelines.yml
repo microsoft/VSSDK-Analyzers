@@ -14,6 +14,10 @@ trigger:
     - azure-pipelines/release.yml
 
 parameters:
+- name: EnableMacOSBuild
+  displayName: Build on macOS
+  type: boolean
+  default: false # macOS is often bogged down in Azure Pipelines
 - name: RunTests
   displayName: Run tests
   type: boolean
@@ -26,4 +30,5 @@ jobs:
 - template: azure-pipelines/build.yml
   parameters:
     Is1ESPT: false
+    EnableMacOSBuild: ${{ parameters.EnableMacOSBuild }}
     RunTests: ${{ parameters.RunTests }}
