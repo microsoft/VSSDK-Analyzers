@@ -198,10 +198,11 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
 
                 if (symbol != null)
                 {
-                    System.Collections.Generic.IEnumerable<MemberAccessExpressionSyntax> variableUses = from access in containingBlockOrExpression.DescendantNodes().OfType<MemberAccessExpressionSyntax>()
-                                       let symbolAccessed = semanticModel.GetSymbolInfo(access.Expression, cancellationToken).Symbol
-                                       where SymbolEqualityComparer.Default.Equals(symbol, symbolAccessed)
-                                       select access;
+                    System.Collections.Generic.IEnumerable<MemberAccessExpressionSyntax> variableUses =
+                        from access in containingBlockOrExpression.DescendantNodes().OfType<MemberAccessExpressionSyntax>()
+                        let symbolAccessed = semanticModel.GetSymbolInfo(access.Expression, cancellationToken).Symbol
+                        where SymbolEqualityComparer.Default.Equals(symbol, symbolAccessed)
+                        select access;
                     if (!containingBlockOrExpression.DescendantNodes().Any(n => this.IsNonNullCheck(n, symbol, semanticModel, cancellationToken)))
                     {
                         return variableUses.Select(vu => vu.Expression.GetLocation()).ToImmutableArray();

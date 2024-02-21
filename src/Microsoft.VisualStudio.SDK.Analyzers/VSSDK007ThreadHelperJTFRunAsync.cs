@@ -244,10 +244,11 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         private static bool IsVariableAwaitedOrJoined(SyntaxNodeAnalysisContext context, string variableName, SyntaxNode enclosingBlock)
         {
             // No diagnostic for:  await task;
-            IEnumerable<AwaitExpressionSyntax>? awaitedList = from awaitExpr in enclosingBlock.DescendantNodes().OfType<AwaitExpressionSyntax>()
-                              where awaitExpr.ChildNodes().OfType<IdentifierNameSyntax>().Count() == 1 &&
-                                    awaitExpr.ChildNodes().OfType<IdentifierNameSyntax>().Single().Identifier.ValueText == variableName
-                              select awaitExpr;
+            IEnumerable<AwaitExpressionSyntax>? awaitedList =
+                from awaitExpr in enclosingBlock.DescendantNodes().OfType<AwaitExpressionSyntax>()
+                where awaitExpr.ChildNodes().OfType<IdentifierNameSyntax>().Count() == 1 &&
+                    awaitExpr.ChildNodes().OfType<IdentifierNameSyntax>().Single().Identifier.ValueText == variableName
+                select awaitExpr;
 
             if (awaitedList.Any())
             {
@@ -255,10 +256,11 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             }
 
             // No diagnostic for:  task.Join();
-            IEnumerable<IdentifierNameSyntax>? methodCallList = from varMethodCall in enclosingBlock.DescendantNodes().OfType<MemberAccessExpressionSyntax>()
-                                 where varMethodCall.ChildNodes().OfType<IdentifierNameSyntax>().Count() == 2 &&
-                                       varMethodCall.ChildNodes().OfType<IdentifierNameSyntax>().First().Identifier.ValueText == variableName
-                                 select varMethodCall.ChildNodes().OfType<IdentifierNameSyntax>().ElementAt(1);
+            IEnumerable<IdentifierNameSyntax>? methodCallList =
+                from varMethodCall in enclosingBlock.DescendantNodes().OfType<MemberAccessExpressionSyntax>()
+                where varMethodCall.ChildNodes().OfType<IdentifierNameSyntax>().Count() == 2 &&
+                        varMethodCall.ChildNodes().OfType<IdentifierNameSyntax>().First().Identifier.ValueText == variableName
+                select varMethodCall.ChildNodes().OfType<IdentifierNameSyntax>().ElementAt(1);
 
             foreach (IdentifierNameSyntax? method in methodCallList)
             {
@@ -269,9 +271,10 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             }
 
             // No diagnostic for:  await task.JoinAsync();
-            IEnumerable<AwaitExpressionSyntax>? awaitedJoinAsyncList = from awaitExpr in enclosingBlock.DescendantNodes().OfType<AwaitExpressionSyntax>()
-                                       where VariableAwaitsJoinAsyncMethod(variableName, awaitExpr)
-                                       select awaitExpr;
+            IEnumerable<AwaitExpressionSyntax>? awaitedJoinAsyncList =
+                from awaitExpr in enclosingBlock.DescendantNodes().OfType<AwaitExpressionSyntax>()
+                where VariableAwaitsJoinAsyncMethod(variableName, awaitExpr)
+                select awaitExpr;
 
             if (awaitedJoinAsyncList.Any())
             {

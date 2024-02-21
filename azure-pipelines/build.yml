@@ -132,7 +132,6 @@ jobs:
 
   - script: dotnet format --verify-no-changes --no-restore
     displayName: 💅 Verify formatted code
-    enabled: false # enable when it passes
 
   - ${{ if eq(variables['system.collectionId'], '011b8bdf-6d56-4f87-be0d-0092136884d9') }}:
     - template: microbuild.after.yml
