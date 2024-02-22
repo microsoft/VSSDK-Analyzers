@@ -440,4 +440,23 @@ namespace ConsoleApplication1
 
         await Verify.VerifyAnalyzerAsync(test);
     }
+
+    [Fact]
+    public async Task RunAsync_AssignedToField()
+    {
+        string test = """
+            using Microsoft.VisualStudio.Shell;
+            using Microsoft.VisualStudio.Threading;
+            class Foo {
+                JoinableTask task;
+                void Bar() {
+                    this.task = ThreadHelper.JoinableTaskFactory.RunAsync(async () => {
+                        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                    });
+                }
+            }
+            """;
+
+        await Verify.VerifyAnalyzerAsync(test);
+    }
 }

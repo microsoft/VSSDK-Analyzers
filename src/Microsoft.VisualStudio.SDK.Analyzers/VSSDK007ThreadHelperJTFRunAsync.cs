@@ -131,9 +131,14 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             // Is the JoinableTask returned from RunAsync assigned to a variable? If so, search the enclosing block
             // and check if that variable is awaited/joined.
             if (IsJoinableTaskAssigned(invocationExpr, out SyntaxNode? assignedTo, out SyntaxToken? assignedToToken) &&
-                assignedTo is not null &&
-                assignedToToken is not null)
+                assignedTo is not null)
             {
+                if (assignedToToken is null)
+                {
+                    // It was assigned to something more complicated (e.g. a field or property). Assume it's used elsewhere.
+                    return;
+                }
+
                 SyntaxNode? enclosingBlock = GetEnclosingBlock(assignedTo);
                 if (enclosingBlock is not null)
                 {
@@ -197,7 +202,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             {
                 var assignmentExpr = (AssignmentExpressionSyntax)invocationExpr.Parent;
                 assignedToNode = assignmentExpr.Left;
-                assignedToToken = ((IdentifierNameSyntax)assignedToNode).Identifier;
+                assignedToToken = (assignedToNode as IdentifierNameSyntax)?.Identifier;
                 return true;
             }
 
