@@ -57,7 +57,7 @@ public static class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
         return test.RunAsync();
     }
 
-    public class Test : CSharpCodeFixTest<TAnalyzer, TCodeFix, XUnitVerifier>
+    public class Test : CSharpCodeFixTest<TAnalyzer, TCodeFix, DefaultVerifier>
     {
         private static readonly MetadataReference PresentationFrameworkReference = MetadataReference.CreateFromFile(typeof(System.Windows.Controls.UserControl).Assembly.Location);
         private static readonly MetadataReference MPFReference = MetadataReference.CreateFromFile(typeof(Microsoft.VisualStudio.Shell.Package).Assembly.Location);
