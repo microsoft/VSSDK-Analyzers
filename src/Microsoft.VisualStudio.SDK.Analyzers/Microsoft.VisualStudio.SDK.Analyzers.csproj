@@ -4,6 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>Microsoft.VisualStudio.SDK.Just.Analyzers</PackageId>
     <IsPackable>false</IsPackable>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     <!-- Buggy analyzer -->
     <NoWarn>$(NoWarn);RS2002</NoWarn>
   </PropertyGroup>

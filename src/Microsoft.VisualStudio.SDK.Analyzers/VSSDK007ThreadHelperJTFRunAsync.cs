@@ -30,7 +30,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         internal static readonly DiagnosticDescriptor Descriptor = new(
             id: Id,
             title: "ThreadHelper.JoinableTaskFactory.RunAsync",
-            messageFormat: "Await/join tasks created from ThreadHelper.JoinableTaskFactory.RunAsync.",
+            messageFormat: "Await/join tasks created from ThreadHelper.JoinableTaskFactory.RunAsync",
             description: "ThreadHelper.JoinableTaskFactory.RunAsync is not safe to use for fire-and-forget tasks inside Visual Studio. Either await/join the JoinableTask, or use the JoinableTaskFactory instance from AsyncPackage or ToolkitThreadHelper.",
             helpLinkUri: Utils.GetHelpLink(Id),
             category: "Reliability",
