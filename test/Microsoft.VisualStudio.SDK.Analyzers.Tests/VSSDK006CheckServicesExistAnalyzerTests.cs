@@ -904,6 +904,27 @@ class Test : Package {
     }
 
     [Fact]
+    public async Task LocalAssigned_CheckedByIfIsNotNull_GetService_ThenUsedAsync()
+    {
+        var test = @"
+using Microsoft;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+
+class Test : Package {
+    protected override void Initialize() {
+        base.Initialize();
+        var svc = this.GetService(typeof(SVsBuildManagerAccessor)) as IVsBuildManagerAccessor;
+        if (svc is not null) {
+            svc.BeginDesignTimeBuild();
+        }
+    }
+}
+";
+        await Verify.VerifyAnalyzerAsync(test);
+    }
+
+    [Fact]
     public async Task FieldAssigned_Checked_GetService_ThenUsedAsync()
     {
         var test = @"
