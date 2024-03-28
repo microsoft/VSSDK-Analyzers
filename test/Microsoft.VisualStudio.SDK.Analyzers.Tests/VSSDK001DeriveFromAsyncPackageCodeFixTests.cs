@@ -191,11 +191,10 @@ namespace Microsoft.VisualStudio
 }
 ";
         var withFix = @"
-using Microsoft.VisualStudio.Shell;
-
 namespace Microsoft.VisualStudio
 {
     using System;
+    using Microsoft.VisualStudio.Shell;
 
     class Test : AsyncPackage
     {
@@ -227,17 +226,17 @@ namespace NS
     }
 }
 ";
-        var withFix = @"using System.Threading;
-using Microsoft.VisualStudio.Shell;
-using Task = System.Threading.Tasks.Task;
+        var withFix = @"using Task = System.Threading.Tasks.Task;
 
 namespace NS
 {
     using System;
+    using System.Threading;
+    using Microsoft.VisualStudio.Shell;
 
     class Test : AsyncPackage
     {
-        protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
+        protected override async System.Threading.Tasks.Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
             Console.WriteLine(""before"");
 

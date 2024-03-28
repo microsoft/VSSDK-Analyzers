@@ -227,13 +227,15 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 bool IsPatternMatchNullCheck(IsPatternExpressionSyntax o) => o.Pattern is ConstantPatternSyntax pattern
                                                                              && pattern.Expression.IsKind(SyntaxKind.NullLiteralExpression)
                                                                              && IsSymbol(o.Expression);
+                bool IsPatternMatchNotNullCheck(IsPatternExpressionSyntax o) => o.Pattern is UnaryPatternSyntax patternSyntax
+                                                                                && IsSymbol(o.Expression);
 
                 if (node is IfStatementSyntax ifStatement)
                 {
                     if (ifStatement.Condition.DescendantNodesAndSelf().OfType<BinaryExpressionSyntax>().Any(
                           o => IsEqualsOrExclamationEqualsCheck(o) || IsPatternMatchTypeCheck(o))
                         || ifStatement.Condition.DescendantNodesAndSelf().OfType<IsPatternExpressionSyntax>().Any(
-                          o => IsPatternMatchNullCheck(o)))
+                          o => IsPatternMatchNullCheck(o) || IsPatternMatchNotNullCheck(o)))
                     {
                         return true;
                     }
