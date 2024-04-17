@@ -11,7 +11,7 @@
 [EnvDTE90a.*]
 [EnvDTE100.*]
 
-# Free-threaded
+# Background safe
 ![Microsoft.Internal.VisualStudio.Shell.Interop.IVsBackgroundSolution]
 ![Microsoft.Internal.VisualStudio.Shell.Interop.SVsBackgroundSolution]
 ![Microsoft.Internal.VisualStudio.Shell.Interop.IVsBackgroundDisposable]
@@ -31,6 +31,13 @@
 ![Microsoft.Internal.VisualStudio.Shell.Interop.IVsRemoteSettingsEvents]
 ![Microsoft.Internal.VisualStudio.Shell.Interop.SVsRemoteSettings]
 ![Microsoft.Internal.VisualStudio.Shell.Interop.IVsSavePrimitives]
+![Microsoft.Internal.VisualStudio.Shell.Interop.IVsSettingsChangeSuppressor]
+![Microsoft.Internal.VisualStudio.Shell.Interop.SVsSettingsChangeSuppressor]
+![Microsoft.Internal.VisualStudio.Shell.Interop.IVsSettingsList]
+![Microsoft.Internal.VisualStudio.Shell.Interop.IVsSettingsManagerLoggingContext]
+![Microsoft.Internal.VisualStudio.Shell.Interop.SVsSettingsManagerLoggingContext]
+![Microsoft.Internal.VisualStudio.Shell.Interop.IVsSettingsPersistenceManager]
+![Microsoft.Internal.VisualStudio.Shell.Interop.SVsSettingsPersistenceManager]
 ![Microsoft.Internal.VisualStudio.Shell.Interop.IVsTelemetryActivity]
 ![Microsoft.Internal.VisualStudio.Shell.Interop.IVsTelemetryAssetService]
 ![Microsoft.Internal.VisualStudio.Shell.Interop.IVsTelemetryContext]
