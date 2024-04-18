@@ -12,6 +12,8 @@
 [EnvDTE100.*]
 
 # Background safe
+![Microsoft.Internal.VisualStudio.AppId.Interop.IVsAppId]
+![Microsoft.Internal.VisualStudio.AppId.Interop.SVsAppId]
 ![Microsoft.Internal.VisualStudio.Shell.Interop.IVsBackgroundSolution]
 ![Microsoft.Internal.VisualStudio.Shell.Interop.SVsBackgroundSolution]
 ![Microsoft.Internal.VisualStudio.Shell.Interop.IVsBackgroundDisposable]
@@ -53,6 +55,8 @@
 ![Microsoft.Internal.VisualStudio.Shell.Interop.IVsTelemetrySession2]
 ![Microsoft.Internal.VisualStudio.Shell.Interop.IVsTelemetrySession3]
 ![Microsoft.Internal.VisualStudio.Shell.Interop.SVsTelemetryService]
+![Microsoft.Internal.VisualStudio.Shell.Interop.IVsWebProxy2]
+![Microsoft.Internal.VisualStudio.Shell.Interop.SVsWebProxy]
 ![Microsoft.VisualStudio.Services.RemoteSettings.IVsRemoteSettingsProvider]
 ![Microsoft.VisualStudio.Services.RemoteSettings.IVsRemoteSettingsProvider2]
 ![Microsoft.VisualStudio.Services.RemoteSettings.SVsRemoteSettingsProvider]
@@ -77,6 +81,8 @@
 ![Microsoft.VisualStudio.Shell.Interop.SUIHostLocale]
 ![Microsoft.VisualStudio.Shell.Interop.IVsActivityLog]
 ![Microsoft.VisualStudio.Shell.Interop.SVsActivityLog]
+![Microsoft.VisualStudio.Shell.Interop.IVsAppCommandLine]
+![Microsoft.VisualStudio.Shell.Interop.SVsAppCommandLine]
 ![Microsoft.VisualStudio.Shell.Interop.IVsAsyncPersistDocData]
 ![Microsoft.VisualStudio.Shell.Interop.IVsAsyncSolution]
 ![Microsoft.VisualStudio.Shell.Interop.IVsAppContainerBootstrapper]
