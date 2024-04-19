@@ -103,6 +103,8 @@
 ![Microsoft.VisualStudio.Shell.Interop.SVsAppContainerProjectDeploy]
 ![Microsoft.VisualStudio.Shell.Interop.IVsExecutionContextTracker]
 ![Microsoft.VisualStudio.Shell.Interop.SVsExecutionContextTracker]
+![Microsoft.VisualStudio.Shell.Interop.IVsFileChangeEx3]
+![Microsoft.VisualStudio.Shell.Interop.SVsFileChangeEx]
 ![Microsoft.VisualStudio.Shell.Interop.IVsInvalidateCachedCommandState]
 ![Microsoft.VisualStudio.Shell.Interop.SVsInvalidateCachedCommandState]
 ![Microsoft.VisualStudio.Shell.Interop.IVsPackageInfo]
