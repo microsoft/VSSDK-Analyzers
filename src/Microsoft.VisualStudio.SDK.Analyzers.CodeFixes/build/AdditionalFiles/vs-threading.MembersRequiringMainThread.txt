@@ -1,9 +1,12 @@
+# NOTE: While there no examples below, members *must* be listed before their declaring type, otherwise
+# their given designation will be ignored. Namespaces and types can be listed in any order.
+
 # Main-thread required
 [Microsoft.Internal.VisualStudio.Shell.Interop.*]
 [Microsoft.VisualStudio.OLE.Interop.*]
 [Microsoft.VisualStudio.Shell.Interop.*]
 [Microsoft.VisualStudio.Shell.Package]::GetService
-[Microsoft.VisualStudio.Shell.ServiceProvider]
+[Microsoft.VisualStudio.Shell.ServiceProvider]::CreateFromSetSite
 [Microsoft.VisualStudio.Shell.UIContext]::IsActive
 [EnvDTE.*]
 [EnvDTE80.*]
@@ -160,5 +163,3 @@
 ![Microsoft.VisualStudio.Shell.Interop.SVsThreadedWaitDialogFactory]
 ![Microsoft.VisualStudio.Shell.Interop.IVsUIContextMonitor]
 ![Microsoft.VisualStudio.Shell.Interop.SVsUIContextMonitor]
-![Microsoft.VisualStudio.Shell.ServiceProvider]::GlobalProvider
-![Microsoft.VisualStudio.Shell.ServiceProvider]::GetGlobalServiceAsync
