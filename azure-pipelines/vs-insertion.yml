@@ -41,7 +41,7 @@ extends:
           artifact: VSInsertion-Windows
           displayName: 🔻 Download VSInsertion-Windows artifact
         - task: 1ES.PublishNuget@1
-          displayName: 📦 Push CoreXT packages to VS feed
+          displayName: 📦 Push VS-repo packages to VS feed
           inputs:
             packagesToPush: '$(Pipeline.Workspace)/CI/VSInsertion-Windows/*.nupkg'
             packageParentPath: $(Pipeline.Workspace)/CI/VSInsertion-Windows
@@ -57,6 +57,7 @@ extends:
             InsertionReviewers: $(Build.RequestedFor),Andrew Arnott
             AutoCompletePR: true
             AutoCompleteMergeStrategy: Squash
+            ShallowClone: true
         - powershell: |
             $contentType = 'application/json';
             $headers = @{ Authorization = 'Bearer $(System.AccessToken)' };
