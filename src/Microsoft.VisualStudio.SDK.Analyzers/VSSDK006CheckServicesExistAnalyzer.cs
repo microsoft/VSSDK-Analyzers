@@ -252,7 +252,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             private bool IsThrowingNullCheck(SyntaxNode node, ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
             {
                 if (node is InvocationExpressionSyntax invocationExpression &&
-                    semanticModel.GetSymbolInfo(invocationExpression.Expression).Symbol?.OriginalDefinition is { } item &&
+                    semanticModel.GetSymbolInfo(invocationExpression.Expression, cancellationToken).Symbol?.OriginalDefinition is { } item &&
                     this.nullThrowingMethods.Contains(item))
                 {
                     ArgumentSyntax? firstArg = invocationExpression.ArgumentList.Arguments.FirstOrDefault();
