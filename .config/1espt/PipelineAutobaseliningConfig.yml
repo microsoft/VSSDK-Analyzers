@@ -23,3 +23,17 @@ pipelines:
           lastModifiedDate: 2024-10-18
         armory:
           lastModifiedDate: 2024-10-18
+  8435:
+    retail:
+      source:
+        credscan:
+          lastModifiedDate: 2024-10-31
+        eslint:
+          lastModifiedDate: 2024-10-31
+        armory:
+          lastModifiedDate: 2024-10-31
+      binary:
+        credscan:
+          lastModifiedDate: 2024-10-31
+        binskim:
+          lastModifiedDate: 2024-10-31
