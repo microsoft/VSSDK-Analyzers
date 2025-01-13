@@ -50,3 +50,22 @@ and link to it from the Issue you file.
 We love to get pull requests. If you have a bug fix to offer or a new analyzer, please send us a pull request.
 
 Every new feature or bug fix should be accompanied by unit tests to cover your change.
+
+## Tutorial and API documentation
+
+API and hand-written docs are found under the `docfx/` directory. and are built by [docfx](https://dotnet.github.io/docfx/).
+
+You can make changes and host the site locally to preview them by switching to that directory and running the `dotnet docfx --serve` command.
+After making a change, you can rebuild the docs site while the localhost server is running by running `dotnet docfx` again from a separate terminal.
+
+The `.github/workflows/docs.yml` GitHub Actions workflow publishes the content of these docs to github.io if the workflow itself and [GitHub Pages is enabled for your repository](https://docs.github.com/en/pages/quickstart).
+
+## Updating dependencies
+
+This repo uses Renovate to keep dependencies current.
+Configuration is in the `.github/renovate.json` file.
+[Learn more about configuring Renovate](https://docs.renovatebot.com/configuration-options/).
+
+When changing the renovate.json file, follow [these validation steps](https://docs.renovatebot.com/config-validation/).
+
+If Renovate is not creating pull requests when you expect it to, check that the [Renovate GitHub App](https://github.com/apps/renovate) is configured for your account or repo.

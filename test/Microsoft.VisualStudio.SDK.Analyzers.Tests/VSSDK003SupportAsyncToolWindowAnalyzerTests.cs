@@ -42,7 +42,7 @@ public class ToolWindow1 : ToolWindowPane
             {
                 Sources = { package, toolWindow },
             },
-        }.RunAsync();
+        }.RunAsync(TestContext.Current.CancellationToken);
     }
 
     [Fact]
@@ -79,7 +79,7 @@ public class ToolWindow1 : ToolWindowPane
                 Sources = { package, toolWindow },
             },
             ExpectedDiagnostics = { Verify.Diagnostic().WithSpan(4, 27, 4, 38) },
-        }.RunAsync();
+        }.RunAsync(TestContext.Current.CancellationToken);
     }
 
     [Fact]
@@ -151,7 +151,7 @@ public class ToolWindow1 : ToolWindowPane
             {
                 Sources = { package, toolWindow },
             },
-        }.RunAsync();
+        }.RunAsync(TestContext.Current.CancellationToken);
     }
 
     [Fact]
@@ -223,7 +223,7 @@ public class ToolWindow1 : ToolWindowPane
             {
                 Sources = { package, toolWindow },
             },
-        }.RunAsync();
+        }.RunAsync(TestContext.Current.CancellationToken);
     }
 
     [Fact]
@@ -296,6 +296,6 @@ public class ToolWindow1
             {
                 Sources = { package, toolWindow },
             },
-        }.RunAsync();
+        }.RunAsync(TestContext.Current.CancellationToken);
     }
 }
