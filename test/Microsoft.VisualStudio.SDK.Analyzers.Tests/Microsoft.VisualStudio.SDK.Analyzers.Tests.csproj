@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
+    <OutputType>Exe</OutputType>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
@@ -14,9 +15,9 @@
     <PackageReference Include="Microsoft.VisualStudio.Designer.Interfaces" PrivateAssets="all" />
     <PackageReference Include="Microsoft.VisualStudio.Validation" PrivateAssets="all" />
     <PackageReference Include="System.ValueTuple" />
-    <PackageReference Include="xunit.runner.console" />
+    <PackageReference Include="xunit.assert" ExcludeAssets="compile" />
     <PackageReference Include="xunit.runner.visualstudio" />
-    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.v3" />
 
     <!-- Avoid dependencies on earlier insecure Newtownsoft.Json -->
     <PackageReference Include="Newtonsoft.Json" />

@@ -973,7 +973,7 @@ partial class Test {
 }
 ";
         var test = new Verify.Test { TestState = { Sources = { test1, test2 } } };
-        await test.RunAsync();
+        await test.RunAsync(TestContext.Current.CancellationToken);
     }
 
     [Fact]
@@ -1003,7 +1003,7 @@ internal partial class Host {
 }
 ";
         var test = new Verify.Test { TestState = { Sources = { test1, test2 } } };
-        await test.RunAsync();
+        await test.RunAsync(TestContext.Current.CancellationToken);
     }
 
     private DiagnosticResult CreateDiagnostic(int line, int column, int length, params (int Line, int Column, int Length)[] additionalLocations)

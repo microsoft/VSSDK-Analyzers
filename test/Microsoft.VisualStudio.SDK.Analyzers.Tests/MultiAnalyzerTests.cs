@@ -33,7 +33,7 @@ class Test : AsyncPackage {
         await new CSharpTest
         {
             TestCode = test,
-        }.RunAsync();
+        }.RunAsync(TestContext.Current.CancellationToken);
     }
 
     [Fact]
@@ -50,7 +50,7 @@ class Test {
         await new CSharpTest(includeVisualStudioSdk: false)
         {
             TestCode = test,
-        }.RunAsync();
+        }.RunAsync(TestContext.Current.CancellationToken);
     }
 
     internal class CSharpTest : CSharpCodeFixVerifier<VSSDK001DeriveFromAsyncPackageAnalyzer, EmptyCodeFixProvider>.Test

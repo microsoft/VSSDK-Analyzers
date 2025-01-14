@@ -5,7 +5,6 @@ using System;
 using System.Linq;
 using Microsoft.VisualStudio.SDK.Analyzers;
 using Xunit;
-using Xunit.Abstractions;
 
 public class AnalyzerAssemblyTests
 {

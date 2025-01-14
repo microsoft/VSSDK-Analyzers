@@ -1,0 +1,35 @@
+{
+	"build": {
+		"content": [
+			{
+				"files": [
+					"**/*.{md,yml}"
+				],
+				"exclude": [
+					"_site/**"
+				]
+			}
+		],
+		"resource": [
+			{
+				"files": [
+					"images/**"
+				]
+			}
+		],
+		"xref": [
+			"https://learn.microsoft.com/en-us/dotnet/.xrefmap.json"
+		],
+		"output": "_site",
+		"template": [
+			"default",
+			"modern"
+		],
+		"globalMetadata": {
+			"_appName": "Microsoft.VisualStudio.SDK.Analyzers",
+			"_appTitle": "Microsoft.VisualStudio.SDK.Analyzers",
+			"_enableSearch": true,
+			"pdf": false
+		}
+	}
+}
