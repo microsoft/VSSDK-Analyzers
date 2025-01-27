@@ -16,10 +16,10 @@ public static class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
     where TCodeFix : CodeFixProvider, new()
 {
     public static DiagnosticResult Diagnostic()
-        => CSharpCodeFixVerifier<TAnalyzer, TCodeFix, XUnitVerifier>.Diagnostic();
+        => CSharpCodeFixVerifier<TAnalyzer, TCodeFix, DefaultVerifier>.Diagnostic();
 
     public static DiagnosticResult Diagnostic(string diagnosticId)
-        => CSharpCodeFixVerifier<TAnalyzer, TCodeFix, XUnitVerifier>.Diagnostic(diagnosticId);
+        => CSharpCodeFixVerifier<TAnalyzer, TCodeFix, DefaultVerifier>.Diagnostic(diagnosticId);
 
     public static DiagnosticResult Diagnostic(DiagnosticDescriptor descriptor)
         => new DiagnosticResult(descriptor);
