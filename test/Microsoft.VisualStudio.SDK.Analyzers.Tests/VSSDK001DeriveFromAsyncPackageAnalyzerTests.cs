@@ -12,7 +12,7 @@ public class VSSDK001DeriveFromAsyncPackageAnalyzerTests
     [Fact]
     public async Task AsyncPackageDerivedClassProducesNoDiagnosticAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 
 class Test : AsyncPackage {
@@ -25,7 +25,7 @@ class Test : AsyncPackage {
     [Fact]
     public async Task NoBaseTypeProducesNoDiagnosticAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 class Test {
 }
 ";
@@ -36,7 +36,7 @@ class Test {
     [Fact]
     public async Task PackageDerivedClassProducesDiagnosticAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 
 class Test : Package {
@@ -50,7 +50,7 @@ class Test : Package {
     [Fact]
     public async Task PackageDerivedClassWithInterfacesProducesDiagnosticAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using System;
 using Microsoft.VisualStudio.Shell;
 

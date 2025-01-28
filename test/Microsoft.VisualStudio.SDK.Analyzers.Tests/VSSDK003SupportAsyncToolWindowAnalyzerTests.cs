@@ -12,7 +12,7 @@ public class VSSDK003SupportAsyncToolWindowAnalyzerTests
     [Fact]
     public async Task SyncToolWindow_NonAsyncPackage_ProducesDiagnosticAsync()
     {
-        var package = @"
+        var package = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 
 [ProvideToolWindow(typeof(ToolWindow1))]
@@ -20,7 +20,7 @@ class ToolWindow1Package : Package
 {
 }
 ";
-        var toolWindow = @"
+        var toolWindow = /* lang=c#-test */ @"
 using System.Runtime.InteropServices;
 using System.Windows.Controls;
 using Microsoft.VisualStudio.Shell;
@@ -48,7 +48,7 @@ public class ToolWindow1 : ToolWindowPane
     [Fact]
     public async Task SyncToolWindow_AsyncPackage_ProducesDiagnosticAsync()
     {
-        var package = @"
+        var package = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 
 [ProvideToolWindow(typeof(ToolWindow1))]
@@ -56,7 +56,7 @@ class ToolWindow1Package : AsyncPackage
 {
 }
 ";
-        var toolWindow = @"
+        var toolWindow = /* lang=c#-test */ @"
 using System.Runtime.InteropServices;
 using System.Windows.Controls;
 using Microsoft.VisualStudio.Shell;
@@ -85,7 +85,7 @@ public class ToolWindow1 : ToolWindowPane
     [Fact]
     public async Task AsyncToolWindow_ProducesNoDiagnosticAsync()
     {
-        var package = @"
+        var package = /* lang=c#-test */ @"
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -124,7 +124,7 @@ class ToolWindow1Package : AsyncPackage
     }
 }
 ";
-        var toolWindow = @"
+        var toolWindow = /* lang=c#-test */ @"
 using System.Runtime.InteropServices;
 using System.Windows.Controls;
 using Microsoft.VisualStudio.Shell;
@@ -157,7 +157,7 @@ public class ToolWindow1 : ToolWindowPane
     [Fact]
     public async Task RTWCompatibleAsyncToolWindow_ProducesNoDiagnosticAsync()
     {
-        var package = @"
+        var package = /* lang=c#-test */ @"
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -196,7 +196,7 @@ class ToolWindow1Package : AsyncPackage
     }
 }
 ";
-        var toolWindow = @"
+        var toolWindow = /* lang=c#-test */ @"
 using System.Runtime.InteropServices;
 using System.Windows.Controls;
 using Microsoft.VisualStudio.Shell;
@@ -229,7 +229,7 @@ public class ToolWindow1 : ToolWindowPane
     [Fact]
     public async Task NoPackageAttributesAsync()
     {
-        var package = @"
+        var package = /* lang=c#-test */ @"
 public class ProtocolPackage : Microsoft.VisualStudio.Shell.AsyncPackage
 {
 }
@@ -240,7 +240,7 @@ public class ProtocolPackage : Microsoft.VisualStudio.Shell.AsyncPackage
     [Fact]
     public async Task OverriddenGetAsyncToolWindowFactory_ToolWindowWithParameterlessConstructor_ProducesNoDiagnosticAsync()
     {
-        var package = @"
+        var package = /* lang=c#-test */ @"
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -279,7 +279,7 @@ class ToolWindow1Package : ToolkitPackage
 {
 }
 ";
-        var toolWindow = @"
+        var toolWindow = /* lang=c#-test */ @"
 using System.Runtime.InteropServices;
 using System.Windows.Controls;
 using Microsoft.VisualStudio.Shell;
