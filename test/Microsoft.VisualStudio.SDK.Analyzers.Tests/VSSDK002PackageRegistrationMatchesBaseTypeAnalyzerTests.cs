@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Threading.Tasks;
 using Xunit;
 using Verify = CSharpCodeFixVerifier<
     Microsoft.VisualStudio.SDK.Analyzers.VSSDK002PackageRegistrationMatchesBaseTypeAnalyzer,
@@ -12,7 +11,7 @@ public class VSSDK002PackageRegistrationMatchesBaseTypeAnalyzerTests
     [Fact]
     public async Task AsyncPackageWithNoAttributeProducesNoDiagnosticAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 
 class Test : AsyncPackage {
@@ -25,7 +24,7 @@ class Test : AsyncPackage {
     [Fact]
     public async Task PackageRegistrationWithNoBaseTypeAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 
 [PackageRegistration(UseManagedResourcesOnly = true)]
@@ -39,7 +38,7 @@ class Test {
     [Fact]
     public async Task PackageRegistrationWithIrrelevantAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using System;
 using Microsoft.VisualStudio.Shell;
 
@@ -55,7 +54,7 @@ class Test : IDisposable {
     [Fact]
     public async Task AsyncPackageMatchProducesNoDiagnosticAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 
 [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
@@ -69,7 +68,7 @@ class Test : AsyncPackage {
     [Fact]
     public async Task PackageMatchProducesNoDiagnosticAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 
 [PackageRegistration(UseManagedResourcesOnly = true)]
@@ -83,14 +82,14 @@ class MyCoolPackage : Package {
     [Fact]
     public async Task AsyncPackageImplicitMismatchProducesDiagnosticAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 
 [[|PackageRegistration(UseManagedResourcesOnly = true)|]]
 class Test : AsyncPackage {
 }
 ";
-        var withFix = @"
+        var withFix = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 
 [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
@@ -104,7 +103,7 @@ class Test : AsyncPackage {
     [Fact]
     public async Task AsyncPackageImplicitMismatchViaIntermediateClass_ProducesDiagnosticAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 
 class Middle : AsyncPackage { }
@@ -113,7 +112,7 @@ class Middle : AsyncPackage { }
 class Test : Middle {
 }
 ";
-        var withFix = @"
+        var withFix = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 
 class Middle : AsyncPackage { }
@@ -129,7 +128,7 @@ class Test : Middle {
     [Fact]
     public async Task PackageMismatchViaIntermediateClass_ProducesDiagnosticAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 
 class Middle : Package { }
@@ -138,7 +137,7 @@ class Middle : Package { }
 class MyCoolPackage : Middle {
 }
 ";
-        var withFix = @"
+        var withFix = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 
 class Middle : Package { }
@@ -154,14 +153,14 @@ class MyCoolPackage : Middle {
     [Fact]
     public async Task AsyncPackageExplicitMismatchProducesDiagnosticAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 
 [PackageRegistration(UseManagedResourcesOnly = true, [|AllowsBackgroundLoading = false|])]
 class Test : AsyncPackage {
 }
 ";
-        var withFix = @"
+        var withFix = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 
 [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
@@ -175,14 +174,14 @@ class Test : AsyncPackage {
     [Fact]
     public async Task PackageMismatchProducesDiagnosticAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 
 [PackageRegistration(UseManagedResourcesOnly = true, [|AllowsBackgroundLoading = true|])]
 class MyCoolPackage : Package {
 }
 ";
-        var withFix = @"
+        var withFix = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 
 [PackageRegistration(UseManagedResourcesOnly = true)]
@@ -196,14 +195,14 @@ class MyCoolPackage : Package {
     [Fact]
     public async Task PackageMismatchProducesDiagnostic_ReverseArgumentOrderAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 
 [PackageRegistration([|AllowsBackgroundLoading = true|], UseManagedResourcesOnly = true)]
 class MyCoolPackage : Package {
 }
 ";
-        var withFix = @"
+        var withFix = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 
 [PackageRegistration(UseManagedResourcesOnly = true)]
@@ -217,7 +216,7 @@ class MyCoolPackage : Package {
     [Fact]
     public async Task PackageMismatchProducesDiagnostic_AcrossPartialClassAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 
 partial class MyCoolPackage : Package {
@@ -226,7 +225,7 @@ partial class MyCoolPackage : Package {
 [PackageRegistration([|AllowsBackgroundLoading = true|], UseManagedResourcesOnly = true)]
 partial class MyCoolPackage { }
 ";
-        var withFix = @"
+        var withFix = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 
 partial class MyCoolPackage : Package {
@@ -242,7 +241,7 @@ partial class MyCoolPackage { }
     [Fact]
     public async Task PackageMatchViaIntermediateClass_ProducesNoDiagnosticAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 
 class Middle : Package { }
@@ -257,7 +256,7 @@ class Test : Middle {
     [Fact]
     public async Task AsyncPackageMatchViaIntermediateClass_ProducesNoDiagnosticAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 
 class Middle : AsyncPackage { }

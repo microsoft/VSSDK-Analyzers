@@ -12,14 +12,14 @@ public class VSSDK001DeriveFromAsyncPackageCodeFixTests
     [Fact]
     public async Task BaseTypeChangesToAsyncPackageAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 
 class Test : [|Package|]
 {
 }
 ";
-        var withFix = @"
+        var withFix = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 
 class Test : AsyncPackage
@@ -32,7 +32,7 @@ class Test : AsyncPackage
     [Fact]
     public async Task PackageRegistrationUpdated_NewArgumentAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 
 [PackageRegistration(UseManagedResourcesOnly = true)]
@@ -40,7 +40,7 @@ class Test : [|Package|]
 {
 }
 ";
-        var withFix = @"
+        var withFix = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 
 [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
@@ -54,7 +54,7 @@ class Test : AsyncPackage
     [Fact]
     public async Task PackageRegistrationUpdated_ExistingArgumentAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 
 [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = false)]
@@ -62,7 +62,7 @@ class Test : [|Package|]
 {
 }
 ";
-        var withFix = @"
+        var withFix = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 
 [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
@@ -76,7 +76,7 @@ class Test : AsyncPackage
     [Fact]
     public async Task BaseTypeChangesToAsyncPackage_WithInterfacesAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using System;
 using Microsoft.VisualStudio.Shell;
 
@@ -87,7 +87,7 @@ class Test : [|Package|], IDisposable
     }
 }
 ";
-        var withFix = @"
+        var withFix = /* lang=c#-test */ @"
 using System;
 using Microsoft.VisualStudio.Shell;
 
@@ -104,12 +104,12 @@ class Test : AsyncPackage, IDisposable
     [Fact]
     public async Task BaseTypeChangesToAsyncPackage_NoUsingsAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 class Test : [|Microsoft.VisualStudio.Shell.Package|]
 {
 }
 ";
-        var withFix = @"
+        var withFix = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 
 class Test : AsyncPackage
@@ -122,7 +122,7 @@ class Test : AsyncPackage
     [Fact]
     public async Task BaseTypeChangesToAsyncPackage_NoUsings_AndInitializeMethod()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 class Test : [|Microsoft.VisualStudio.Shell.Package|]
 {
     protected override void Initialize()
@@ -131,7 +131,7 @@ class Test : [|Microsoft.VisualStudio.Shell.Package|]
     }
 }
 ";
-        var withFix = @"using System;
+        var withFix = /* lang=c#-test */ @"using System;
 using System.Threading;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
@@ -155,7 +155,7 @@ class Test : AsyncPackage
     [Fact]
     public async Task BaseTypeChangesToAsyncPackage_InPartiallyMatchingNamespaceAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 namespace Microsoft.VisualStudio
 {
     class Test : [|Microsoft.VisualStudio.Shell.Package|]
@@ -163,7 +163,7 @@ namespace Microsoft.VisualStudio
     }
 }
 ";
-        var withFix = @"
+        var withFix = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 
 namespace Microsoft.VisualStudio
@@ -179,7 +179,7 @@ namespace Microsoft.VisualStudio
     [Fact]
     public async Task BaseTypeChangesToAsyncPackage_InPartiallyMatchingNamespace_UsingsInsideNamespace()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 namespace Microsoft.VisualStudio
 {
     using System;
@@ -190,7 +190,7 @@ namespace Microsoft.VisualStudio
     }
 }
 ";
-        var withFix = @"
+        var withFix = /* lang=c#-test */ @"
 namespace Microsoft.VisualStudio
 {
     using System;
@@ -208,7 +208,7 @@ namespace Microsoft.VisualStudio
     [Fact]
     public async Task InitializeOverride_BecomesAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 namespace NS
 {
     using System;
@@ -226,7 +226,7 @@ namespace NS
     }
 }
 ";
-        var withFix = @"using Task = System.Threading.Tasks.Task;
+        var withFix = /* lang=c#-test */ @"using Task = System.Threading.Tasks.Task;
 
 namespace NS
 {
@@ -258,7 +258,7 @@ namespace NS
     [Fact]
     public async Task InitializeOverride_AlreadyDefinesTaskUsing()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using System;
 using Task = System.Threading.Tasks.Task;
 
@@ -270,7 +270,7 @@ class Test : [|Microsoft.VisualStudio.Shell.Package|]
     }
 }
 ";
-        var withFix = @"
+        var withFix = /* lang=c#-test */ @"
 using System;
 using System.Threading;
 using Microsoft.VisualStudio.Shell;
@@ -295,7 +295,7 @@ class Test : AsyncPackage
     [Fact]
     public async Task InitializeOverride_MissingBaseInitializeCall()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using System;
 
 class Test : [|Microsoft.VisualStudio.Shell.Package|]
@@ -306,7 +306,7 @@ class Test : [|Microsoft.VisualStudio.Shell.Package|]
     }
 }
 ";
-        var withFix = @"
+        var withFix = /* lang=c#-test */ @"
 using System;
 using System.Threading;
 using Microsoft.VisualStudio.Shell;
@@ -330,7 +330,7 @@ class Test : AsyncPackage
     [Fact]
     public async Task InitializeOverride_GetServiceCallsUpdatedAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using System;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -347,7 +347,7 @@ class Test : [|Package|]
     }
 }
 ";
-        var withFix = @"
+        var withFix = /* lang=c#-test */ @"
 using System;
 using System.Threading;
 using Microsoft.VisualStudio.Shell;
