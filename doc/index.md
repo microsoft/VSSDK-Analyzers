@@ -15,6 +15,6 @@ ID | Title | Category
 
 This analyzer package also depends on the [Microsoft.VisualStudio.Threading.Analyzers][2] package, which adds [many more analyzers][3].
 
-[1]: https://nuget.org/packages/microsoft.visualstudio.sdk.analyzers
-[2]: https://nuget.org/packages/microsoft.visualstudio.threading.analyzers
+[1]: https://www.nuget.org/packages/microsoft.visualstudio.sdk.analyzers
+[2]: https://www.nuget.org/packages/microsoft.visualstudio.threading.analyzers
 [3]: https://github.com/Microsoft/vs-threading/blob/main/doc/analyzers/index.md
