@@ -7,6 +7,7 @@
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     <!-- Buggy analyzer -->
     <NoWarn>$(NoWarn);RS2002</NoWarn>
+    <IsAnalyzerProject>true</IsAnalyzerProject>
   </PropertyGroup>
 
   <ItemGroup>

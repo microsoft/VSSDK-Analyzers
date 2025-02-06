@@ -13,7 +13,7 @@ public class VSSDK004ProvideAutoLoadAttributeAnalyzerTests
     [Fact]
     public async Task NoPackageBaseClassProvidesNoDiagnosticsAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 
 [ProvideAutoLoad(""{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"")]
@@ -26,7 +26,7 @@ class Test {
     [Fact]
     public async Task NoProvideAutoLoadProducesNoDiagnosticsAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 
 class Test : AsyncPackage {
@@ -38,7 +38,7 @@ class Test : AsyncPackage {
     [Fact]
     public async Task BasicProvideAutoLoadProducesDiagnosticsAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 
 [ProvideAutoLoad(""{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"")]
@@ -52,7 +52,7 @@ class Test : AsyncPackage {
     [Fact]
     public async Task ProvideAutoLoadWithFlagsButNoBackgroundLoadProducesDiagnosticsAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 
 [ProvideAutoLoad(""{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"", PackageAutoLoadFlags.None)]
@@ -66,7 +66,7 @@ class Test : AsyncPackage {
     [Fact]
     public async Task MultipleProvideAutoLoadProducesMultipleDiagnosticsAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 
 [ProvideAutoLoad(""{A184B08F-C81C-45F6-A57F-5ABD9991F28F}"", PackageAutoLoadFlags.None)]
@@ -85,7 +85,7 @@ class Test : AsyncPackage {
     [Fact]
     public async Task ProvideAutoLoadWithNamedFlagsButNoBackgroundLoadProducesDiagnosticsAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 
 [ProvideAutoLoad(""{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"", flags: PackageAutoLoadFlags.None)]
@@ -99,7 +99,7 @@ class Test : AsyncPackage {
     [Fact]
     public async Task ProvideAutoLoadWithSkipFlagProducesNoDiagnosticsAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 
 [ProvideAutoLoad(""{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"", PackageAutoLoadFlags.SkipWhenUIContextRulesActive)]
@@ -112,7 +112,7 @@ class Test : Package {
     [Fact]
     public async Task ProvideAutoLoadWithBackgroundLoadFlagProducesNoDiagnosticsAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 
 [ProvideAutoLoad(""{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"", PackageAutoLoadFlags.BackgroundLoad)]
@@ -125,7 +125,7 @@ class Test : AsyncPackage {
     [Fact]
     public async Task ProvideAutoLoadOnPackageWithBackgroundLoadFlagProducesDiagnosticsAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 
 [ProvideAutoLoad(""{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"", PackageAutoLoadFlags.BackgroundLoad)]

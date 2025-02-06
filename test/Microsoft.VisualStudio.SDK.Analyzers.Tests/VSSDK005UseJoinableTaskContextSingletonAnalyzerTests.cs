@@ -12,7 +12,7 @@ public class VSSDK005UseJoinableTaskContextSingletonAnalyzerTests
     [Fact]
     public async Task InstantiatingInMethod_ProducesDiagnosticAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Threading;
 
 class Test {
@@ -28,7 +28,7 @@ class Test {
     [Fact]
     public async Task InstantiatingInField_ProducesDiagnosticAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Threading;
 
 class Test {
@@ -42,7 +42,7 @@ class Test {
     [Fact]
     public async Task InstantiatingSimilarlyNamedType_ProducesNoDiagnosticAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 class Test {
     JoinableTaskContext jtc = new JoinableTaskContext();
 }

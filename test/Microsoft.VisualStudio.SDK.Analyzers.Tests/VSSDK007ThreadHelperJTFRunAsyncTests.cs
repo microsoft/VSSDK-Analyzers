@@ -13,7 +13,7 @@ public class VSSDK007ThreadHelperJTFRunAsyncTests
     [Fact]
     public async Task RunAsync_Dropped_Warning()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 namespace ConsoleApplication1
 {
@@ -36,7 +36,7 @@ namespace ConsoleApplication1
     [Fact]
     public async Task RunAsync_Forget_Warning()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Threading;
 namespace ConsoleApplication1
@@ -60,7 +60,7 @@ namespace ConsoleApplication1
     [Fact]
     public async Task RunAsync_FileAndForget_Warning()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Threading;
 namespace ConsoleApplication1
@@ -84,7 +84,7 @@ namespace ConsoleApplication1
     [Fact]
     public async Task RunAsync_Awaited_NoWarning()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using System;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.Shell;
@@ -109,7 +109,7 @@ namespace ConsoleApplication1
     [Fact]
     public async Task RunAsync_Joined_NoWarning()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using System;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.Shell;
@@ -134,7 +134,7 @@ namespace ConsoleApplication1
     [Fact]
     public async Task RunAsync_AssignedButNotJoined_Warning()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using System;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.Shell;
@@ -215,7 +215,7 @@ namespace ConsoleApplication1
     [Fact]
     public async Task RunAsync_AssignedAndJoined_NoWarning()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using System;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.Shell;
@@ -259,7 +259,7 @@ namespace ConsoleApplication1
     [Fact]
     public async Task RunAsync_JoinedElsewhere_NoWarning()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using System;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.Shell;
@@ -369,7 +369,7 @@ namespace ConsoleApplication1
     [Fact]
     public async Task RunAsync_Dropped_NotThreadHelper_NoWarning()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Threading;
 namespace ConsoleApplication1
@@ -408,7 +408,7 @@ namespace ConsoleApplication1
     [Fact]
     public async Task RunAsync_DifferentType_NoWarning()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using System.Threading.Tasks;
 namespace ConsoleApplication1
 {

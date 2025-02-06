@@ -13,7 +13,7 @@ public class VSSDK006CheckServicesExistAnalyzerTests
     [Fact]
     public async Task LocalAssigned_GetService_ThenUsedAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
@@ -26,7 +26,7 @@ class Test : Package {
 }
 ";
 
-        var fix = @"
+        var fix = /* lang=c#-test */ @"
 using Microsoft;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -48,7 +48,7 @@ class Test : Package {
     [Fact]
     public async Task LocalAssigned_OleInterop_QueryService_Guid_ThenUsedAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
@@ -60,7 +60,7 @@ class Test : Package {
 }
 ";
 
-        var fix = @"
+        var fix = /* lang=c#-test */ @"
 using Microsoft;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -81,7 +81,7 @@ class Test : Package {
     [Fact]
     public async Task LocalAssigned_OleInterop_QueryService_Generic_ThenUsedAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
@@ -93,7 +93,7 @@ class Test : Package {
 }
 ";
 
-        var fix = @"
+        var fix = /* lang=c#-test */ @"
 using Microsoft;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -114,7 +114,7 @@ class Test : Package {
     [Fact]
     public async Task LocalAssigned_GetService_ThenUsed_WithNullConditionalAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
@@ -133,7 +133,7 @@ class Test : Package {
     [Fact]
     public async Task LocalAssigned_IServiceProvider_GetService_ThenUsedAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using System;
 using Microsoft.VisualStudio.Shell.Interop;
 
@@ -145,7 +145,7 @@ class Test {
 }
 ";
 
-        var fix = @"
+        var fix = /* lang=c#-test */ @"
 using System;
 using Microsoft;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -166,7 +166,7 @@ class Test {
     [Fact]
     public async Task LocalDeclarationAssignedWithDirectCast_GetService_ThenUsedAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
@@ -179,7 +179,7 @@ class Test : Package {
 }
 ";
 
-        var fix = @"
+        var fix = /* lang=c#-test */ @"
 using Microsoft;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -201,7 +201,7 @@ class Test : Package {
     [Fact]
     public async Task LocalDeclarationAssignedWithAsCast_GetServiceAsync_ThenUsedAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using System;
 using System.Threading;
 using Microsoft.VisualStudio.Shell;
@@ -217,7 +217,7 @@ class Test : AsyncPackage {
 }
 ";
 
-        var fix = @"
+        var fix = /* lang=c#-test */ @"
 using System;
 using System.Threading;
 using Microsoft;
@@ -242,7 +242,7 @@ class Test : AsyncPackage {
     [Fact]
     public async Task LocalDeclarationAssignedWithAsCast_GetService_InAsyncPackage_ThenUsedAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using System;
 using System.Threading;
 using Microsoft.VisualStudio.Shell;
@@ -258,7 +258,7 @@ class Test : AsyncPackage {
 }
 ";
 
-        var fix = @"
+        var fix = /* lang=c#-test */ @"
 using System;
 using System.Threading;
 using Microsoft;
@@ -283,7 +283,7 @@ class Test : AsyncPackage {
     [Fact]
     public async Task LocalDeclarationAssignedWithAsCast_GetService_InAsyncPackage_ThenUsed_TwiceAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using System;
 using System.Threading;
 using Microsoft;
@@ -305,7 +305,7 @@ class Test : AsyncPackage {
 }
 ";
 
-        var fix = @"
+        var fix = /* lang=c#-test */ @"
 using System;
 using System.Threading;
 using Microsoft;
@@ -335,7 +335,7 @@ class Test : AsyncPackage {
     [Fact]
     public async Task LocalAssignedWithAsCast_GetServiceAsync_ThenUsedAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using System;
 using System.Threading;
 using Microsoft.VisualStudio.Shell;
@@ -352,7 +352,7 @@ class Test : AsyncPackage {
 }
 ";
 
-        var fix = @"
+        var fix = /* lang=c#-test */ @"
 using System;
 using System.Threading;
 using Microsoft;
@@ -378,7 +378,7 @@ class Test : AsyncPackage {
     [Fact]
     public async Task LocalAssignedWithDirectCast_GetService_ThenUsedAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
@@ -392,7 +392,7 @@ class Test : Package {
 }
 ";
 
-        var fix = @"
+        var fix = /* lang=c#-test */ @"
 using Microsoft;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -415,7 +415,7 @@ class Test : Package {
     [Fact]
     public async Task FieldAssigned_GetService_ThenUsedAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
@@ -429,7 +429,7 @@ class Test : Package {
 }
 ";
 
-        var fix = @"
+        var fix = /* lang=c#-test */ @"
 using Microsoft;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -452,7 +452,7 @@ class Test : Package {
     [Fact]
     public async Task FieldAssigned_GetService_ThenUsedElsewhereAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
@@ -469,7 +469,7 @@ class Test : Package {
 }
 ";
 
-        var fix = @"
+        var fix = /* lang=c#-test */ @"
 using Microsoft;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -495,7 +495,7 @@ class Test : Package {
     [Fact]
     public async Task FieldAssigned_GetServiceAsync_ThenUsedElsewhereAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using System;
 using System.Threading;
 using Microsoft.VisualStudio.Shell;
@@ -515,7 +515,7 @@ class Test : AsyncPackage {
 }
 ";
 
-        var fix = @"
+        var fix = /* lang=c#-test */ @"
 using System;
 using System.Threading;
 using Microsoft;
@@ -544,7 +544,7 @@ class Test : AsyncPackage {
     [Fact]
     public async Task FieldAssigned_GetServiceAsync_WithConfigureAwait_ThenUsedElsewhereAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using System;
 using System.Threading;
 using Microsoft.VisualStudio.Shell;
@@ -564,7 +564,7 @@ class Test : AsyncPackage {
 }
 ";
 
-        var fix = @"
+        var fix = /* lang=c#-test */ @"
 using System;
 using System.Threading;
 using Microsoft;
@@ -593,7 +593,7 @@ class Test : AsyncPackage {
     [Fact]
     public async Task FieldAssigned_GetService_ThenUsedElsewhereWithIfCheckAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
@@ -618,7 +618,7 @@ class Test : Package {
     [Fact]
     public async Task FieldAssigned_GetService_ThenUsedElsewhereWithIfEqualCheckAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
@@ -644,7 +644,7 @@ class Test : Package {
     [Fact]
     public async Task FieldAssigned_GetService_ThenUsedElsewhereWithIfIsNullCheckAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
@@ -670,7 +670,7 @@ class Test : Package {
     [Fact]
     public async Task FieldAssigned_GetService_ThenUsedElsewhereWithIfIsObjectCheckAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
@@ -695,7 +695,7 @@ class Test : Package {
     [Fact]
     public async Task FieldAssigned_GetService_ThenUsedElsewhereWithIfIsExpectedTypeCheckAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
@@ -720,7 +720,7 @@ class Test : Package {
     [Fact]
     public async Task PropertyAssigned_GetService_ThenUsedWithinClassAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
@@ -737,7 +737,7 @@ class Test : Package {
 }
 ";
 
-        var fix = @"
+        var fix = /* lang=c#-test */ @"
 using Microsoft;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -763,7 +763,7 @@ class Test : Package {
     [Fact]
     public async Task GetService_DirectlyUsedAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
@@ -782,7 +782,7 @@ class Test : Package {
     [Fact]
     public async Task GetService_DirectlyUsed_WithConditionalMemberAccessAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
@@ -800,7 +800,7 @@ class Test : Package {
     [Fact]
     public async Task GetServiceAsync_DirectlyUsedAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using System;
 using System.Threading;
 using Microsoft.VisualStudio.Shell;
@@ -822,7 +822,7 @@ class Test : AsyncPackage {
     [Fact]
     public async Task GetServiceAsync_WithConfigureAwait_DirectlyUsedAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using System;
 using System.Threading;
 using Microsoft.VisualStudio.Shell;
@@ -844,7 +844,7 @@ class Test : AsyncPackage {
     [Fact]
     public async Task GetServiceAsync_WithConfigureAwait()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using System;
 using System.Threading;
 using Microsoft.VisualStudio.Shell;
@@ -865,7 +865,7 @@ class Test : AsyncPackage {
     [Fact]
     public async Task LocalAssigned_CheckedByThrow_GetService_ThenUsedAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -885,7 +885,7 @@ class Test : Package {
     [Fact]
     public async Task LocalAssigned_CheckedByIf_GetService_ThenUsedAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -906,7 +906,7 @@ class Test : Package {
     [Fact]
     public async Task LocalAssigned_CheckedByIfIsNotNull_GetService_ThenUsedAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -927,7 +927,7 @@ class Test : Package {
     [Fact]
     public async Task FieldAssigned_Checked_GetService_ThenUsedAsync()
     {
-        var test = @"
+        var test = /* lang=c#-test */ @"
 using Microsoft;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -948,7 +948,7 @@ class Test : Package {
     [Fact]
     public async Task PartialClass()
     {
-        var test1 = @"
+        var test1 = /* lang=c#-test */ @"
 using Microsoft;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -963,7 +963,7 @@ partial class Test : Package {
     }
 }
 ";
-        var test2 = @"
+        var test2 = /* lang=c#-test */ @"
 using System;
 
 partial class Test {
@@ -979,7 +979,7 @@ partial class Test {
     [Fact]
     public async Task PartialWithMemberThatChecksOtherField()
     {
-        var test1 = @"
+        var test1 = /* lang=c#-test */ @"
 internal partial class Host {
     private static object s_lockObject = new object();
 
@@ -991,7 +991,7 @@ internal partial class Host {
     }
 }
 ";
-        var test2 = @"
+        var test2 = /* lang=c#-test */ @"
 using System;
 internal partial class Host {
     private static T GetServiceObject<T>(IServiceProvider serviceProvider)
