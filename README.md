@@ -5,7 +5,7 @@
 
 ## Microsoft.VisualStudio.SDK.Analyzers
 
-[![NuGet](https://img.shields.io/nuget/v/Microsoft.VisualStudio.SDK.Analyzers.svg)](https://nuget.org/packages/Microsoft.VisualStudio.SDK.Analyzers)
+[![NuGet](https://img.shields.io/nuget/v/Microsoft.VisualStudio.SDK.Analyzers.svg)](https://www.nuget.org/packages/Microsoft.VisualStudio.SDK.Analyzers)
 
 This project is meant to provide a set of Roslyn Analyzers that makes it easy to catch, discover and implement a wide array of best practices when building Visual Studio extensions.
 
