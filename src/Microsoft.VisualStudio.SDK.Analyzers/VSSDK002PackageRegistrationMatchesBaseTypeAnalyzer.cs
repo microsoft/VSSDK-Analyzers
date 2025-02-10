@@ -9,13 +9,12 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
-using Microsoft.VisualStudio.Shell;
 
 namespace Microsoft.VisualStudio.SDK.Analyzers
 {
     /// <summary>
-    /// Identifies cases where an <see cref="AsyncPackage"/> isn't tagged as such in the <see cref="PackageRegistrationAttribute"/>,
-    /// or a <see cref="Package"/> is tagged as async inappropriately.
+    /// Identifies cases where an "AsyncPackage" isn't tagged as such in the "PackageRegistrationAttribute",
+    /// or a "Package" is tagged as async inappropriately.
     /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class VSSDK002PackageRegistrationMatchesBaseTypeAnalyzer : DiagnosticAnalyzer

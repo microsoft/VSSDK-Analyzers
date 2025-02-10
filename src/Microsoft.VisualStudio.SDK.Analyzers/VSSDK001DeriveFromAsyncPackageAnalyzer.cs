@@ -7,12 +7,11 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
-using Microsoft.VisualStudio.Shell;
 
 namespace Microsoft.VisualStudio.SDK.Analyzers
 {
     /// <summary>
-    /// Discovers VS packages that derive directly from <see cref="Package"/> instead of <see cref="AsyncPackage"/>.
+    /// Discovers VS packages that derive directly from "$1" instead of "AsyncPackage".
     /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class VSSDK001DeriveFromAsyncPackageAnalyzer : DiagnosticAnalyzer
