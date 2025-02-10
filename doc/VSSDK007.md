@@ -129,4 +129,4 @@ class MyCoolPackage : AsyncPackage
 
 [ThreadHelper]: https://docs.microsoft.com/en-us/dotnet/api/microsoft.visualstudio.shell.threadhelper?view=visualstudiosdk-2019
 [ToolkitThreadHelper]: https://github.com/VsixCommunity/Community.VisualStudio.Toolkit/blob/22c9362197c29b7282075c3a7550d0445fbb313a/src/Community.VisualStudio.Toolkit.Shared/Helpers/ToolkitThreadHelper.cs#L68
-[FireAndForget]: https://github.com/microsoft/vs-threading/blob/main/doc/cookbook_vs.md#void-returning-fire-and-forget-methods
+[FireAndForget]: https://aka.ms/vsthreadingcookbook#void-returning-fire-and-forget-methods
