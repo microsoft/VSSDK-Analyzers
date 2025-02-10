@@ -25,7 +25,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         {
             nameof(Microsoft),
             nameof(VisualStudio),
-            nameof(Shell),
+            "Shell",
         };
 
         /// <summary>
@@ -35,8 +35,8 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         {
             nameof(Microsoft),
             nameof(VisualStudio),
-            nameof(Shell),
-            nameof(Shell.Interop),
+            "Shell",
+            "Interop",
         };
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         {
             nameof(Microsoft),
             nameof(VisualStudio),
-            nameof(Threading),
+            "Threading",
         };
 
         /// <summary>

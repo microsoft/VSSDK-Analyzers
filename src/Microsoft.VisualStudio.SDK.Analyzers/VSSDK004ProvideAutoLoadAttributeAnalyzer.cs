@@ -12,7 +12,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace Microsoft.VisualStudio.SDK.Analyzers
 {
     /// <summary>
-    /// Discovers <see cref="Microsoft.VisualStudio.Shell.ProvideAutoLoadAttribute"/> usages without BackgroundLoad flag.
+    /// Discovers "Microsoft.VisualStudio.Shell.ProvideAutoLoadAttribute" usages without BackgroundLoad flag.
     /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class VSSDK004ProvideAutoLoadAttributeAnalyzer : DiagnosticAnalyzer
