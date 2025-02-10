@@ -7,12 +7,12 @@
     <MicroBuildVersion>2.0.187</MicroBuildVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="Microsoft.Build.Utilities.Core" Version="17.13.9" />
+    <PackageVersion Include="Microsoft.Build.Utilities.Core" Version="17.12.6" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing.XUnit" Version="1.1.2" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.11.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="3.11.0" />
-    <PackageVersion Include="Microsoft.VisualStudio.Designer.Interfaces" Version="17.13.39276" />
+    <PackageVersion Include="Microsoft.VisualStudio.Designer.Interfaces" Version="17.12.40391" />
     <PackageVersion Include="Microsoft.VisualStudio.Shell.15.0" Version="17.8.37221" />
     <PackageVersion Include="Microsoft.VisualStudio.Shell.Framework" Version="17.8.37221" />
     <PackageVersion Include="Microsoft.VisualStudio.Threading" Version="17.8.14" />
