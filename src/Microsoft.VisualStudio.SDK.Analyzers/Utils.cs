@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -286,6 +287,41 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             System.Diagnostics.Debugger.Launch();
 #endif
             return true;
+        }
+
+        public static bool Contains(this ImmutableArray<QualifiedMember> methods, ISymbol symbol)
+        {
+            foreach (QualifiedMember method in methods)
+            {
+                if (method.IsMatch(symbol))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public static bool Contains(this ImmutableArray<TypeMatchSpec> types, /*[NotNullWhen(true)]*/ ITypeSymbol? typeSymbol, ISymbol? memberSymbol)
+        {
+            TypeMatchSpec matching = default(TypeMatchSpec);
+            foreach (TypeMatchSpec type in types)
+            {
+                if (type.IsMatch(typeSymbol, memberSymbol))
+                {
+                    if (matching.IsEmpty || matching.IsWildcard)
+                    {
+                        matching = type;
+                        if (!matching.IsWildcard)
+                        {
+                            // It's an exact match, so return it immediately.
+                            return !matching.InvertedLogic;
+                        }
+                    }
+                }
+            }
+
+            return !matching.IsEmpty && !matching.InvertedLogic;
         }
     }
 }
