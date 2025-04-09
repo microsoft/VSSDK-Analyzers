@@ -5,6 +5,7 @@ using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -52,7 +53,43 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         /// <inheritdoc />
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ReusableSupportedDiagnostics;
 
-        internal ImmutableArray<TypeMatchSpec> MembersRequiringMainThread { get; set; } // TODO: move to MethodAnalyzer, remove setter
+        private static readonly TimeSpan RegexMatchTimeout = TimeSpan.FromSeconds(5);  // Prevent expensive CPU hang in Regex.Match if backtracking occurs due to pathological input (see vs-threading #485).
+        private static readonly Regex MemberReferenceRegex = new Regex(@"^\[(?<typeName>[^\[\]\:]+)+\]::(?<memberName>\S+)\s*$", RegexOptions.Singleline | RegexOptions.CultureInvariant, RegexMatchTimeout);
+        private static readonly char[] QualifiedIdentifierSeparators = new[] { '.' };
+        internal ImmutableArray<TypeMatchSpec> MembersRequiringMainThread { get; set; }
+
+        public static IEnumerable<TypeMatchSpec> ReadTypesAndMembers(AnalyzerOptions analyzerOptions, Regex fileNamePattern, CancellationToken cancellationToken)
+        {
+            var sampleTypes = """
+                [Microsoft.VisualStudio.Shell.Interop]::SampleMethod
+                [Microsoft.VisualStudio.Shell.ThreadHelper]::ThrowIfNotOnUIThread
+                """;
+            foreach (string line in sampleTypes.Split('\n'))
+            {
+                Match? match = null;
+                try
+                {
+                    match = fileNamePattern.Match(line);
+                }
+                catch (RegexMatchTimeoutException)
+                {
+                    throw new InvalidOperationException($"Regex.Match timeout when parsing line: {line}");
+                }
+
+                if (!match.Success)
+                {
+                    throw new InvalidOperationException($"Parsing error on line: {line}");
+                }
+
+                bool inverted = match.Groups["negated"].Success;
+                string[] typeNameElements = match.Groups["typeName"].Value.Split(QualifiedIdentifierSeparators);
+                string typeName = typeNameElements[typeNameElements.Length - 1];
+                var containingNamespace = typeNameElements.Take(typeNameElements.Length - 1).ToImmutableArray();
+                var type = new QualifiedType(containingNamespace, typeName);
+                QualifiedMember member = match.Groups["memberName"].Success ? new QualifiedMember(type, match.Groups["memberName"].Value) : default(QualifiedMember);
+                yield return new TypeMatchSpec(type, member, inverted);
+            }
+        }
 
         /// <inheritdoc />
         public override void Initialize(AnalysisContext context)
@@ -68,11 +105,8 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             // Register for compilation first so that we only activate the analyzer for applicable compilations
             context.RegisterCompilationStartAction(compilationContext =>
             {
-                INamedTypeSymbol? exportAttributeType = compilationContext.Compilation.GetTypeByMetadataName(Types.ExportAttribute.FullName)?.OriginalDefinition;
-                if (exportAttributeType is null)
-                {
-                    return;
-                }
+                this.MembersRequiringMainThread = ReadTypesAndMembers(compilationContext.Options, MemberReferenceRegex, compilationContext.CancellationToken)
+                .ToImmutableArray();
 
                 // Check field initializers
                 compilationContext.RegisterSyntaxNodeAction(
@@ -142,12 +176,34 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
 
         private void AnalyzeClassDeclaration(SyntaxNodeAnalysisContext context)
         {
+            INamedTypeSymbol? exportAttributeType = context.Compilation.GetTypeByMetadataName(Types.ExportAttribute.FullName)?.OriginalDefinition;
+            if (exportAttributeType is null)
+            {
+                return;
+            }
+
             var declaration = (ClassDeclarationSyntax)context.Node;
+
+            // Check if the class has the Export attribute
+            bool hasExportAttribute = declaration.AttributeLists
+                .SelectMany(attrList => attrList.Attributes)
+                .Any(attr => context.SemanticModel.GetSymbolInfo(attr).Symbol?.ContainingType.Equals(exportAttributeType) == true);
+
+            if (!hasExportAttribute)
+            {
+                return;
+            }
+
             IEnumerable<SyntaxNode> toCheck = declaration.Members.OfType<FieldDeclarationSyntax>().Cast<SyntaxNode>()
                 .Union(declaration.Members.OfType<PropertyDeclarationSyntax>().Cast<SyntaxNode>());
             this.AnalyzeStatements(context, toCheck);
-        }
 
+            // TODO: Check eligible constructors - call AnalyzeConstructorDeclaration or AnalyzeMethodDeclaration from here
+            foreach (var constructor in declaration.Members.OfType<ConstructorDeclarationSyntax>())
+            {
+                // AnalyzeConstructorDeclaration
+            }
+        }
 
         private void AnalyzeStatements(SyntaxNodeAnalysisContext context, IEnumerable<SyntaxNode> nodes)
         {
