@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -56,12 +57,16 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         private static readonly TimeSpan RegexMatchTimeout = TimeSpan.FromSeconds(5);  // Prevent expensive CPU hang in Regex.Match if backtracking occurs due to pathological input (see vs-threading #485).
         private static readonly Regex MemberReferenceRegex = new Regex(@"^\[(?<typeName>[^\[\]\:]+)+\]::(?<memberName>\S+)\s*$", RegexOptions.Singleline | RegexOptions.CultureInvariant, RegexMatchTimeout);
         private static readonly char[] QualifiedIdentifierSeparators = new[] { '.' };
+        public static readonly Regex FileNamePatternForMembersRequiringMainThread = new Regex(@"^vs-threading\.MembersRequiringMainThread(\..*)?.txt$", FileNamePatternRegexOptions);
+        private const RegexOptions FileNamePatternRegexOptions = RegexOptions.IgnoreCase | RegexOptions.Singleline;
+
         internal ImmutableArray<TypeMatchSpec> MembersRequiringMainThread { get; set; }
 
         public static IEnumerable<TypeMatchSpec> ReadTypesAndMembers(AnalyzerOptions analyzerOptions, Regex fileNamePattern, CancellationToken cancellationToken)
         {
+            // TODO: load from files matching fileNamePattern instead
             var sampleTypes = """
-                [Microsoft.VisualStudio.Shell.Interop]::SampleMethod
+                [Microsoft.VisualStudio.Shell.UIContext]::*
                 [Microsoft.VisualStudio.Shell.ThreadHelper]::ThrowIfNotOnUIThread
                 """;
             foreach (string line in sampleTypes.Split('\n'))
@@ -69,7 +74,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 Match? match = null;
                 try
                 {
-                    match = fileNamePattern.Match(line);
+                    match = MemberReferenceRegex.Match(line);
                 }
                 catch (RegexMatchTimeoutException)
                 {
@@ -103,184 +108,181 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
 
             // Register for compilation first so that we only activate the analyzer for applicable compilations
-            context.RegisterCompilationStartAction(compilationContext =>
+            context.RegisterCompilationStartAction(startCompilation =>
             {
-                this.MembersRequiringMainThread = ReadTypesAndMembers(compilationContext.Options, MemberReferenceRegex, compilationContext.CancellationToken)
-                .ToImmutableArray();
+                this.MembersRequiringMainThread = ReadTypesAndMembers(startCompilation.Options, FileNamePatternForMembersRequiringMainThread, startCompilation.CancellationToken).ToImmutableArray();
+                INamedTypeSymbol? importingConstructorAttribute = startCompilation.Compilation.GetTypeByMetadataName(Types.ImportingConstructorAttribute.FullName)?.OriginalDefinition;
+                INamedTypeSymbol? partImportsSatisfiedNotificationInterface = startCompilation.Compilation.GetTypeByMetadataName(Types.IPartImportsSatisfiedNotification.FullName)?.OriginalDefinition;
+                INamedTypeSymbol? exportAttributeType = startCompilation.Compilation.GetTypeByMetadataName(Types.ExportAttribute.FullName)?.OriginalDefinition;
 
-                // Check field initializers
-                compilationContext.RegisterSyntaxNodeAction(
-                    Utils.DebuggableWrapper(ctxt => this.AnalyzeClassDeclaration(ctxt)),
-                    SyntaxKind.ClassDeclaration);
+                if (importingConstructorAttribute is object)
+                {
+                    // Check decorated constructor
+                    startCompilation.RegisterSymbolAction(Utils.DebuggableWrapper(c => this.AnalyzeMethod(c, importingConstructorAttribute)), SymbolKind.Method);
+                }
 
-                // Check member access
-                compilationContext.RegisterSyntaxNodeAction(
-                    Utils.DebuggableWrapper(ctxt => this.AnalyzeMemberAccess(ctxt)),
-                    SyntaxKind.SimpleMemberAccessExpression);
+                if (partImportsSatisfiedNotificationInterface is object)
+                {
+                    // Check interface implementation
+                    startCompilation.RegisterSymbolAction(Utils.DebuggableWrapper(c => this.AnalyzeImportSatisfied(c, partImportsSatisfiedNotificationInterface)), SymbolKind.NamedType);
+                }
 
-                // Check constructors
-                compilationContext.RegisterSyntaxNodeAction(
-                    Utils.DebuggableWrapper(ctxt => this.AnalyzeConstructorDeclaration(ctxt)),
-                    SyntaxKind.ConstructorDeclaration);
-
-                // Check IPartImportSatisfiedNotification.OnImportsSatisfied
-                compilationContext.RegisterSyntaxNodeAction(
-                    Utils.DebuggableWrapper(ctxt => this.AnalyzeMethodDeclaration(ctxt)),
-                    SyntaxKind.MethodDeclaration);
+                if (exportAttributeType is object)
+                {
+                    // Check constructor and field initializers
+                    startCompilation.RegisterSymbolAction(Utils.DebuggableWrapper(c => this.AnalyzeType(c, exportAttributeType)), SymbolKind.NamedType);
+                }
             });
         }
 
-        internal void AnalyzeMemberAccess(SyntaxNodeAnalysisContext context)
+        internal void AnalyzeMethod(SymbolAnalysisContext context, INamedTypeSymbol importingConstructorAttribute)
         {
-            var memberAccessSyntax = (MemberAccessExpressionSyntax)context.Node;
-            var property = context.SemanticModel.GetSymbolInfo(context.Node).Symbol as IPropertySymbol;
-            if (property is object)
-            {
-                this.AnalyzeMemberWithinContext(property.ContainingType, property, context, memberAccessSyntax.Name.GetLocation());
-            }
-            else
-            {
-                var @event = context.SemanticModel.GetSymbolInfo(context.Node).Symbol as IEventSymbol;
-                if (@event is object)
-                {
-                    this.AnalyzeMemberWithinContext(@event.ContainingType, @event, context, memberAccessSyntax.Name.GetLocation());
-                }
-            }
-        }
-
-        private void AnalyzeConstructorDeclaration(SyntaxNodeAnalysisContext context)
-        {
-            INamedTypeSymbol? importingConstructorAttribute = context.Compilation.GetTypeByMetadataName(Types.ImportingConstructorAttribute.FullName)?.OriginalDefinition;
-            var declaration = (ConstructorDeclarationSyntax)context.Node;
-            if (declaration.Body is not null
-                && (declaration.ParameterList.Parameters.Count > 0
-                || declaration.AttributeLists.Any(attrList => attrList.Attributes.Any(attr => context.SemanticModel.GetSymbolInfo(attr).Symbol?.ContainingType.Equals(importingConstructorAttribute) == true))))
-            {
-                this.AnalyzeStatements(context, declaration.Body.Statements);
-            }
-        }
-
-        private void AnalyzeMethodDeclaration(SyntaxNodeAnalysisContext context)
-        {
-            INamedTypeSymbol? partImportsSatisfiedNotificationInterface = context.Compilation.GetTypeByMetadataName(Types.IPartImportsSatisfiedNotification.FullName)?.OriginalDefinition;
-            var declaration = (MethodDeclarationSyntax)context.Node;
-            var methodSymbol = context.SemanticModel.GetDeclaredSymbol(declaration) as IMethodSymbol;
-
-            if (partImportsSatisfiedNotificationInterface is not null
-                && declaration.Body is not null
-                && methodSymbol != null && methodSymbol.ContainingType.AllInterfaces.Contains(partImportsSatisfiedNotificationInterface))
-            {
-                this.AnalyzeStatements(context, declaration.Body.Statements);
-            }
-        }
-
-        private void AnalyzeClassDeclaration(SyntaxNodeAnalysisContext context)
-        {
-            INamedTypeSymbol? exportAttributeType = context.Compilation.GetTypeByMetadataName(Types.ExportAttribute.FullName)?.OriginalDefinition;
-            if (exportAttributeType is null)
+            // Ensure the symbol is a method
+            if (context.Symbol is not IMethodSymbol methodSymbol)
             {
                 return;
             }
 
-            var declaration = (ClassDeclarationSyntax)context.Node;
-
-            // Check if the class has the Export attribute
-            bool hasExportAttribute = declaration.AttributeLists
-                .SelectMany(attrList => attrList.Attributes)
-                .Any(attr => context.SemanticModel.GetSymbolInfo(attr).Symbol?.ContainingType.Equals(exportAttributeType) == true);
-
-            if (!hasExportAttribute)
+            // Check if the method is a constructor
+            if (methodSymbol.MethodKind != MethodKind.Constructor)
             {
                 return;
             }
 
-            IEnumerable<SyntaxNode> toCheck = declaration.Members.OfType<FieldDeclarationSyntax>().Cast<SyntaxNode>()
-                .Union(declaration.Members.OfType<PropertyDeclarationSyntax>().Cast<SyntaxNode>());
-            this.AnalyzeStatements(context, toCheck);
-
-            // TODO: Check eligible constructors - call AnalyzeConstructorDeclaration or AnalyzeMethodDeclaration from here
-            foreach (var constructor in declaration.Members.OfType<ConstructorDeclarationSyntax>())
+            // Check if the constructor is decorated with the importingConstructorAttribute
+            foreach (var attribute in methodSymbol.GetAttributes())
             {
-                // AnalyzeConstructorDeclaration
+                if (SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, importingConstructorAttribute))
+                {
+                    // Analyze all statements within the method
+                    var syntaxReference = methodSymbol.DeclaringSyntaxReferences.FirstOrDefault();
+                    if (syntaxReference != null)
+                    {
+                        var methodDeclaration = syntaxReference.GetSyntax(context.CancellationToken) as ConstructorDeclarationSyntax;
+                        if (methodDeclaration != null)
+                        {
+                            foreach (var statement in methodDeclaration.Body?.Statements ?? Enumerable.Empty<StatementSyntax>())
+                            {
+                                // Analyze each statement within this constructor
+                                var symbolInfo = context.Compilation.GetSemanticModel(syntaxReference.SyntaxTree)
+                                    .GetSymbolInfo(statement, context.CancellationToken).Symbol;
+                                // TODO: In ImportingConstructor_MainThreadAsserted_Flagged symbolInfo is null
+                                this.AnalyzeMemberWithinContext(methodSymbol.ContainingType, symbolInfo, context, statement.GetLocation());
+                            }
+                        }
+                    }
+
+                    return;
+                }
             }
         }
 
-        private void AnalyzeStatements(SyntaxNodeAnalysisContext context, IEnumerable<SyntaxNode> nodes)
+        internal void AnalyzeImportSatisfied(SymbolAnalysisContext context, INamedTypeSymbol partImportsSatisfiedNotificationInterface)
         {
-            var semanticModel = context.SemanticModel;
-            foreach (var node in nodes)
+            // Ensure the symbol is a named type
+            if (context.Symbol is not INamedTypeSymbol namedTypeSymbol)
             {
-                // Check member accesses
-                var memberAccesses = node.DescendantNodes().OfType<MemberAccessExpressionSyntax>();
-                foreach (var memberAccess in memberAccesses)
-                {
-                    var symbol = semanticModel.GetSymbolInfo(memberAccess).Symbol;
-                    if (symbol is IPropertySymbol property)
-                    {
-                        this.AnalyzeMemberWithinContext(property.ContainingType, property, context, memberAccess.Name.GetLocation());
-                    }
-                    else if (symbol is IEventSymbol @event)
-                    {
-                        this.AnalyzeMemberWithinContext(@event.ContainingType, @event, context, memberAccess.Name.GetLocation());
-                    }
-                }
+                return;
+            }
 
-                // Check function calls
-                var invocationExpressions = node.DescendantNodes().OfType<InvocationExpressionSyntax>();
-                foreach (var invocation in invocationExpressions)
-                {
-                    var symbol = semanticModel.GetSymbolInfo(invocation).Symbol as IMethodSymbol;
-                    if (symbol is object)
-                    {
-                        this.AnalyzeMemberWithinContext(symbol.ContainingType, symbol, context, invocation.GetLocation());
-                    }
-                }
+            // Check if the type implements the IPartImportsSatisfiedNotification interface
+            if (!namedTypeSymbol.AllInterfaces.Contains(partImportsSatisfiedNotificationInterface, SymbolEqualityComparer.Default))
+            {
+                return;
+            }
 
-                // Check object creation expressions
-                var objectCreations = node.DescendantNodes().OfType<ObjectCreationExpressionSyntax>();
-                foreach (var objectCreation in objectCreations)
-                {
-                    var symbol = semanticModel.GetSymbolInfo(objectCreation).Symbol as IMethodSymbol;
-                    if (symbol is object)
-                    {
-                        this.AnalyzeMemberWithinContext(symbol.ContainingType, symbol, context, objectCreation.GetLocation());
-                    }
-                }
+            // Look for the OnImportsSatisfied method in the type
+            var matchingMethodSymbol = namedTypeSymbol.GetMembers()
+                .OfType<IMethodSymbol>()
+                .FirstOrDefault(method => method.Name == "OnImportsSatisfied" && method.Parameters.Length == 0);
 
-                // Check assignment expressions
-                var assignmentExpressions = node.DescendantNodes().OfType<AssignmentExpressionSyntax>();
-                foreach (var assignment in assignmentExpressions)
+            if (matchingMethodSymbol is not null)
+            {
+                AnalyzeMethodContents(context, matchingMethodSymbol);
+            }
+        }
+
+        private void AnalyzeMethodContents(SymbolAnalysisContext context, IMethodSymbol matchingMethodSymbol)
+        {
+            // Analyze all statements within the method
+            var syntaxReference = matchingMethodSymbol.DeclaringSyntaxReferences.FirstOrDefault();
+            if (syntaxReference != null)
+            {
+                var baseMethodDeclaration = syntaxReference.GetSyntax(context.CancellationToken) as BaseMethodDeclarationSyntax;
+                if (baseMethodDeclaration != null)
                 {
-                    var symbol = semanticModel.GetSymbolInfo(assignment.Right).Symbol;
-                    if (symbol is IPropertySymbol property)
+                    foreach (var statement in baseMethodDeclaration.Body?.Statements ?? Enumerable.Empty<StatementSyntax>())
                     {
-                        this.AnalyzeMemberWithinContext(property.ContainingType, property, context, assignment.GetLocation());
-                    }
-                    else if (symbol is IEventSymbol @event)
-                    {
-                        this.AnalyzeMemberWithinContext(@event.ContainingType, @event, context, assignment.GetLocation());
-                    }
-                    else if (symbol is IMethodSymbol method)
-                    {
-                        this.AnalyzeMemberWithinContext(method.ContainingType, method, context, assignment.GetLocation());
+                        var semanticModel = context.Compilation.GetSemanticModel(statement.SyntaxTree);
+                        var expressionStatement = statement as ExpressionStatementSyntax;
+                        if (expressionStatement?.Expression is InvocationExpressionSyntax invocationExpression)
+                        {
+                            var symbolInfo = semanticModel.GetSymbolInfo(invocationExpression.Expression, context.CancellationToken).Symbol;
+                            this.AnalyzeMemberWithinContext(symbolInfo.ContainingType, symbolInfo, context, statement.GetLocation());
+                        }
                     }
                 }
             }
         }
 
-        private bool AnalyzeMemberWithinContext(ITypeSymbol type, ISymbol? symbol, SyntaxNodeAnalysisContext context, Location? focusDiagnosticOn = null)
+        internal void AnalyzeType(SymbolAnalysisContext context, INamedTypeSymbol exportAttributeType)
+        {
+            // Ensure the symbol is a named type
+            if (context.Symbol is not INamedTypeSymbol namedTypeSymbol)
+            {
+                return;
+            }
+
+            // Check if the class is decorated with the Export attribute
+            if (!namedTypeSymbol.GetAttributes().Any(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, exportAttributeType)))
+            {
+                return;
+            }
+
+            // Find constructors with no parameters
+            var parameterlessConstructors = namedTypeSymbol.Constructors
+                .Where(ctor => ctor.Parameters.Length == 0);
+
+            foreach (var parameterlessConstructor in parameterlessConstructors)
+            {
+                AnalyzeMethodContents(context, parameterlessConstructor);
+            }
+
+            // Find fields and properties with initializers
+            var fieldsWithInitializers = namedTypeSymbol.GetMembers()
+                .OfType<IFieldSymbol>()
+                .Where(field => field.DeclaringSyntaxReferences
+                    .Select(reference => reference.GetSyntax())
+                    .OfType<VariableDeclaratorSyntax>()
+                    .Any(declarator => declarator.Initializer != null));
+
+            foreach (var field in fieldsWithInitializers)
+            {
+                this.AnalyzeMemberWithinContext(field.ContainingType, field, context, field.Locations.First());
+            }
+
+            var propertiesWithInitializers = namedTypeSymbol.GetMembers()
+                .OfType<IPropertySymbol>()
+                .Where(property => property.DeclaringSyntaxReferences
+                    .Select(reference => reference.GetSyntax())
+                    .OfType<PropertyDeclarationSyntax>()
+                    .Any(declaration => declaration.Initializer != null));
+
+            foreach (var property in propertiesWithInitializers)
+            {
+                this.AnalyzeMemberWithinContext(property.ContainingType, property, context, property.Locations.First());
+            }
+        }
+
+        private bool AnalyzeMemberWithinContext(ITypeSymbol type, ISymbol? symbol, SymbolAnalysisContext context, Location location)
         {
             if (type is null)
             {
                 throw new ArgumentNullException(nameof(type));
             }
 
-            bool requiresUIThread = (type.TypeKind == TypeKind.Interface || type.TypeKind == TypeKind.Class || type.TypeKind == TypeKind.Struct)
-                && this.MembersRequiringMainThread.Contains(type, symbol);
-
-            if (requiresUIThread)
+            if (this.MembersRequiringMainThread.Contains(type, symbol))
             {
-                Location location = focusDiagnosticOn ?? context.Node.GetLocation();
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, location));
                 return true;
             }
@@ -299,24 +301,5 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             SyntaxKind.SetAccessorDeclaration,
             SyntaxKind.AddAccessorDeclaration,
             SyntaxKind.RemoveAccessorDeclaration);
-
-        private enum ThreadingContext
-        {
-            /// <summary>
-            /// The context is not known, either because it was never asserted or switched to,
-            /// or because a branch in the method exists which changed the context conditionally.
-            /// </summary>
-            Unknown,
-
-            /// <summary>
-            /// The context is definitely on the main thread.
-            /// </summary>
-            MainThread,
-
-            /// <summary>
-            /// The context is definitely on a non-UI thread.
-            /// </summary>
-            NotMainThread,
-        }
     }
 }

@@ -8,8 +8,6 @@ using Verify = CSharpCodeFixVerifier<
     Microsoft.VisualStudio.SDK.Analyzers.VSSDK013ThreadAffinitizedMEFConstruction,
     Microsoft.CodeAnalysis.Testing.EmptyCodeFixProvider>;
 
-// TODO: Borrow ideas from vs-threading's VSTHRD010MainThreadUsageAnalyzerTests
-
 public class VSSDK013ThreadAffinitizedMEFConstructionTests
 {
     [Fact]
@@ -22,7 +20,7 @@ class C
 {
     public C()
     {
-        _ = Microsoft.VisualStudio.Shell.Interop.SampleMethod();
+        Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
     }
 }";
 
@@ -40,30 +38,11 @@ class C
     {
         public C()
         {
-            _ = Microsoft.VisualStudio.Shell.Interop.SampleMethod();
-        }
-    }";
-
-        DiagnosticResult expected = Verify.Diagnostic().WithSpan(8, 17, 8, 68);
-        await Verify.VerifyAnalyzerAsync(test, expected);
-    }
-
-    [Fact]
-    public async Task Constructor_MainThreadAsserted_Flagged()
-    {
-        var test = /* lang=c#-test */ @"
-using System.ComponentModel.Composition;
-
-[Export]
-class C
-    {
-        public C()
-        {
             Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
         }
     }";
 
-        DiagnosticResult expected = Verify.Diagnostic().WithSpan(8, 13, 8, 77);
+        DiagnosticResult expected = Verify.Diagnostic().WithSpan(9, 13, 9, 78);
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
@@ -83,11 +62,11 @@ class C
         [ImportingConstructor]
         public C(bool b)
         {
-            _ = Microsoft.VisualStudio.Shell.Interop.SampleMethod();
+            Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
         }
     }";
 
-        DiagnosticResult expected = Verify.Diagnostic().WithSpan(13, 17, 13, 69);
+        DiagnosticResult expected = Verify.Diagnostic().WithSpan(14, 13, 14, 77);
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
@@ -98,19 +77,19 @@ class C
 using System.ComponentModel.Composition;
 
 [Export]
-class C : IPartImportSatisfiedNotification
+class C : IPartImportsSatisfiedNotification
     {
         public C()
         {
         }
 
-        void IPartImportSatisfiedNotification.OnImportsSatisfied()
+        void IPartImportsSatisfiedNotification.OnImportsSatisfied()
         {
-            _ = Microsoft.VisualStudio.Shell.Interop.SampleMethod();
+            Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
         }
     }";
 
-        DiagnosticResult expected = Verify.Diagnostic().WithSpan(12, 17, 12, 69);
+        DiagnosticResult expected = Verify.Diagnostic().WithSpan(13, 13, 13, 77);
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
@@ -121,16 +100,16 @@ class C : IPartImportSatisfiedNotification
 using System.ComponentModel.Composition;
 
 [Export]
-class C : IPartImportSatisfiedNotification
+class C
     {
-        object o = Microsoft.VisualStudio.Shell.Interop.SampleMethod();
+        object o = Microsoft.VisualStudio.Shell.UIContext.FromUIContextGuid(System.Guid.Empty);
 
         public C()
         {
         }
     }";
 
-        DiagnosticResult expected = Verify.Diagnostic().WithSpan(6, 20, 6, 71);
+        DiagnosticResult expected = Verify.Diagnostic().WithSpan(7, 20, 7, 71);
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
@@ -145,7 +124,7 @@ class C
     {
         public C()
         {
-            _ = Microsoft.VisualStudio.Shell.Interop.IVsFeatureFlags();
+            _ = Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskContext;
         }
     }";
 
@@ -167,13 +146,14 @@ class C
 
         public void X()
         {
-            _ = Microsoft.VisualStudio.Shell.Interop.SampleMethod();
+            Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
         }
     }";
 
         await Verify.VerifyAnalyzerAsync(test);
     }
 
+    // TODO: This test would require flow analysis
     [Fact]
     public async Task Constructor_IndirectMainThreadRequired_NoWarning()
     {
@@ -190,7 +170,7 @@ class C
 
         public void X()
         {
-            _ = Microsoft.VisualStudio.Shell.Interop.SampleMethod();
+            Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
         }
     }";
 
