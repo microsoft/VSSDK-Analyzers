@@ -66,7 +66,7 @@ class C
         }
     }";
 
-        DiagnosticResult expected = Verify.Diagnostic().WithSpan(14, 13, 14, 77);
+        DiagnosticResult expected = Verify.Diagnostic().WithSpan(14, 13, 14, 78);
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 

@@ -155,24 +155,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 if (SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, importingConstructorAttribute))
                 {
                     // Analyze all statements within the method
-                    var syntaxReference = methodSymbol.DeclaringSyntaxReferences.FirstOrDefault();
-                    if (syntaxReference != null)
-                    {
-                        var methodDeclaration = syntaxReference.GetSyntax(context.CancellationToken) as ConstructorDeclarationSyntax;
-                        if (methodDeclaration != null)
-                        {
-                            foreach (var statement in methodDeclaration.Body?.Statements ?? Enumerable.Empty<StatementSyntax>())
-                            {
-                                // Analyze each statement within this constructor
-                                var symbolInfo = context.Compilation.GetSemanticModel(syntaxReference.SyntaxTree)
-                                    .GetSymbolInfo(statement, context.CancellationToken).Symbol;
-                                // TODO: In ImportingConstructor_MainThreadAsserted_Flagged symbolInfo is null
-                                this.AnalyzeMemberWithinContext(methodSymbol.ContainingType, symbolInfo, context, statement.GetLocation());
-                            }
-                        }
-                    }
-
-                    return;
+                    AnalyzeMethodContents(context, methodSymbol);
                 }
             }
         }
