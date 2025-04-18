@@ -55,7 +55,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ReusableSupportedDiagnostics;
 
         private static readonly TimeSpan RegexMatchTimeout = TimeSpan.FromSeconds(5);  // Prevent expensive CPU hang in Regex.Match if backtracking occurs due to pathological input (see vs-threading #485).
-        private static readonly Regex MemberReferenceRegex = new Regex(@"^\[(?<typeName>[^\[\]\:]+)+\]::(?<memberName>\S+)\s*$", RegexOptions.Singleline | RegexOptions.CultureInvariant, RegexMatchTimeout);
+        private static readonly Regex NegatableTypeOrMemberReferenceRegex = new Regex(@"^(?<negated>!)?\[(?<typeName>[^\[\]\:]+)+\](?:\:\:(?<memberName>\S+))?\s*$", RegexOptions.Singleline | RegexOptions.CultureInvariant, RegexMatchTimeout);
         private static readonly char[] QualifiedIdentifierSeparators = new[] { '.' };
         public static readonly Regex FileNamePatternForMembersRequiringMainThread = new Regex(@"^vs-threading\.MembersRequiringMainThread(\..*)?.txt$", FileNamePatternRegexOptions);
         private const RegexOptions FileNamePatternRegexOptions = RegexOptions.IgnoreCase | RegexOptions.Singleline;
@@ -66,7 +66,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         {
             // TODO: load from files matching fileNamePattern instead
             var sampleTypes = """
-                [Microsoft.VisualStudio.Shell.UIContext]::*
+                [Microsoft.VisualStudio.Shell.UIContext]
                 [Microsoft.VisualStudio.Shell.ThreadHelper]::ThrowIfNotOnUIThread
                 """;
             foreach (string line in sampleTypes.Split('\n'))
@@ -74,7 +74,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 Match? match = null;
                 try
                 {
-                    match = MemberReferenceRegex.Match(line);
+                    match = NegatableTypeOrMemberReferenceRegex.Match(line);
                 }
                 catch (RegexMatchTimeoutException)
                 {
@@ -245,7 +245,25 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
 
             foreach (var field in fieldsWithInitializers)
             {
-                this.AnalyzeMemberWithinContext(field.ContainingType, field, context, field.Locations.First());
+                var declaratorSyntax = field.DeclaringSyntaxReferences
+                    .Select(reference => reference.GetSyntax())
+                    .OfType<VariableDeclaratorSyntax>()
+                    .FirstOrDefault(declarator => declarator.Initializer != null);
+
+                if (declaratorSyntax?.Initializer?.Value is ExpressionSyntax initializerExpression)
+                {
+                    var semanticModel = context.Compilation.GetSemanticModel(initializerExpression.SyntaxTree);
+
+                    // Traverse the initializer expression to analyze all symbols
+                    foreach (var descendantNode in initializerExpression.DescendantNodesAndSelf())
+                    {
+                        var symbol = semanticModel.GetSymbolInfo(descendantNode, context.CancellationToken).Symbol;
+                        if (symbol?.ContainingType != null)
+                        {
+                            this.AnalyzeMemberWithinContext(symbol.ContainingType, symbol, context, descendantNode.GetLocation());
+                        }
+                    }
+                }
             }
 
             var propertiesWithInitializers = namedTypeSymbol.GetMembers()
@@ -257,7 +275,25 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
 
             foreach (var property in propertiesWithInitializers)
             {
-                this.AnalyzeMemberWithinContext(property.ContainingType, property, context, property.Locations.First());
+                var propertyDeclarationSyntax = property.DeclaringSyntaxReferences
+                    .Select(reference => reference.GetSyntax())
+                    .OfType<PropertyDeclarationSyntax>()
+                    .FirstOrDefault(declaration => declaration.Initializer != null);
+
+                if (propertyDeclarationSyntax?.Initializer?.Value is ExpressionSyntax initializerExpression)
+                {
+                    var semanticModel = context.Compilation.GetSemanticModel(initializerExpression.SyntaxTree);
+
+                    // Traverse the initializer expression to analyze all symbols
+                    foreach (var descendantNode in initializerExpression.DescendantNodesAndSelf())
+                    {
+                        var symbol = semanticModel.GetSymbolInfo(descendantNode, context.CancellationToken).Symbol;
+                        if (symbol?.ContainingType != null)
+                        {
+                            this.AnalyzeMemberWithinContext(symbol.ContainingType, symbol, context, descendantNode.GetLocation());
+                        }
+                    }
+                }
             }
         }
 

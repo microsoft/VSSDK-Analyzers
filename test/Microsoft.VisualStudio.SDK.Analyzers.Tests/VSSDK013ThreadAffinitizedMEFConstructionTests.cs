@@ -136,6 +136,47 @@ class C
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
+
+    [Fact]
+    public async Task PropertyInitializer_MainThreadAsserted_Flagged()
+    {
+        var test = /* lang=c#-test */ @"
+using System.ComponentModel.Composition;
+
+[Export]
+class C
+{
+    object o { get; } = Microsoft.VisualStudio.Shell.UIContext.FromUIContextGuid(System.Guid.Empty);
+
+    public C()
+    {
+    }
+}";
+
+        DiagnosticResult expected = Verify.Diagnostic().WithSpan(7, 25, 7, 99);
+        await Verify.VerifyAnalyzerAsync(test, expected);
+    }
+
+
+    [Fact]
+    public async Task PropertyGetter_MainThreadAsserted_NoWarning()
+    {
+        var test = /* lang=c#-test */ @"
+using System.ComponentModel.Composition;
+
+[Export]
+class C
+{
+    object o => Microsoft.VisualStudio.Shell.UIContext.FromUIContextGuid(System.Guid.Empty);
+
+    public C()
+    {
+    }
+}";
+
+        await Verify.VerifyAnalyzerAsync(test);
+    }
+
     [Fact]
     public async Task Constructor_FreeThreaded_NoWarning()
     {
