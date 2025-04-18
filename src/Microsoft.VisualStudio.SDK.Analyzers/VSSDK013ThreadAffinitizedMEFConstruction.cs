@@ -155,7 +155,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 if (SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, importingConstructorAttribute))
                 {
                     // Analyze all statements within the method
-                    AnalyzeMethodContents(context, methodSymbol);
+                    this.AnalyzeMethodContents(context, methodSymbol);
                 }
             }
         }
@@ -178,7 +178,6 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             var candidateSymbols = namedTypeSymbol
                 .GetMembers()
                 .OfType<IMethodSymbol>();
-            var debug = candidateSymbols.ToImmutableArray();
             var explicitImplementations = candidateSymbols
                 .Where(n => n.MethodKind == MethodKind.ExplicitInterfaceImplementation && n.Name == Types.IPartImportsSatisfiedNotification.OnImportsSatisfiedFullName);
             var implicitImplementations = candidateSymbols
@@ -186,7 +185,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
 
             if (explicitImplementations.Any() || implicitImplementations.Any())
             {
-                AnalyzeMethodContents(context, explicitImplementations.FirstOrDefault() ?? implicitImplementations.First());
+                this.AnalyzeMethodContents(context, explicitImplementations.FirstOrDefault() ?? implicitImplementations.First());
             }
         }
 
@@ -233,7 +232,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
 
             foreach (var parameterlessConstructor in parameterlessConstructors)
             {
-                AnalyzeMethodContents(context, parameterlessConstructor);
+                this.AnalyzeMethodContents(context, parameterlessConstructor);
             }
 
             // Find fields and properties with initializers
