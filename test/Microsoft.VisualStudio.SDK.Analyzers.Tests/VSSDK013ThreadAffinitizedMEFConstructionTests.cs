@@ -71,7 +71,7 @@ class C
     }
 
     [Fact]
-    public async Task PartImportSatisfiedNotification_MainThreadAsserted_Flagged()
+    public async Task PartImportSatisfiedNotificationExplicit_MainThreadAsserted_Flagged()
     {
         var test = /* lang=c#-test */ @"
 using System.ComponentModel.Composition;
@@ -89,7 +89,30 @@ class C : IPartImportsSatisfiedNotification
         }
     }";
 
-        DiagnosticResult expected = Verify.Diagnostic().WithSpan(13, 13, 13, 77);
+        DiagnosticResult expected = Verify.Diagnostic().WithSpan(13, 13, 13, 78);
+        await Verify.VerifyAnalyzerAsync(test, expected);
+    }
+
+    [Fact]
+    public async Task PartImportSatisfiedNotificationImplicit_MainThreadAsserted_Flagged()
+    {
+        var test = /* lang=c#-test */ @"
+using System.ComponentModel.Composition;
+
+[Export]
+class C : IPartImportsSatisfiedNotification
+    {
+        public C()
+        {
+        }
+
+        public void OnImportsSatisfied()
+        {
+            Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
+        }
+    }";
+
+        DiagnosticResult expected = Verify.Diagnostic().WithSpan(13, 13, 13, 78);
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 

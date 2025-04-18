@@ -175,13 +175,18 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             }
 
             // Look for the OnImportsSatisfied method in the type
-            var matchingMethodSymbol = namedTypeSymbol.GetMembers()
-                .OfType<IMethodSymbol>()
-                .FirstOrDefault(method => method.Name == "OnImportsSatisfied" && method.Parameters.Length == 0);
+            var candidateSymbols = namedTypeSymbol
+                .GetMembers()
+                .OfType<IMethodSymbol>();
+            var debug = candidateSymbols.ToImmutableArray();
+            var explicitImplementations = candidateSymbols
+                .Where(n => n.MethodKind == MethodKind.ExplicitInterfaceImplementation && n.Name == Types.IPartImportsSatisfiedNotification.OnImportsSatisfiedFullName);
+            var implicitImplementations = candidateSymbols
+                .Where(n => n.MethodKind == MethodKind.Ordinary && n.Parameters.Length == 0 && n.Name.EndsWith(Types.IPartImportsSatisfiedNotification.OnImportsSatisfied));
 
-            if (matchingMethodSymbol is not null)
+            if (explicitImplementations.Any() || implicitImplementations.Any())
             {
-                AnalyzeMethodContents(context, matchingMethodSymbol);
+                AnalyzeMethodContents(context, explicitImplementations.FirstOrDefault() ?? implicitImplementations.First());
             }
         }
 

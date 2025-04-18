@@ -664,6 +664,11 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             internal const string TypeName = nameof(System.ComponentModel.Composition.IPartImportsSatisfiedNotification);
 
             /// <summary>
+            /// Gets the method name of <see cref="System.ComponentModel.Composition.IPartImportsSatisfiedNotification.OnImportsSatisfied"/>.
+            /// </summary>
+            internal const string OnImportsSatisfied = "OnImportsSatisfied";
+
+            /// <summary>
             /// Gets an array of the nesting namespaces for this type.
             /// </summary>
             internal static readonly IReadOnlyList<string> Namespace = Namespaces.SystemComponentModelComposition;
@@ -677,6 +682,11 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             /// Gets the fully-qualified name of this type as a string.
             /// </summary>
             internal static string FullName { get; } = string.Join(".", Namespace) + "." + TypeName;
+
+            /// <summary>
+            /// Gets the full name of <see cref="System.ComponentModel.Composition.IPartImportsSatisfiedNotification.OnImportsSatisfied"/>.
+            /// </summary>
+            internal static string OnImportsSatisfiedFullName { get; } = string.Join(".", Namespace) + "." + TypeName + "." + OnImportsSatisfied;
         }
 
         /// <summary>
