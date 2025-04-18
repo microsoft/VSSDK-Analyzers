@@ -132,7 +132,7 @@ class C
     }
 }";
 
-        DiagnosticResult expected = Verify.Diagnostic().WithSpan(7, 16, 7, 67);
+        DiagnosticResult expected = Verify.Diagnostic().WithSpan(7, 16, 7, 72);
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
@@ -153,7 +153,7 @@ class C
     }
 }";
 
-        DiagnosticResult expected = Verify.Diagnostic().WithSpan(7, 25, 7, 99);
+        DiagnosticResult expected = Verify.Diagnostic().WithSpan(7, 25, 7, 81);
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
