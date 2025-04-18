@@ -35,14 +35,14 @@ using System.ComponentModel.Composition;
 
 [Export]
 class C
+{
+    public C()
     {
-        public C()
-        {
-            Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
-        }
-    }";
+        Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
+    }
+}";
 
-        DiagnosticResult expected = Verify.Diagnostic().WithSpan(9, 13, 9, 78);
+        DiagnosticResult expected = Verify.Diagnostic().WithSpan(9, 9, 9, 74);
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
@@ -54,19 +54,19 @@ using System.ComponentModel.Composition;
 
 [Export]
 class C
+{
+    public C()
     {
-        public C()
-        {
-        }
+    }
 
-        [ImportingConstructor]
-        public C(bool b)
-        {
-            Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
-        }
-    }";
+    [ImportingConstructor]
+    public C(bool b)
+    {
+        Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
+    }
+}";
 
-        DiagnosticResult expected = Verify.Diagnostic().WithSpan(14, 13, 14, 78);
+        DiagnosticResult expected = Verify.Diagnostic().WithSpan(14, 9, 14, 74);
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
@@ -78,18 +78,18 @@ using System.ComponentModel.Composition;
 
 [Export]
 class C : IPartImportsSatisfiedNotification
+{
+    public C()
     {
-        public C()
-        {
-        }
+    }
 
-        void IPartImportsSatisfiedNotification.OnImportsSatisfied()
-        {
-            Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
-        }
-    }";
+    void IPartImportsSatisfiedNotification.OnImportsSatisfied()
+    {
+        Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
+    }
+}";
 
-        DiagnosticResult expected = Verify.Diagnostic().WithSpan(13, 13, 13, 78);
+        DiagnosticResult expected = Verify.Diagnostic().WithSpan(13, 9, 13, 74);
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
@@ -101,18 +101,18 @@ using System.ComponentModel.Composition;
 
 [Export]
 class C : IPartImportsSatisfiedNotification
+{
+    public C()
     {
-        public C()
-        {
-        }
+    }
 
-        public void OnImportsSatisfied()
-        {
-            Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
-        }
-    }";
+    public void OnImportsSatisfied()
+    {
+        Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
+    }
+}";
 
-        DiagnosticResult expected = Verify.Diagnostic().WithSpan(13, 13, 13, 78);
+        DiagnosticResult expected = Verify.Diagnostic().WithSpan(13, 9, 13, 74);
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
@@ -124,15 +124,15 @@ using System.ComponentModel.Composition;
 
 [Export]
 class C
+{
+    object o = Microsoft.VisualStudio.Shell.UIContext.FromUIContextGuid(System.Guid.Empty);
+
+    public C()
     {
-        object o = Microsoft.VisualStudio.Shell.UIContext.FromUIContextGuid(System.Guid.Empty);
+    }
+}";
 
-        public C()
-        {
-        }
-    }";
-
-        DiagnosticResult expected = Verify.Diagnostic().WithSpan(7, 20, 7, 71);
+        DiagnosticResult expected = Verify.Diagnostic().WithSpan(7, 16, 7, 67);
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
@@ -144,12 +144,12 @@ using System.ComponentModel.Composition;
 
 [Export]
 class C
+{
+    public C()
     {
-        public C()
-        {
-            _ = Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskContext;
-        }
-    }";
+        _ = Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskContext;
+    }
+}";
 
         await Verify.VerifyAnalyzerAsync(test);
     }
@@ -162,16 +162,16 @@ using System.ComponentModel.Composition;
 
 [Export]
 class C
+{
+    public C()
     {
-        public C()
-        {
-        }
+    }
 
-        public void X()
-        {
-            Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
-        }
-    }";
+    public void X()
+    {
+        Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
+    }
+}";
 
         await Verify.VerifyAnalyzerAsync(test);
     }
@@ -185,17 +185,17 @@ using System.ComponentModel.Composition;
 
 [Export]
 class C
+{
+    public C()
     {
-        public C()
-        {
-            X();
-        }
+        X();
+    }
 
-        public void X()
-        {
-            Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
-        }
-    }";
+    public void X()
+    {
+        Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
+    }
+}";
 
         await Verify.VerifyAnalyzerAsync(test);
     }
