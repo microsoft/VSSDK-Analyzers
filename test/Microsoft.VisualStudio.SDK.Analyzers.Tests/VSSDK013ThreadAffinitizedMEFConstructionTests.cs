@@ -42,7 +42,7 @@ class C
     }
 }";
 
-        DiagnosticResult expected = Verify.Diagnostic().WithSpan(9, 9, 9, 74);
+        DiagnosticResult expected = Verify.Diagnostic().WithSpan(9, 9, 9, 73);
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
@@ -66,7 +66,7 @@ class C
     }
 }";
 
-        DiagnosticResult expected = Verify.Diagnostic().WithSpan(14, 9, 14, 74);
+        DiagnosticResult expected = Verify.Diagnostic().WithSpan(14, 9, 14, 73);
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
@@ -89,7 +89,7 @@ class C : IPartImportsSatisfiedNotification
     }
 }";
 
-        DiagnosticResult expected = Verify.Diagnostic().WithSpan(13, 9, 13, 74);
+        DiagnosticResult expected = Verify.Diagnostic().WithSpan(13, 9, 13, 73);
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
@@ -112,7 +112,7 @@ class C : IPartImportsSatisfiedNotification
     }
 }";
 
-        DiagnosticResult expected = Verify.Diagnostic().WithSpan(13, 9, 13, 74);
+        DiagnosticResult expected = Verify.Diagnostic().WithSpan(13, 9, 13, 73);
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
@@ -132,7 +132,7 @@ class C
     }
 }";
 
-        DiagnosticResult expected = Verify.Diagnostic().WithSpan(7, 16, 7, 72);
+        DiagnosticResult expected = Verify.Diagnostic().WithSpan(7, 16, 7, 91);
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
@@ -153,7 +153,7 @@ class C
     }
 }";
 
-        DiagnosticResult expected = Verify.Diagnostic().WithSpan(7, 25, 7, 81);
+        DiagnosticResult expected = Verify.Diagnostic().WithSpan(7, 25, 7, 100);
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 

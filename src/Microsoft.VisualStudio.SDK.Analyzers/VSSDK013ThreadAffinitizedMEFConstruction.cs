@@ -12,6 +12,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis.Operations;
 
 namespace Microsoft.VisualStudio.SDK.Analyzers
 {
@@ -115,6 +116,20 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 INamedTypeSymbol? partImportsSatisfiedNotificationInterface = startCompilation.Compilation.GetTypeByMetadataName(Types.IPartImportsSatisfiedNotification.FullName)?.OriginalDefinition;
                 INamedTypeSymbol? exportAttributeType = startCompilation.Compilation.GetTypeByMetadataName(Types.ExportAttribute.FullName)?.OriginalDefinition;
 
+                var operationKinds = ImmutableArray.Create<OperationKind>(
+                    OperationKind.MethodReference,
+                    OperationKind.InstanceReference,
+                    OperationKind.FieldReference,
+                    OperationKind.ObjectOrCollectionInitializer,
+                    OperationKind.Invocation, // Method calls
+                    OperationKind.MemberInitializer, // For static member access
+                    OperationKind.PropertyReference, // For property access
+                    OperationKind.ObjectCreation // For object creation scenarios
+                );
+                startCompilation.RegisterOperationAction(
+                    Utils.DebuggableWrapper(c => this.AnalyzeOperation(c, exportAttributeType, importingConstructorAttribute, partImportsSatisfiedNotificationInterface)),
+                    operationKinds);
+                /*
                 if (importingConstructorAttribute is object)
                 {
                     // Check decorated constructor
@@ -132,7 +147,104 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                     // Check constructor and field initializers
                     startCompilation.RegisterSymbolAction(Utils.DebuggableWrapper(c => this.AnalyzeType(c, exportAttributeType)), SymbolKind.NamedType);
                 }
+                */
             });
+        }
+
+        private void AnalyzeOperation(
+            OperationAnalysisContext c,
+            INamedTypeSymbol? exportAttributeType,
+            INamedTypeSymbol? importingConstructorAttribute,
+            INamedTypeSymbol? partImportsSatisfiedNotificationInterface)
+        {
+            var containingSymbol = c.ContainingSymbol;
+            var operation = c.Operation;
+            var containingType = containingSymbol.ContainingType;
+
+            if (!containingType.GetAttributes().Any(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, exportAttributeType)))
+            {
+                // This type is not a MEF part, don't check it.
+                return;
+            }
+
+            // If there is a containing method, check if it's a parameterless constructor, or decorated with partImportsSatisfiedNotificationInterface or importingConstructorAttribute
+            if (containingSymbol is IMethodSymbol methodSymbol)
+            {
+                if (methodSymbol.MethodKind == MethodKind.Constructor && methodSymbol.Parameters.Length == 0)
+                {
+                    // Need to check if it's a parameterless constructor
+                }
+                else if (methodSymbol.GetAttributes().Any(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, importingConstructorAttribute)))
+                {
+                    // Need to check if it's decorated with importingConstructorAttribute
+                }
+                else
+                {
+                    // This is not a constructor.
+                    if (containingType.AllInterfaces.Contains(partImportsSatisfiedNotificationInterface, SymbolEqualityComparer.Default))
+                    {
+                        var onImportsSatisfiedMethod = containingType.GetMembers()
+                            .OfType<IMethodSymbol>()
+                            .FirstOrDefault(m => m.Name == Types.IPartImportsSatisfiedNotification.OnImportsSatisfiedFullName);
+
+                        if (onImportsSatisfiedMethod != null)
+                        {
+                            // Need to check if this is a OnImportsSatisfied method
+                        }
+                        else
+                        {
+                            // this method is safe to use UI thread, we don't need to check it
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        // this method is safe to use UI thread, we don't need to check it
+                        return;
+                    }
+                }
+            }
+
+            ISymbol? targetSymbol = null;
+
+            // Use pattern matching to handle different operation types
+            switch (operation)
+            {
+                case IInvocationOperation invocationOperation:
+                    targetSymbol = invocationOperation.TargetMethod;
+                    break;
+
+                case IFieldReferenceOperation fieldReferenceOperation:
+                    targetSymbol = fieldReferenceOperation.Field;
+                    break;
+
+                case IPropertyReferenceOperation propertyReferenceOperation:
+                    targetSymbol = propertyReferenceOperation.Property;
+                    break;
+
+                case IMethodReferenceOperation methodReferenceOperation:
+                    targetSymbol = methodReferenceOperation.Method;
+                    break;
+
+                case IObjectCreationOperation objectCreationOperation:
+                    targetSymbol = objectCreationOperation.Constructor;
+                    break;
+
+                case IInstanceReferenceOperation instanceReferenceOperation:
+                    // not sure how to handle this
+                    break;
+
+                default:
+                    throw new NotImplementedException();
+            }
+
+            if (targetSymbol != null)
+            {
+                // Analyze the target symbol within the context
+                var operationLocation = operation.Syntax.GetLocation();
+                var firstSyntaxlocation = targetSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax(c.CancellationToken).GetLocation();
+                this.AnalyzeMemberWithinContext(targetSymbol.ContainingType, targetSymbol, c, firstSyntaxlocation ?? operationLocation);
+            }
         }
 
         internal void AnalyzeMethod(SymbolAnalysisContext context, INamedTypeSymbol importingConstructorAttribute)
@@ -298,6 +410,22 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         }
 
         private bool AnalyzeMemberWithinContext(ITypeSymbol type, ISymbol? symbol, SymbolAnalysisContext context, Location location)
+        {
+            if (type is null)
+            {
+                throw new ArgumentNullException(nameof(type));
+            }
+
+            if (this.MembersRequiringMainThread.Contains(type, symbol))
+            {
+                context.ReportDiagnostic(Diagnostic.Create(Descriptor, location));
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool AnalyzeMemberWithinContext(ITypeSymbol type, ISymbol? symbol, OperationAnalysisContext context, Location location)
         {
             if (type is null)
             {
