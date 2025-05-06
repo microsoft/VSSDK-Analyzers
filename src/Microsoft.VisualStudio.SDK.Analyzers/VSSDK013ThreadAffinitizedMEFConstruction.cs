@@ -172,36 +172,21 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             {
                 if (methodSymbol.MethodKind == MethodKind.Constructor && methodSymbol.Parameters.Length == 0)
                 {
-                    // Need to check if it's a parameterless constructor
+                    // Parameterless constructor must be free threaded
                 }
                 else if (methodSymbol.GetAttributes().Any(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, importingConstructorAttribute)))
                 {
-                    // Need to check if it's decorated with importingConstructorAttribute
+                    // Constructor decorated with ImportingConstructorAttribute must be free threaded
+                }
+                else if (methodSymbol.Name == Types.IPartImportsSatisfiedNotification.OnImportsSatisfied
+                    && containingType.AllInterfaces.Contains(partImportsSatisfiedNotificationInterface, SymbolEqualityComparer.Default))
+                {
+                    // OnImportsSatisfied implementation must be free threaded
                 }
                 else
                 {
-                    // This is not a constructor.
-                    if (containingType.AllInterfaces.Contains(partImportsSatisfiedNotificationInterface, SymbolEqualityComparer.Default))
-                    {
-                        var onImportsSatisfiedMethod = containingType.GetMembers()
-                            .OfType<IMethodSymbol>()
-                            .FirstOrDefault(m => m.Name == Types.IPartImportsSatisfiedNotification.OnImportsSatisfiedFullName);
-
-                        if (onImportsSatisfiedMethod != null)
-                        {
-                            // Need to check if this is a OnImportsSatisfied method
-                        }
-                        else
-                        {
-                            // this method is safe to use UI thread, we don't need to check it
-                            return;
-                        }
-                    }
-                    else
-                    {
-                        // this method is safe to use UI thread, we don't need to check it
-                        return;
-                    }
+                    // This analyzer does not enforce threading contstraints on any other methods.
+                    return;
                 }
             }
 

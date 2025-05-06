@@ -117,6 +117,32 @@ class C : IPartImportsSatisfiedNotification
     }
 
     [Fact]
+    public async Task PartImportSatisfiedNotificationUnrelated_NoWarning()
+    {
+        var test = /* lang=c#-test */ @"
+using System.ComponentModel.Composition;
+
+[Export]
+class C : IPartImportsSatisfiedNotification
+{
+    public C()
+    {
+    }
+
+    void IPartImportsSatisfiedNotification.OnImportsSatisfied()
+    {
+    }
+
+    void AnotherMethod()
+    {
+        Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
+    }
+}";
+
+        await Verify.VerifyAnalyzerAsync(test);
+    }
+
+    [Fact]
     public async Task FieldInitializer_MainThreadAsserted_Flagged()
     {
         var test = /* lang=c#-test */ @"
