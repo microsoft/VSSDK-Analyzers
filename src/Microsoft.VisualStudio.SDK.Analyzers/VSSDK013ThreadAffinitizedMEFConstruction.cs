@@ -4,8 +4,6 @@
 using System.Collections.Immutable;
 using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
 
@@ -25,6 +23,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         /// The value to use for <see cref="DiagnosticDescriptor.Id"/> in generated diagnostics.
         /// </summary>
         public const string Id = "VSSDK013";
+        private const RegexOptions FileNamePatternRegexOptions = RegexOptions.IgnoreCase | RegexOptions.Singleline;
 
         /// <summary>
         /// A reusable descriptor for diagnostics produced by this analyzer.
@@ -38,19 +37,18 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             defaultSeverity: DiagnosticSeverity.Info,
             isEnabledByDefault: true);
 
+        public static readonly Regex FileNamePatternForMembersRequiringMainThread = new Regex(@"^vs-threading\.MembersRequiringMainThread(\..*)?.txt$", FileNamePatternRegexOptions);
+
         /// <summary>
         /// A cached array for the <see cref="SupportedDiagnostics"/> property.
         /// </summary>
         private static readonly ImmutableArray<DiagnosticDescriptor> ReusableSupportedDiagnostics = ImmutableArray.Create(Descriptor);
-
-        /// <inheritdoc />
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ReusableSupportedDiagnostics;
-
         private static readonly TimeSpan RegexMatchTimeout = TimeSpan.FromSeconds(5);  // Prevent expensive CPU hang in Regex.Match if backtracking occurs due to pathological input (see vs-threading #485).
         private static readonly Regex NegatableTypeOrMemberReferenceRegex = new Regex(@"^(?<negated>!)?\[(?<typeName>[^\[\]\:]+)+\](?:\:\:(?<memberName>\S+))?\s*$", RegexOptions.Singleline | RegexOptions.CultureInvariant, RegexMatchTimeout);
         private static readonly char[] QualifiedIdentifierSeparators = new[] { '.' };
-        public static readonly Regex FileNamePatternForMembersRequiringMainThread = new Regex(@"^vs-threading\.MembersRequiringMainThread(\..*)?.txt$", FileNamePatternRegexOptions);
-        private const RegexOptions FileNamePatternRegexOptions = RegexOptions.IgnoreCase | RegexOptions.Singleline;
+
+        /// <inheritdoc />
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ReusableSupportedDiagnostics;
 
         internal ImmutableArray<TypeMatchSpec> MembersRequiringMainThread { get; set; }
 
@@ -213,184 +211,6 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             }
         }
 
-        internal void AnalyzeMethod(SymbolAnalysisContext context, INamedTypeSymbol importingConstructorAttribute)
-        {
-            // Ensure the symbol is a method
-            if (context.Symbol is not IMethodSymbol methodSymbol)
-            {
-                return;
-            }
-
-            // Check if the method is a constructor
-            if (methodSymbol.MethodKind != MethodKind.Constructor)
-            {
-                return;
-            }
-
-            // Check if the constructor is decorated with the importingConstructorAttribute
-            foreach (var attribute in methodSymbol.GetAttributes())
-            {
-                if (SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, importingConstructorAttribute))
-                {
-                    // Analyze all statements within the method
-                    this.AnalyzeMethodContents(context, methodSymbol);
-                }
-            }
-        }
-
-        internal void AnalyzeImportSatisfied(SymbolAnalysisContext context, INamedTypeSymbol partImportsSatisfiedNotificationInterface)
-        {
-            // Ensure the symbol is a named type
-            if (context.Symbol is not INamedTypeSymbol namedTypeSymbol)
-            {
-                return;
-            }
-
-            // Check if the type implements the IPartImportsSatisfiedNotification interface
-            if (!namedTypeSymbol.AllInterfaces.Contains(partImportsSatisfiedNotificationInterface, SymbolEqualityComparer.Default))
-            {
-                return;
-            }
-
-            // Look for the OnImportsSatisfied method in the type
-            var candidateSymbols = namedTypeSymbol
-                .GetMembers()
-                .OfType<IMethodSymbol>();
-            var explicitImplementations = candidateSymbols
-                .Where(n => n.MethodKind == MethodKind.ExplicitInterfaceImplementation && n.Name == Types.IPartImportsSatisfiedNotification.OnImportsSatisfiedFullName);
-            var implicitImplementations = candidateSymbols
-                .Where(n => n.MethodKind == MethodKind.Ordinary && n.Parameters.Length == 0 && n.Name.EndsWith(Types.IPartImportsSatisfiedNotification.OnImportsSatisfied));
-
-            if (explicitImplementations.Any() || implicitImplementations.Any())
-            {
-                this.AnalyzeMethodContents(context, explicitImplementations.FirstOrDefault() ?? implicitImplementations.First());
-            }
-        }
-
-        private void AnalyzeMethodContents(SymbolAnalysisContext context, IMethodSymbol matchingMethodSymbol)
-        {
-            // Analyze all statements within the method
-            var syntaxReference = matchingMethodSymbol.DeclaringSyntaxReferences.FirstOrDefault();
-            if (syntaxReference != null)
-            {
-                var baseMethodDeclaration = syntaxReference.GetSyntax(context.CancellationToken) as BaseMethodDeclarationSyntax;
-                if (baseMethodDeclaration != null)
-                {
-                    foreach (var statement in baseMethodDeclaration.Body?.Statements ?? Enumerable.Empty<StatementSyntax>())
-                    {
-                        var semanticModel = context.Compilation.GetSemanticModel(statement.SyntaxTree);
-                        var expressionStatement = statement as ExpressionStatementSyntax;
-                        if (expressionStatement?.Expression is InvocationExpressionSyntax invocationExpression)
-                        {
-                            var symbolInfo = semanticModel.GetSymbolInfo(invocationExpression.Expression, context.CancellationToken).Symbol;
-                            this.AnalyzeMemberWithinContext(symbolInfo.ContainingType, symbolInfo, context, statement.GetLocation());
-                        }
-                    }
-                }
-            }
-        }
-
-        internal void AnalyzeType(SymbolAnalysisContext context, INamedTypeSymbol exportAttributeType)
-        {
-            // Ensure the symbol is a named type
-            if (context.Symbol is not INamedTypeSymbol namedTypeSymbol)
-            {
-                return;
-            }
-
-            // Check if the class is decorated with the Export attribute
-            if (!namedTypeSymbol.GetAttributes().Any(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, exportAttributeType)))
-            {
-                return;
-            }
-
-            // Find constructors with no parameters
-            var parameterlessConstructors = namedTypeSymbol.Constructors
-                .Where(ctor => ctor.Parameters.Length == 0);
-
-            foreach (var parameterlessConstructor in parameterlessConstructors)
-            {
-                this.AnalyzeMethodContents(context, parameterlessConstructor);
-            }
-
-            // Find fields and properties with initializers
-            var fieldsWithInitializers = namedTypeSymbol.GetMembers()
-                .OfType<IFieldSymbol>()
-                .Where(field => field.DeclaringSyntaxReferences
-                    .Select(reference => reference.GetSyntax())
-                    .OfType<VariableDeclaratorSyntax>()
-                    .Any(declarator => declarator.Initializer != null));
-
-            foreach (var field in fieldsWithInitializers)
-            {
-                var declaratorSyntax = field.DeclaringSyntaxReferences
-                    .Select(reference => reference.GetSyntax())
-                    .OfType<VariableDeclaratorSyntax>()
-                    .FirstOrDefault(declarator => declarator.Initializer != null);
-
-                if (declaratorSyntax?.Initializer?.Value is ExpressionSyntax initializerExpression)
-                {
-                    var semanticModel = context.Compilation.GetSemanticModel(initializerExpression.SyntaxTree);
-
-                    // Traverse the initializer expression to analyze all symbols
-                    foreach (var descendantNode in initializerExpression.DescendantNodesAndSelf())
-                    {
-                        var symbol = semanticModel.GetSymbolInfo(descendantNode, context.CancellationToken).Symbol;
-                        if (symbol?.ContainingType != null)
-                        {
-                            this.AnalyzeMemberWithinContext(symbol.ContainingType, symbol, context, descendantNode.GetLocation());
-                        }
-                    }
-                }
-            }
-
-            var propertiesWithInitializers = namedTypeSymbol.GetMembers()
-                .OfType<IPropertySymbol>()
-                .Where(property => property.DeclaringSyntaxReferences
-                    .Select(reference => reference.GetSyntax())
-                    .OfType<PropertyDeclarationSyntax>()
-                    .Any(declaration => declaration.Initializer != null));
-
-            foreach (var property in propertiesWithInitializers)
-            {
-                var propertyDeclarationSyntax = property.DeclaringSyntaxReferences
-                    .Select(reference => reference.GetSyntax())
-                    .OfType<PropertyDeclarationSyntax>()
-                    .FirstOrDefault(declaration => declaration.Initializer != null);
-
-                if (propertyDeclarationSyntax?.Initializer?.Value is ExpressionSyntax initializerExpression)
-                {
-                    var semanticModel = context.Compilation.GetSemanticModel(initializerExpression.SyntaxTree);
-
-                    // Traverse the initializer expression to analyze all symbols
-                    foreach (var descendantNode in initializerExpression.DescendantNodesAndSelf())
-                    {
-                        var symbol = semanticModel.GetSymbolInfo(descendantNode, context.CancellationToken).Symbol;
-                        if (symbol?.ContainingType != null)
-                        {
-                            this.AnalyzeMemberWithinContext(symbol.ContainingType, symbol, context, descendantNode.GetLocation());
-                        }
-                    }
-                }
-            }
-        }
-
-        private bool AnalyzeMemberWithinContext(ITypeSymbol type, ISymbol? symbol, SymbolAnalysisContext context, Location location)
-        {
-            if (type is null)
-            {
-                throw new ArgumentNullException(nameof(type));
-            }
-
-            if (this.MembersRequiringMainThread.Contains(type, symbol))
-            {
-                context.ReportDiagnostic(Diagnostic.Create(Descriptor, location));
-                return true;
-            }
-
-            return false;
-        }
-
         private bool AnalyzeMemberWithinContext(ITypeSymbol type, ISymbol? symbol, OperationAnalysisContext context, Location location)
         {
             if (type is null)
@@ -406,17 +226,5 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
 
             return false;
         }
-
-        internal static readonly IImmutableSet<SyntaxKind> MethodSyntaxKinds = ImmutableHashSet.Create(
-            SyntaxKind.ConstructorDeclaration,
-            SyntaxKind.MethodDeclaration,
-            SyntaxKind.OperatorDeclaration,
-            SyntaxKind.AnonymousMethodExpression,
-            SyntaxKind.SimpleLambdaExpression,
-            SyntaxKind.ParenthesizedLambdaExpression,
-            SyntaxKind.GetAccessorDeclaration,
-            SyntaxKind.SetAccessorDeclaration,
-            SyntaxKind.AddAccessorDeclaration,
-            SyntaxKind.RemoveAccessorDeclaration);
     }
 }
