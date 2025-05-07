@@ -11,16 +11,12 @@ using Microsoft.CodeAnalysis.Operations;
 
 namespace Microsoft.VisualStudio.SDK.Analyzers
 {
-    // TODO: Learn from VSTHRD010MainThreadUsageAnalyzer
-    // https://microsoft.github.io/vs-threading/analyzers/VSTHRD010.html
-    // particularly GetTransitiveClosureOfMainThreadRequiringMethods
-
     /// <summary>
     /// Identifies cases where a class decorated with [Export] accesses any member bound to UI thread from
     /// - Constructor with no params
     /// - Constructor decorated with [ImportingConstructor]
     /// - Field or property initializer
-    /// - implementation of IPartImportsSatisfiedNotification.OnImportsSatisfied
+    /// - implementation of IPartImportsSatisfiedNotification.OnImportsSatisfied.
     /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class VSSDK013ThreadAffinitizedMEFConstruction : DiagnosticAnalyzer
@@ -148,6 +144,15 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             {
                 if (methodSymbol.MethodKind == MethodKind.Constructor && methodSymbol.Parameters.Length == 0)
                 {
+                    // Check if there is any other constructor decorated with importingConstructorAttribute
+                    if (containingType.Constructors.Any(ctor =>
+                        !SymbolEqualityComparer.Default.Equals(ctor.AssociatedSymbol, methodSymbol)
+                        && ctor.GetAttributes().Any(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, importingConstructorAttribute))))
+                    {
+                        // A different constructor is marked as importing contructor. It's OK if this constructor has UI thread dependency.
+                        return;
+                    }
+
                     // Parameterless constructor must be free threaded
                 }
                 else if (methodSymbol.GetAttributes().Any(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, importingConstructorAttribute)))

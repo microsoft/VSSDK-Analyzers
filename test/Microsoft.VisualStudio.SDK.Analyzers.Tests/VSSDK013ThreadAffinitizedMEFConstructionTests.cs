@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.Testing;
 using Xunit;
 using Verify = CSharpCodeFixVerifier<
@@ -261,6 +260,121 @@ class C
     public void X()
     {
         Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
+    }
+}";
+
+        await Verify.VerifyAnalyzerAsync(test);
+    }
+
+    [Fact]
+    public async Task NoExport_UnrelatedMethod_NoWarning()
+    {
+        var test = /* lang=c#-test */ @"
+using System.ComponentModel.Composition;
+
+class C
+{
+    public void UnrelatedMethod()
+    {
+        Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
+    }
+}";
+
+        await Verify.VerifyAnalyzerAsync(test);
+    }
+
+    [Fact]
+    public async Task MultipleConstructors_OnlyImportingConstructorFlagged()
+    {
+        var test = /* lang=c#-test */ @"
+using System.ComponentModel.Composition;
+
+[Export]
+class C
+{
+    public C()
+    {
+Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
+    }
+
+    [ImportingConstructor]
+    public C(bool b)
+    {
+        Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
+    }
+}";
+
+        DiagnosticResult expected = Verify.Diagnostic().WithSpan(15, 9, 15, 73);
+        await Verify.VerifyAnalyzerAsync(test, expected);
+    }
+
+    [Fact]
+    public async Task ComplexInitializer_NoWarning()
+    {
+        var test = /* lang=c#-test */ @"
+using System.ComponentModel.Composition;
+
+[Export]
+class C
+{
+    object o = new object();
+
+    public C()
+    {
+    }
+}";
+
+        await Verify.VerifyAnalyzerAsync(test);
+    }
+
+    [Fact]
+    public async Task ExportWithoutConstructors_NoWarning()
+    {
+        var test = /* lang=c#-test */ @"
+using System.ComponentModel.Composition;
+
+[Export]
+class C
+{
+}";
+
+        await Verify.VerifyAnalyzerAsync(test);
+    }
+
+    [Fact]
+    public async Task ExportWithValidThreading_NoWarning()
+    {
+        var test = /* lang=c#-test */ @"
+using System.ComponentModel.Composition;
+
+[Export]
+class C
+{
+    public C()
+    {
+        _ = Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskContext;
+    }
+}";
+
+        await Verify.VerifyAnalyzerAsync(test);
+    }
+
+    [Fact]
+    public async Task OnImportsSatisfied_UnrelatedImplementation_NoWarning()
+    {
+        var test = /* lang=c#-test */ @"
+using System.ComponentModel.Composition;
+
+[Export]
+class C : IPartImportsSatisfiedNotification
+{
+    public C()
+    {
+    }
+
+    public void OnImportsSatisfied()
+    {
+        // No UI thread-bound members accessed here
     }
 }";
 
