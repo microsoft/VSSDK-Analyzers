@@ -146,7 +146,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 {
                     // Check if there is any other constructor decorated with importingConstructorAttribute
                     if (containingType.Constructors.Any(ctor =>
-                        !SymbolEqualityComparer.Default.Equals(ctor.AssociatedSymbol, methodSymbol)
+                        !SymbolEqualityComparer.Default.Equals(ctor, methodSymbol)
                         && ctor.GetAttributes().Any(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, importingConstructorAttribute))))
                     {
                         // A different constructor is marked as importing contructor. It's OK if this constructor has UI thread dependency.

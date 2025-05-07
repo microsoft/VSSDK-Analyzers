@@ -284,7 +284,27 @@ class C
     }
 
     [Fact]
-    public async Task MultipleConstructors_OnlyImportingConstructorFlagged()
+    public async Task MultipleConstructors_ParameterlessImportingConstructor_Flagged()
+    {
+        var test = /* lang=c#-test */ @"
+using System.ComponentModel.Composition;
+
+[Export]
+class C
+{
+    [ImportingConstructor]
+    public C()
+    {
+        Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
+    }
+}";
+
+        DiagnosticResult expected = Verify.Diagnostic().WithSpan(10, 9, 10, 73);
+        await Verify.VerifyAnalyzerAsync(test, expected);
+    }
+
+    [Fact]
+    public async Task MultipleConstructors_OnlyImportingConstructor_Flagged()
     {
         var test = /* lang=c#-test */ @"
 using System.ComponentModel.Composition;
@@ -294,7 +314,7 @@ class C
 {
     public C()
     {
-Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
+        Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
     }
 
     [ImportingConstructor]
@@ -309,7 +329,7 @@ Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
     }
 
     [Fact]
-    public async Task ComplexInitializer_NoWarning()
+    public async Task FieldInitializer_Benign_NoWarning()
     {
         var test = /* lang=c#-test */ @"
 using System.ComponentModel.Composition;
@@ -342,7 +362,7 @@ class C
     }
 
     [Fact]
-    public async Task ExportWithValidThreading_NoWarning()
+    public async Task Constructor_Benign_NoWarning()
     {
         var test = /* lang=c#-test */ @"
 using System.ComponentModel.Composition;
@@ -360,7 +380,7 @@ class C
     }
 
     [Fact]
-    public async Task OnImportsSatisfied_UnrelatedImplementation_NoWarning()
+    public async Task OnImportsSatisfied_Benign_NoWarning()
     {
         var test = /* lang=c#-test */ @"
 using System.ComponentModel.Composition;
@@ -374,7 +394,7 @@ class C : IPartImportsSatisfiedNotification
 
     public void OnImportsSatisfied()
     {
-        // No UI thread-bound members accessed here
+        var o = new object();
     }
 }";
 
