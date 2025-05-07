@@ -1,13 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Collections.Immutable;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
 using System.Text.RegularExpressions;
-using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -129,25 +124,6 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 startCompilation.RegisterOperationAction(
                     Utils.DebuggableWrapper(c => this.AnalyzeOperation(c, exportAttributeType, importingConstructorAttribute, partImportsSatisfiedNotificationInterface)),
                     operationKinds);
-                /*
-                if (importingConstructorAttribute is object)
-                {
-                    // Check decorated constructor
-                    startCompilation.RegisterSymbolAction(Utils.DebuggableWrapper(c => this.AnalyzeMethod(c, importingConstructorAttribute)), SymbolKind.Method);
-                }
-
-                if (partImportsSatisfiedNotificationInterface is object)
-                {
-                    // Check interface implementation
-                    startCompilation.RegisterSymbolAction(Utils.DebuggableWrapper(c => this.AnalyzeImportSatisfied(c, partImportsSatisfiedNotificationInterface)), SymbolKind.NamedType);
-                }
-
-                if (exportAttributeType is object)
-                {
-                    // Check constructor and field initializers
-                    startCompilation.RegisterSymbolAction(Utils.DebuggableWrapper(c => this.AnalyzeType(c, exportAttributeType)), SymbolKind.NamedType);
-                }
-                */
             });
         }
 
@@ -178,7 +154,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 {
                     // Constructor decorated with ImportingConstructorAttribute must be free threaded
                 }
-                else if (methodSymbol.Name == Types.IPartImportsSatisfiedNotification.OnImportsSatisfied
+                else if ((methodSymbol.Name == Types.IPartImportsSatisfiedNotification.OnImportsSatisfied || methodSymbol.Name == Types.IPartImportsSatisfiedNotification.OnImportsSatisfiedFullName)
                     && containingType.AllInterfaces.Contains(partImportsSatisfiedNotificationInterface, SymbolEqualityComparer.Default))
                 {
                     // OnImportsSatisfied implementation must be free threaded
