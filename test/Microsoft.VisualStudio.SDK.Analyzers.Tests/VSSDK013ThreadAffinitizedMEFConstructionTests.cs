@@ -408,4 +408,47 @@ using System.Runtime.InteropServices;
 
         await Verify.VerifyAnalyzerAsync(test);
     }
+
+    [Fact]
+    public async Task InstanceReference_Benign_NoWarning()
+    {
+        var test = /* lang=c#-test */ @"
+using System.ComponentModel.Composition;
+
+[Export]
+internal class C
+{
+    bool? MyProperty = null;
+    public C()
+    {
+        MyProperty = false;
+    }
+}
+";
+
+        await Verify.VerifyAnalyzerAsync(test);
+    }
+
+    // TODO: it's not reproing the exception
+    [Fact]
+    public async Task ObjectOrCollectionInitializer_Benign_NoWarning()
+    {
+        var test = /* lang=c#-test */ @"
+using System.ComponentModel.Composition;
+using Microsoft.VisualStudio.Utilities;
+
+[Export]
+[Name(PartName)]
+[Order(Before = ""default"")]
+internal class C
+{
+    public const string PartName = ""PartName"";
+    public C()
+    {
+    }
+}
+";
+
+        await Verify.VerifyAnalyzerAsync(test);
+    }
 }

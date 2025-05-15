@@ -171,37 +171,22 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 }
             }
 
-            ISymbol? targetSymbol = null;
+            ISymbol? targetSymbol = GetSymbolFromOperation(operation);
 
-            // Use pattern matching to handle different operation types
-            switch (operation)
+            ISymbol? GetSymbolFromOperation(IOperation operation)
             {
-                case IInvocationOperation invocationOperation:
-                    targetSymbol = invocationOperation.TargetMethod;
-                    break;
-
-                case IFieldReferenceOperation fieldReferenceOperation:
-                    targetSymbol = fieldReferenceOperation.Field;
-                    break;
-
-                case IPropertyReferenceOperation propertyReferenceOperation:
-                    targetSymbol = propertyReferenceOperation.Property;
-                    break;
-
-                case IMethodReferenceOperation methodReferenceOperation:
-                    targetSymbol = methodReferenceOperation.Method;
-                    break;
-
-                case IObjectCreationOperation objectCreationOperation:
-                    targetSymbol = objectCreationOperation.Constructor;
-                    break;
-
-                case IInstanceReferenceOperation instanceReferenceOperation:
-                    // not sure how to handle this
-                    break;
-
-                default:
-                    throw new NotImplementedException();
+                return operation switch
+                {
+                    IInvocationOperation op => op.TargetMethod,
+                    IFieldReferenceOperation op => op.Field,
+                    IPropertyReferenceOperation op => op.Property,
+                    IMethodReferenceOperation op => op.Method,
+                    IObjectCreationOperation op => op.Constructor,
+                    IObjectOrCollectionInitializerOperation op => op.Parent is not null ? GetSymbolFromOperation(op.Parent) : null,
+                    IInstanceReferenceOperation op => op.Parent is not null ? GetSymbolFromOperation(op.Parent) : null,
+                    IMemberInitializerOperation op => op.Parent is not null ? GetSymbolFromOperation(op.Parent) : null,
+                    _ => null,
+                };
             }
 
             if (targetSymbol != null)
