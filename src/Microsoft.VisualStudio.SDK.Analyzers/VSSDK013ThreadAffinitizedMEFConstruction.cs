@@ -126,6 +126,12 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             IOperation operation = c.Operation;
             INamedTypeSymbol containingType = containingSymbol.ContainingType;
 
+            if (containingType is null || exportAttributeType is null)
+            {
+                // This code does not belong to a type, or we can't get a hold of [Export]Attribute. This analyzer does not apply.
+                return;
+            }
+
             if (!containingType.GetAttributes().Any(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, exportAttributeType)))
             {
                 // This type is not a MEF part, don't check it.

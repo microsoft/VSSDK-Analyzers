@@ -161,7 +161,6 @@ class C
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
-
     [Fact]
     public async Task PropertyInitializer_MainThreadAsserted_Flagged()
     {
@@ -181,7 +180,6 @@ class C
         DiagnosticResult expected = Verify.Diagnostic().WithSpan(7, 25, 7, 100);
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
-
 
     [Fact]
     public async Task PropertyGetter_MainThreadAsserted_NoWarning()
@@ -397,6 +395,16 @@ class C : IPartImportsSatisfiedNotification
         var o = new object();
     }
 }";
+
+        await Verify.VerifyAnalyzerAsync(test);
+    }
+
+    [Fact]
+    public async Task OperationsWithoutType_Benign_NoWarning()
+    {
+        var test = /* lang=c#-test */ @"
+using System.Runtime.InteropServices;
+[assembly: DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]";
 
         await Verify.VerifyAnalyzerAsync(test);
     }
