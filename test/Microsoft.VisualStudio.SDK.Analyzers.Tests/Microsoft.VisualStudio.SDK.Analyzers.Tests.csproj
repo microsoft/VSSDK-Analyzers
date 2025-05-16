@@ -32,4 +32,14 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="$(PkgMicrosoft_VisualStudio_Threading_Analyzers)\buildTransitive\AdditionalFiles\**"
+      LinkBase="BuiltIn.AdditionalFiles">
+      <LogicalName>AdditionalFiles.%(FileName)%(Extension)</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AdditionalFiles\**">
+      <LogicalName>AdditionalFiles.%(FileName)%(Extension)</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
 </Project>

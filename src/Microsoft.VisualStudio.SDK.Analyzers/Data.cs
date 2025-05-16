@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using Microsoft.CodeAnalysis;
 
 namespace Microsoft.VisualStudio.SDK.Analyzers
 {
-
     public readonly struct TypeMatchSpec
     {
         public TypeMatchSpec(QualifiedType type, QualifiedMember member, bool inverted)

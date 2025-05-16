@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Immutable;
-using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
@@ -36,12 +35,6 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true);
 
-        private const RegexOptions FileNamePatternRegexOptions = RegexOptions.IgnoreCase | RegexOptions.Singleline;
-        private static readonly Regex FileNamePatternForMembersRequiringMainThread = new Regex(@"^vs-threading\.MembersRequiringMainThread(\..*)?.txt$", FileNamePatternRegexOptions);
-        private static readonly TimeSpan RegexMatchTimeout = TimeSpan.FromSeconds(5);  // Prevent expensive CPU hang in Regex.Match if backtracking occurs due to pathological input (see vs-threading #485).
-        private static readonly Regex NegatableTypeOrMemberReferenceRegex = new Regex(@"^(?<negated>!)?\[(?<typeName>[^\[\]\:]+)+\](?:\:\:(?<memberName>\S+))?\s*$", RegexOptions.Singleline | RegexOptions.CultureInvariant, RegexMatchTimeout);
-        private static readonly char[] QualifiedIdentifierSeparators = new[] { '.' };
-
         /// <inheritdoc />
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Descriptor);
 
@@ -61,7 +54,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             // Register for compilation first so that we only activate the analyzer for applicable compilations
             context.RegisterCompilationStartAction(startCompilation =>
             {
-                this.MembersRequiringMainThread = ReadTypesAndMembers(startCompilation.Options, FileNamePatternForMembersRequiringMainThread, startCompilation.CancellationToken).ToImmutableArray();
+                this.MembersRequiringMainThread = AdditionalFilesHelpers.GetMembersRequiringMainThread(startCompilation.Options, startCompilation.CancellationToken);
                 INamedTypeSymbol? importingConstructorAttribute = startCompilation.Compilation.GetTypeByMetadataName(Types.ImportingConstructorAttribute.FullName)?.OriginalDefinition;
                 INamedTypeSymbol? partImportsSatisfiedNotificationInterface = startCompilation.Compilation.GetTypeByMetadataName(Types.IPartImportsSatisfiedNotification.FullName)?.OriginalDefinition;
                 INamedTypeSymbol? exportAttributeType = startCompilation.Compilation.GetTypeByMetadataName(Types.ExportAttribute.FullName)?.OriginalDefinition;
@@ -82,39 +75,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             });
         }
 
-        private static IEnumerable<TypeMatchSpec> ReadTypesAndMembers(AnalyzerOptions analyzerOptions, Regex fileNamePattern, CancellationToken cancellationToken)
-        {
-            // TODO: load from files matching fileNamePattern instead
-            string sampleTypes = """
-                [Microsoft.VisualStudio.Shell.UIContext]
-                [Microsoft.VisualStudio.Shell.ThreadHelper]::ThrowIfNotOnUIThread
-                """;
-            foreach (string line in sampleTypes.Split('\n'))
-            {
-                Match? match = null;
-                try
-                {
-                    match = NegatableTypeOrMemberReferenceRegex.Match(line);
-                }
-                catch (RegexMatchTimeoutException)
-                {
-                    throw new InvalidOperationException($"Regex.Match timeout when parsing line: {line}");
-                }
 
-                if (!match.Success)
-                {
-                    throw new InvalidOperationException($"Parsing error on line: {line}");
-                }
-
-                bool inverted = match.Groups["negated"].Success;
-                string[] typeNameElements = match.Groups["typeName"].Value.Split(QualifiedIdentifierSeparators);
-                string typeName = typeNameElements[typeNameElements.Length - 1];
-                var containingNamespace = typeNameElements.Take(typeNameElements.Length - 1).ToImmutableArray();
-                var type = new QualifiedType(containingNamespace, typeName);
-                QualifiedMember member = match.Groups["memberName"].Success ? new QualifiedMember(type, match.Groups["memberName"].Value) : default(QualifiedMember);
-                yield return new TypeMatchSpec(type, member, inverted);
-            }
-        }
 
         private void AnalyzeOperation(
             OperationAnalysisContext c,

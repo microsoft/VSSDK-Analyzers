@@ -1,0 +1,2 @@
+[Microsoft.VisualStudio.Shell.UIContext]
+[Microsoft.VisualStudio.Shell.ThreadHelper]::ThrowIfNotOnUIThread
