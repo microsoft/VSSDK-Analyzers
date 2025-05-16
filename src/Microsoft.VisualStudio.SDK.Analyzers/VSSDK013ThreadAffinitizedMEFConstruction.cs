@@ -75,8 +75,6 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             });
         }
 
-
-
         private void AnalyzeOperation(
             OperationAnalysisContext c,
             INamedTypeSymbol? exportAttributeType,

@@ -1,12 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -281,15 +276,13 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             return syntaxRoot.GetAnnotatedNodes(trackAnnotation).Single();
         }
 
-        private static bool LaunchDebuggerExceptionFilter()
-        {
-#if DEBUG
-            System.Diagnostics.Debugger.Launch();
-#endif
-            return true;
-        }
-
-        public static bool Contains(this ImmutableArray<QualifiedMember> methods, ISymbol symbol)
+        /// <summary>
+        /// Whether the array contains element matching the <paramref name="symbol"/>.
+        /// </summary>
+        /// <param name="methods">Array of elements that specify members.</param>
+        /// <param name="symbol">Symbol under test.</param>
+        /// <returns><see langword="true" /> if the <paramref name="methods"/> contains element matching <paramref name="symbol"/>.</returns>
+        internal static bool Contains(this ImmutableArray<QualifiedMember> methods, ISymbol symbol)
         {
             foreach (QualifiedMember method in methods)
             {
@@ -302,7 +295,14 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             return false;
         }
 
-        public static bool Contains(this ImmutableArray<TypeMatchSpec> types, /*[NotNullWhen(true)]*/ ITypeSymbol? typeSymbol, ISymbol? memberSymbol)
+        /// <summary>
+        /// Whether the array contains element matching the <paramref name="typeSymbol"/> and <paramref name="memberSymbol"/>.
+        /// </summary>
+        /// <param name="types">Array of elements that specify types.</param>
+        /// <param name="typeSymbol">Type symbol under test.</param>
+        /// <param name="memberSymbol">Member symbol under test.</param>
+        /// <returns><see langword="true" /> if the <paramref name="types"/> contains element matching <paramref name="typeSymbol"/> and <paramref name="memberSymbol"/>.</returns>
+        internal static bool Contains(this ImmutableArray<TypeMatchSpec> types, ITypeSymbol? typeSymbol, ISymbol? memberSymbol)
         {
             TypeMatchSpec matching = default(TypeMatchSpec);
             foreach (TypeMatchSpec type in types)
@@ -322,6 +322,14 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             }
 
             return !matching.IsEmpty && !matching.InvertedLogic;
+        }
+
+        private static bool LaunchDebuggerExceptionFilter()
+        {
+#if DEBUG
+            System.Diagnostics.Debugger.Launch();
+#endif
+            return true;
         }
     }
 }

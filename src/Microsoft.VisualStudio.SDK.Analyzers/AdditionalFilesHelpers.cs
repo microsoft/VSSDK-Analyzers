@@ -15,12 +15,12 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
     /// </summary>
     internal class AdditionalFilesHelpers
     {
+        private const RegexOptions FileNamePatternRegexOptions = RegexOptions.IgnoreCase | RegexOptions.Singleline;
         private static readonly Regex FileNamePatternForLegacyThreadSwitchingMembers = new Regex(@"^vs-threading\.LegacyThreadSwitchingMembers(\..*)?.txt$", FileNamePatternRegexOptions);
         private static readonly Regex FileNamePatternForMembersRequiringMainThread = new Regex(@"^vs-threading\.MembersRequiringMainThread(\..*)?.txt$", FileNamePatternRegexOptions);
         private static readonly Regex FileNamePatternForMethodsThatAssertMainThread = new Regex(@"^vs-threading\.MainThreadAssertingMethods(\..*)?.txt$", FileNamePatternRegexOptions);
         private static readonly Regex FileNamePatternForMethodsThatSwitchToMainThread = new Regex(@"^vs-threading\.MainThreadSwitchingMethods(\..*)?.txt$", FileNamePatternRegexOptions);
 
-        private const RegexOptions FileNamePatternRegexOptions = RegexOptions.IgnoreCase | RegexOptions.Singleline;
         private static readonly TimeSpan RegexMatchTimeout = TimeSpan.FromSeconds(5);  // Prevent expensive CPU hang in Regex.Match if backtracking occurs due to pathological input (see vs-threading #485).
         private static readonly Regex NegatableTypeOrMemberReferenceRegex = new Regex(@"^(?<negated>!)?\[(?<typeName>[^\[\]\:]+)+\](?:\:\:(?<memberName>\S+))?\s*$", RegexOptions.Singleline | RegexOptions.CultureInvariant, RegexMatchTimeout);
         private static readonly char[] QualifiedIdentifierSeparators = new[] { '.' };
@@ -28,6 +28,8 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         /// <summary>
         /// Gets memebers that require main thread, from all available files matching <see cref="FileNamePatternForMembersRequiringMainThread"/>.
         /// </summary>
+        /// <param name="analyzerOptions">Compilation options.</param>
+        /// <param name="cancellationToken">Compilation cancellation token.</param>
         /// <returns>Array of members that require, assert, or switch to Main thread.</returns>
         public static ImmutableArray<TypeMatchSpec> GetMembersRequiringMainThread(AnalyzerOptions analyzerOptions, CancellationToken cancellationToken)
         {

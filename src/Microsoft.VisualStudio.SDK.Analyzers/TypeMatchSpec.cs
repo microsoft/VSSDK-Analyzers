@@ -5,9 +5,14 @@ using Microsoft.CodeAnalysis;
 
 namespace Microsoft.VisualStudio.SDK.Analyzers
 {
-    public readonly struct TypeMatchSpec
+    // Code copied from Microsoft.VisualStudio.Threading.Analyzers.
+#pragma warning disable SA1649 // File name should match first type name.
+#pragma warning disable SA1600 // Elements should be documented.
+#pragma warning disable SA1615 // Element return value should be documented.
+#pragma warning disable SA1611 // Element parameters should be documented.
+    internal readonly struct TypeMatchSpec
     {
-        public TypeMatchSpec(QualifiedType type, QualifiedMember member, bool inverted)
+        internal TypeMatchSpec(QualifiedType type, QualifiedMember member, bool inverted)
         {
             this.InvertedLogic = inverted;
             this.Type = type;
@@ -52,7 +57,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         /// <summary>
         /// Tests whether a given symbol matches the description of a type (independent of its <see cref="InvertedLogic"/> property).
         /// </summary>
-        public bool IsMatch(/*[NotNullWhen(true)]*/ ITypeSymbol? typeSymbol, ISymbol? memberSymbol)
+        public bool IsMatch(ITypeSymbol? typeSymbol, ISymbol? memberSymbol)
         {
             if (typeSymbol is null)
             {
@@ -78,7 +83,11 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         }
     }
 
-    public readonly struct QualifiedType
+    /// <summary>
+    /// Specifies a type and its namespace.
+    /// Copied from Microsoft.VisualStudio.Threading.Analyzers.
+    /// </summary>
+    internal readonly struct QualifiedType
     {
         public QualifiedType(IReadOnlyList<string> containingTypeNamespace, string typeName)
         {
@@ -99,7 +108,11 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         public override string ToString() => string.Join(".", this.Namespace.Concat(new[] { this.Name }));
     }
 
-    public readonly struct QualifiedMember
+    /// <summary>
+    /// Specifies member within a type.
+    /// Copied from Microsoft.VisualStudio.Threading.Analyzers.
+    /// </summary>
+    internal readonly struct QualifiedMember
     {
         public QualifiedMember(QualifiedType containingType, string methodName)
         {
@@ -120,3 +133,6 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         public override string ToString() => this.ContainingType.ToString() + "." + this.Name;
     }
 }
+#pragma warning restore SA1649 // File name should match first type name
+#pragma warning restore SA1600 // Elements should be documented
+#pragma warning restore SA1611 // Element parameters should be documented

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Collections.Generic;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -651,7 +650,6 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             /// </summary>
             internal static string FullName { get; } = string.Join(".", Namespace) + "." + TypeName;
         }
-
 
         /// <summary>
         /// Describes the <see cref="System.ComponentModel.Composition.IPartImportsSatisfiedNotification"/> type.
