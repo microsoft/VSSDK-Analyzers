@@ -182,6 +182,32 @@ class C
     }
 
     [Fact]
+    public async Task LazyPropertyInitializer_MainThreadAsserted_NoWarning()
+    {
+        var test = /* lang=c#-test */ @"
+using System.ComponentModel.Composition;
+using Microsoft.VisualStudio.Threading;
+
+[Export]
+class C
+{
+    private readonly AsyncLazy<object> _o;
+
+    [ImportingConstructor]
+    public C(JoinableTaskContext joinableTaskContext)
+    {
+        _o = new(async() =>
+        {
+            await joinableTaskContext.Factory.SwitchToMainThreadAsync(System.Threading.CancellationToken.None);
+            return Microsoft.VisualStudio.Shell.UIContext.FromUIContextGuid(System.Guid.Empty);
+        });
+    }
+}";
+
+        await Verify.VerifyAnalyzerAsync(test);
+    }
+
+    [Fact]
     public async Task PropertyGetter_MainThreadAsserted_NoWarning()
     {
         var test = /* lang=c#-test */ @"
@@ -450,5 +476,57 @@ internal class C
 ";
 
         await Verify.VerifyAnalyzerAsync(test);
+    }
+
+    [Fact]
+    public async Task Constructor_MainThreadRequired_LocalFunction_Flagged()
+    {
+        var test = /* lang=c#-test */ @"
+using System.ComponentModel.Composition;
+
+[Export]
+class C
+{
+    public C()
+    {
+        LocalFunction();
+
+        void LocalFunction()
+        {
+            Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
+        }
+    }
+}";
+
+        DiagnosticResult expected = Verify.Diagnostic().WithSpan(13, 13, 13, 77);
+        await Verify.VerifyAnalyzerAsync(test, expected);
+    }
+
+    [Fact]
+    public async Task Constructor_MainThreadRequired_LocalFunction_FireAndForget_Flagged_FalsePositive()
+    {
+        var test = /* lang=c#-test */ @"
+using Microsoft.VisualStudio.Threading;
+using System.ComponentModel.Composition;
+using System.Threading.Tasks;
+
+[Export]
+class C
+{
+    [ImportingConstructor]
+    public C(JoinableTaskContext joinableTaskContext)
+    {
+        LocalFunctionAsync().Forget();
+
+        async Task LocalFunctionAsync()
+        {
+            await joinableTaskContext.Factory.SwitchToMainThreadAsync();
+            return;
+        }
+    }
+}";
+
+        DiagnosticResult expected = Verify.Diagnostic().WithSpan(16, 19, 16, 72);
+        await Verify.VerifyAnalyzerAsync(test, expected);
     }
 }

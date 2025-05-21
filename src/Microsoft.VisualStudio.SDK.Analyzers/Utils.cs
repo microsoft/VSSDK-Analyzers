@@ -324,6 +324,28 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             return !matching.IsEmpty && !matching.InvertedLogic;
         }
 
+        /// <summary>
+        /// Returns whether <paramref name="node"/> is a child of a lambda or delegate.
+        /// </summary>
+        /// <param name="node">Syntax node to check.</param>
+        /// <returns><see langword="true" /> if the <paramref name="node"/> is a child node of lambda or delegate syntax.</returns>
+        internal static bool IsChildOfDelegateOrLambda(SyntaxNode? node)
+        {
+            while (node != null)
+            {
+                if (node is ParenthesizedLambdaExpressionSyntax || // (x) => x + 1
+                    node is SimpleLambdaExpressionSyntax || // x =? x + 1
+                    node is AnonymousMethodExpressionSyntax) // delegate { }
+                {
+                    return true;
+                }
+
+                node = node.Parent;
+            }
+
+            return false;
+        }
+
         private static bool LaunchDebuggerExceptionFilter()
         {
 #if DEBUG

@@ -97,6 +97,15 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 return;
             }
 
+            if (Utils.IsChildOfDelegateOrLambda(operation.Syntax))
+            {
+                // Don't test delegates or lambdas, because they are frequently invoked either asynchronously or lazily.
+                // This is to reduce number of false positives (delegate initialized at construction).
+                // We still suffer from a false positive of a "fire and forget" async method invoked in the constructor,
+                // because it's very hard to detect such invocations that are awaited. In these edge cases, extender should suppress the warning.
+                return;
+            }
+
             // If there is a containing method, check if it's a parameterless constructor, or decorated with partImportsSatisfiedNotificationInterface or importingConstructorAttribute
             if (containingSymbol is IMethodSymbol methodSymbol)
             {
