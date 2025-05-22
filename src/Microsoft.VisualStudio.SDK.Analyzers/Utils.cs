@@ -333,9 +333,9 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         {
             while (node != null)
             {
-                if (node is ParenthesizedLambdaExpressionSyntax || // (x) => x + 1
-                    node is SimpleLambdaExpressionSyntax || // x =? x + 1
-                    node is AnonymousMethodExpressionSyntax) // delegate { }
+                if (node is ParenthesizedLambdaExpressionSyntax ||
+                    node is SimpleLambdaExpressionSyntax ||
+                    node is AnonymousMethodExpressionSyntax)
                 {
                     return true;
                 }
