@@ -502,6 +502,11 @@ class C
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
+    /// <summary>
+    /// This test case showcases a false positive, where a file-and-forget function is flagged.
+    /// It's OK to access UI thread within the local function which executes asynchronously and
+    /// MEF part construction does not join on this async work.
+    /// </summary>
     [Fact]
     public async Task Constructor_MainThreadRequired_LocalFunction_FireAndForget_Flagged_FalsePositive()
     {
@@ -526,7 +531,39 @@ class C
     }
 }";
 
-        DiagnosticResult expected = Verify.Diagnostic().WithSpan(16, 19, 16, 72);
-        await Verify.VerifyAnalyzerAsync(test, expected);
+        DiagnosticResult falsePositive = Verify.Diagnostic().WithSpan(16, 19, 16, 72);
+        await Verify.VerifyAnalyzerAsync(test, falsePositive);
+    }
+
+    /// <summary>
+    /// This test showcases a false negative, where VSSDK013 does not report
+    /// UI thread dependency inside the async lambda. To reduce number of false positives,
+    /// we assume that lambdas are executed asynchronously.
+    /// In this example, execution joins the lambda, effectively blocking UI thread.
+    /// </summary>
+    [Fact]
+    public async Task JoiningAsyncLambda_MainThreadAsserted_NoWarning_FalseNegative()
+    {
+        var test = /* lang=c#-test */ @"
+using System.ComponentModel.Composition;
+using Microsoft.VisualStudio.Threading;
+
+[Export]
+class C
+{
+    private readonly AsyncLazy<object> _o;
+
+    [ImportingConstructor]
+    public C(JoinableTaskContext joinableTaskContext)
+    {
+        var s = joinableTaskContext.Factory.Run(async () =>
+        {
+            await joinableTaskContext.Factory.SwitchToMainThreadAsync(System.Threading.CancellationToken.None);
+            return ""test"";
+        });
+    }
+}";
+
+        await Verify.VerifyAnalyzerAsync(test);
     }
 }
