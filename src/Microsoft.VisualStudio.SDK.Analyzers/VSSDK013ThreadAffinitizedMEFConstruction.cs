@@ -28,7 +28,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         /// </summary>
         internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: Id,
-            title: "Free threaded MEF Part construction",
+            title: "Avoid UI thread in MEF Part construction",
             messageFormat: "MEF part construction must not have UI thread affinity",
             helpLinkUri: Utils.GetHelpLink(Id),
             category: "Reliability",
