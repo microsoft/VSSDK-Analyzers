@@ -36,7 +36,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             isEnabledByDefault: true);
 
         /// <inheritdoc />
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Descriptor);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = [Descriptor];
 
         private ImmutableArray<TypeMatchSpec> MembersRequiringMainThread { get; set; }
 
@@ -134,7 +134,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 }
                 else
                 {
-                    // This analyzer does not enforce threading contstraints on any other methods.
+                    // This analyzer does not enforce threading constraints on any other methods.
                     return;
                 }
             }

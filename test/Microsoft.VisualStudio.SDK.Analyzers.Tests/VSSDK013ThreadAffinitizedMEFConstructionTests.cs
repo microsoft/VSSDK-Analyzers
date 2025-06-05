@@ -37,12 +37,11 @@ class C
 {
     public C()
     {
-        Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
+        [|Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread()|];
     }
 }";
 
-        DiagnosticResult expected = Verify.Diagnostic().WithSpan(9, 9, 9, 73);
-        await Verify.VerifyAnalyzerAsync(test, expected);
+        await Verify.VerifyAnalyzerAsync(test);
     }
 
     [Fact]

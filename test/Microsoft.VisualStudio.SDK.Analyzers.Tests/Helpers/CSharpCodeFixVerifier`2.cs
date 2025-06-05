@@ -90,10 +90,8 @@ public static class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
 
         private static string ReadManifestResource(Assembly assembly, string resourceName)
         {
-            using (var reader = new StreamReader(assembly.GetManifestResourceStream(resourceName) ?? throw Assumes.Fail("Resource not found.")))
-            {
-                return reader.ReadToEnd();
-            }
+            using var reader = new StreamReader(assembly.GetManifestResourceStream(resourceName) ?? throw Assumes.Fail("Resource not found."));
+            return reader.ReadToEnd();
         }
     }
 }
