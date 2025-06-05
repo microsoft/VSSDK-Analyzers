@@ -86,5 +86,24 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             nameof(global::System.Threading),
             nameof(global::System.Threading.Tasks),
         };
+
+        /// <summary>
+        /// Gets an array for each element in the namespace System.ComponentModel.Composition.
+        /// </summary>
+        internal static readonly IReadOnlyList<string> SystemComponentModelComposition = new[]
+        {
+            nameof(System),
+            nameof(global::System.ComponentModel),
+            nameof(global::System.ComponentModel.Composition),
+        };
+
+        /// <summary>
+        /// Gets an array for each element in the namespace System.Composition.
+        /// </summary>
+        internal static readonly IReadOnlyList<string> SystemComposition = new[]
+        {
+            nameof(System),
+            nameof(global::System.Composition),
+        };
     }
 }

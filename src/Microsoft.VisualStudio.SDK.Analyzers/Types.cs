@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Collections.Generic;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -588,6 +587,120 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 /// </summary>
                 BackgroundLoad = 2,
             }
+
+            /// <summary>
+            /// Gets the <see cref="Microsoft.CodeAnalysis.CSharp.Syntax.TypeSyntax"/> for this type.
+            /// </summary>
+            internal static TypeSyntax TypeSyntax { get; } = Utils.QualifyName(Namespace, SyntaxFactory.IdentifierName(TypeName));
+
+            /// <summary>
+            /// Gets the fully-qualified name of this type as a string.
+            /// </summary>
+            internal static string FullName { get; } = string.Join(".", Namespace) + "." + TypeName;
+        }
+
+        /// <summary>
+        /// Describes the <see cref="System.ComponentModel.Composition.ExportAttribute"/> type.
+        /// </summary>
+        internal static class ExportAttribute
+        {
+            /// <summary>
+            /// Gets the simple name of the <see cref="System.ComponentModel.Composition.ExportAttribute"/> type.
+            /// </summary>
+            internal const string TypeName = nameof(System.ComponentModel.Composition.ExportAttribute);
+
+            /// <summary>
+            /// Gets an array of the nesting namespaces for this type.
+            /// </summary>
+            internal static readonly IReadOnlyList<string> Namespace = Namespaces.SystemComponentModelComposition;
+
+            /// <summary>
+            /// Gets the <see cref="Microsoft.CodeAnalysis.CSharp.Syntax.TypeSyntax"/> for this type.
+            /// </summary>
+            internal static TypeSyntax TypeSyntax { get; } = Utils.QualifyName(Namespace, SyntaxFactory.IdentifierName(TypeName));
+
+            /// <summary>
+            /// Gets the fully-qualified name of this type as a string.
+            /// </summary>
+            internal static string FullName { get; } = string.Join(".", Namespace) + "." + TypeName;
+        }
+
+        /// <summary>
+        /// Describes the <see cref="System.ComponentModel.Composition.ImportingConstructorAttribute"/> type.
+        /// </summary>
+        internal static class ImportingConstructorAttribute
+        {
+            /// <summary>
+            /// Gets the simple name of the <see cref="System.ComponentModel.Composition.ImportingConstructorAttribute"/> type.
+            /// </summary>
+            internal const string TypeName = nameof(System.ComponentModel.Composition.ImportingConstructorAttribute);
+
+            /// <summary>
+            /// Gets an array of the nesting namespaces for this type.
+            /// </summary>
+            internal static readonly IReadOnlyList<string> Namespace = Namespaces.SystemComponentModelComposition;
+
+            /// <summary>
+            /// Gets the <see cref="Microsoft.CodeAnalysis.CSharp.Syntax.TypeSyntax"/> for this type.
+            /// </summary>
+            internal static TypeSyntax TypeSyntax { get; } = Utils.QualifyName(Namespace, SyntaxFactory.IdentifierName(TypeName));
+
+            /// <summary>
+            /// Gets the fully-qualified name of this type as a string.
+            /// </summary>
+            internal static string FullName { get; } = string.Join(".", Namespace) + "." + TypeName;
+        }
+
+        /// <summary>
+        /// Describes the <see cref="System.ComponentModel.Composition.IPartImportsSatisfiedNotification"/> type.
+        /// </summary>
+        internal static class IPartImportsSatisfiedNotification
+        {
+            /// <summary>
+            /// Gets the simple name of the <see cref="System.ComponentModel.Composition.IPartImportsSatisfiedNotification"/> type.
+            /// </summary>
+            internal const string TypeName = nameof(System.ComponentModel.Composition.IPartImportsSatisfiedNotification);
+
+            /// <summary>
+            /// Gets the method name of <see cref="System.ComponentModel.Composition.IPartImportsSatisfiedNotification.OnImportsSatisfied"/>.
+            /// </summary>
+            internal const string OnImportsSatisfied = "OnImportsSatisfied";
+
+            /// <summary>
+            /// Gets an array of the nesting namespaces for this type.
+            /// </summary>
+            internal static readonly IReadOnlyList<string> Namespace = Namespaces.SystemComponentModelComposition;
+
+            /// <summary>
+            /// Gets the <see cref="Microsoft.CodeAnalysis.CSharp.Syntax.TypeSyntax"/> for this type.
+            /// </summary>
+            internal static TypeSyntax TypeSyntax { get; } = Utils.QualifyName(Namespace, SyntaxFactory.IdentifierName(TypeName));
+
+            /// <summary>
+            /// Gets the fully-qualified name of this type as a string.
+            /// </summary>
+            internal static string FullName { get; } = string.Join(".", Namespace) + "." + TypeName;
+
+            /// <summary>
+            /// Gets the full name of <see cref="System.ComponentModel.Composition.IPartImportsSatisfiedNotification.OnImportsSatisfied"/>.
+            /// </summary>
+            internal static string OnImportsSatisfiedFullName { get; } = string.Join(".", Namespace) + "." + TypeName + "." + OnImportsSatisfied;
+        }
+
+        /// <summary>
+        /// Describes the <see cref="System.Composition.OnImportsSatisfiedAttribute"/> type.
+        /// </summary>
+        internal static class OnImportsSatisfiedAttribute
+        {
+            /// <summary>
+            /// Gets the simple name of the <see cref="System.Composition.OnImportsSatisfiedAttribute"/> type.
+            /// </summary>
+            internal const string TypeName = nameof(System.Composition.OnImportsSatisfiedAttribute);
+
+            /// <summary>
+            /// Gets an array of the nesting namespaces for this type.
+            /// </summary>
+            internal static readonly IReadOnlyList<string> Namespace = Namespaces.SystemComponentModelComposition;
 
             /// <summary>
             /// Gets the <see cref="Microsoft.CodeAnalysis.CSharp.Syntax.TypeSyntax"/> for this type.
