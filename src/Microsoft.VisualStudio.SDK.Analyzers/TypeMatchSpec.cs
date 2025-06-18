@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 
 namespace Microsoft.VisualStudio.SDK.Analyzers
@@ -40,7 +41,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         public QualifiedMember Member { get; }
 
         /// <summary>
-        /// Gets a value indicating whether a member match is reuqired.
+        /// Gets a value indicating whether a member match is required.
         /// </summary>
         public bool IsMember => this.Member.Name is object;
 
@@ -52,7 +53,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         /// <summary>
         /// Gets a value indicating whether this is an uninitialized (default) instance.
         /// </summary>
-        public bool IsEmpty => this.Type.Namespace is null;
+        public bool IsEmpty => this.Type.Namespace.IsDefaultOrEmpty;
 
         /// <summary>
         /// Tests whether a given symbol matches the description of a type (independent of its <see cref="InvertedLogic"/> property).
@@ -89,13 +90,13 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
     /// </summary>
     internal readonly struct QualifiedType
     {
-        public QualifiedType(IReadOnlyList<string> containingTypeNamespace, string typeName)
+        public QualifiedType(ImmutableArray<string> containingTypeNamespace, string typeName)
         {
             this.Namespace = containingTypeNamespace;
             this.Name = typeName;
         }
 
-        public IReadOnlyList<string> Namespace { get; }
+        public ImmutableArray<string> Namespace { get; }
 
         public string Name { get; }
 
