@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Microsoft.CodeAnalysis.Testing;
 using Xunit;
 using Verify = CSharpCodeFixVerifier<
     Microsoft.VisualStudio.SDK.Analyzers.VSSDK013ThreadAffinitizedMEFConstruction,
@@ -60,12 +59,11 @@ class C
     [ImportingConstructor]
     public C(bool b)
     {
-        Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
+        [|Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread()|];
     }
 }";
 
-        DiagnosticResult expected = Verify.Diagnostic().WithSpan(14, 9, 14, 73);
-        await Verify.VerifyAnalyzerAsync(test, expected);
+        await Verify.VerifyAnalyzerAsync(test);
     }
 
     [Fact]
@@ -83,12 +81,11 @@ class C : IPartImportsSatisfiedNotification
 
     void IPartImportsSatisfiedNotification.OnImportsSatisfied()
     {
-        Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
+        [|Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread()|];
     }
 }";
 
-        DiagnosticResult expected = Verify.Diagnostic().WithSpan(13, 9, 13, 73);
-        await Verify.VerifyAnalyzerAsync(test, expected);
+        await Verify.VerifyAnalyzerAsync(test);
     }
 
     [Fact]
@@ -106,12 +103,11 @@ class C : IPartImportsSatisfiedNotification
 
     public void OnImportsSatisfied()
     {
-        Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
+        [|Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread()|];
     }
 }";
 
-        DiagnosticResult expected = Verify.Diagnostic().WithSpan(13, 9, 13, 73);
-        await Verify.VerifyAnalyzerAsync(test, expected);
+        await Verify.VerifyAnalyzerAsync(test);
     }
 
     [Fact]
@@ -149,15 +145,14 @@ using System.ComponentModel.Composition;
 [Export]
 class C
 {
-    object o = Microsoft.VisualStudio.Shell.UIContext.FromUIContextGuid(System.Guid.Empty);
+    object o = [|Microsoft.VisualStudio.Shell.UIContext.FromUIContextGuid(System.Guid.Empty)|];
 
     public C()
     {
     }
 }";
 
-        DiagnosticResult expected = Verify.Diagnostic().WithSpan(7, 16, 7, 91);
-        await Verify.VerifyAnalyzerAsync(test, expected);
+        await Verify.VerifyAnalyzerAsync(test);
     }
 
     [Fact]
@@ -169,15 +164,14 @@ using System.ComponentModel.Composition;
 [Export]
 class C
 {
-    object o { get; } = Microsoft.VisualStudio.Shell.UIContext.FromUIContextGuid(System.Guid.Empty);
+    object o { get; } = [|Microsoft.VisualStudio.Shell.UIContext.FromUIContextGuid(System.Guid.Empty)|];
 
     public C()
     {
     }
 }";
 
-        DiagnosticResult expected = Verify.Diagnostic().WithSpan(7, 25, 7, 100);
-        await Verify.VerifyAnalyzerAsync(test, expected);
+        await Verify.VerifyAnalyzerAsync(test);
     }
 
     [Fact]
@@ -318,12 +312,11 @@ class C
     [ImportingConstructor]
     public C()
     {
-        Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
+        [|Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread()|];
     }
 }";
 
-        DiagnosticResult expected = Verify.Diagnostic().WithSpan(10, 9, 10, 73);
-        await Verify.VerifyAnalyzerAsync(test, expected);
+        await Verify.VerifyAnalyzerAsync(test);
     }
 
     [Fact]
@@ -343,12 +336,11 @@ class C
     [ImportingConstructor]
     public C(bool b)
     {
-        Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
+        [|Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread()|];
     }
 }";
 
-        DiagnosticResult expected = Verify.Diagnostic().WithSpan(15, 9, 15, 73);
-        await Verify.VerifyAnalyzerAsync(test, expected);
+        await Verify.VerifyAnalyzerAsync(test);
     }
 
     [Fact]
@@ -492,13 +484,12 @@ class C
 
         void LocalFunction()
         {
-            Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
+            [|Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread()|];
         }
     }
 }";
 
-        DiagnosticResult expected = Verify.Diagnostic().WithSpan(13, 13, 13, 77);
-        await Verify.VerifyAnalyzerAsync(test, expected);
+        await Verify.VerifyAnalyzerAsync(test);
     }
 
     /// <summary>
@@ -524,14 +515,13 @@ class C
 
         async Task LocalFunctionAsync()
         {
-            await joinableTaskContext.Factory.SwitchToMainThreadAsync();
+            await [|joinableTaskContext.Factory.SwitchToMainThreadAsync()|];
             return;
         }
     }
 }";
 
-        DiagnosticResult falsePositive = Verify.Diagnostic().WithSpan(16, 19, 16, 72);
-        await Verify.VerifyAnalyzerAsync(test, falsePositive);
+        await Verify.VerifyAnalyzerAsync(test);
     }
 
     /// <summary>
