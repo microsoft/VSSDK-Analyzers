@@ -55,9 +55,10 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             context.RegisterCompilationStartAction(startCompilation =>
             {
                 this.MembersRequiringMainThread = AdditionalFilesHelpers.GetMembersRequiringMainThread(startCompilation.Options, startCompilation.CancellationToken);
-                INamedTypeSymbol? importingConstructorAttribute = startCompilation.Compilation.GetTypeByMetadataName(Types.ImportingConstructorAttribute.FullName)?.OriginalDefinition;
-                INamedTypeSymbol? partImportsSatisfiedNotificationInterface = startCompilation.Compilation.GetTypeByMetadataName(Types.IPartImportsSatisfiedNotification.FullName)?.OriginalDefinition;
                 INamedTypeSymbol? exportAttributeType = startCompilation.Compilation.GetTypeByMetadataName(Types.ExportAttribute.FullName)?.OriginalDefinition;
+                INamedTypeSymbol? importingConstructorAttribute = startCompilation.Compilation.GetTypeByMetadataName(Types.ImportingConstructorAttribute.FullName)?.OriginalDefinition;
+                INamedTypeSymbol? inheritedExportAttribute = startCompilation.Compilation.GetTypeByMetadataName(Types.InheritedExportAttribute.FullName)?.OriginalDefinition;
+                INamedTypeSymbol? partImportsSatisfiedNotificationInterface = startCompilation.Compilation.GetTypeByMetadataName(Types.IPartImportsSatisfiedNotification.FullName)?.OriginalDefinition;
 
                 if (exportAttributeType is null)
                 {
@@ -65,7 +66,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 }
 
                 startCompilation.RegisterOperationAction(
-                    Utils.DebuggableWrapper(c => this.AnalyzeOperation(c, exportAttributeType, importingConstructorAttribute, partImportsSatisfiedNotificationInterface)),
+                    Utils.DebuggableWrapper(c => this.AnalyzeOperation(c, exportAttributeType, inheritedExportAttribute, importingConstructorAttribute, partImportsSatisfiedNotificationInterface)),
                     OperationKind.MethodReference,
                     OperationKind.InstanceReference,
                     OperationKind.FieldReference,
@@ -80,6 +81,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         private void AnalyzeOperation(
             OperationAnalysisContext c,
             INamedTypeSymbol exportAttributeType,
+            INamedTypeSymbol inheritedExportAttribute,
             INamedTypeSymbol? importingConstructorAttribute,
             INamedTypeSymbol? partImportsSatisfiedNotificationInterface)
         {
@@ -95,8 +97,23 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
 
             if (!containingType.GetAttributes().Any(attr => Utils.IsEqualToOrDerivedFrom(attr.AttributeClass, exportAttributeType)))
             {
-                // This type is not a MEF part, don't check it.
-                return;
+                // It looks like this type is not a MEF part, so try to return early without checking it.
+
+                // But first, check if any base type is decorated with [InheritedExport] attribute.
+                INamedTypeSymbol? baseType = containingType.BaseType;
+                if (inheritedExportAttribute is not null && baseType is not null)
+                {
+                    if (!Utils.HasInheritedAttribute(baseType, inheritedExportAttribute))
+                    {
+                        // Neither this type nor its base type is a MEF part.
+                        return;
+                    }
+                }
+                else
+                {
+                    // This type is not a MEF part, and it does not have a base class that might be a MEF part.
+                    return;
+                }
             }
 
             if (Utils.IsChildOfDelegateOrLambda(operation.Syntax))

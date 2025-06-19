@@ -712,5 +712,31 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             /// </summary>
             internal static string FullName { get; } = string.Join(".", Namespace) + "." + TypeName;
         }
+
+        /// <summary>
+        /// Describes the <see cref="System.ComponentModel.Composition.InheritedExportAttribute"/> type.
+        /// </summary>
+        internal static class InheritedExportAttribute
+        {
+            /// <summary>
+            /// Gets the simple name of the <see cref="System.ComponentModel.Composition.InheritedExportAttribute"/> type.
+            /// </summary>
+            internal const string TypeName = nameof(System.ComponentModel.Composition.InheritedExportAttribute);
+
+            /// <summary>
+            /// Gets an array of the nesting namespaces for this type.
+            /// </summary>
+            internal static readonly IReadOnlyList<string> Namespace = Namespaces.SystemComponentModelComposition;
+
+            /// <summary>
+            /// Gets the <see cref="Microsoft.CodeAnalysis.CSharp.Syntax.TypeSyntax"/> for this type.
+            /// </summary>
+            internal static TypeSyntax TypeSyntax { get; } = Utils.QualifyName(Namespace, SyntaxFactory.IdentifierName(TypeName));
+
+            /// <summary>
+            /// Gets the fully-qualified name of this type as a string.
+            /// </summary>
+            internal static string FullName { get; } = string.Join(".", Namespace) + "." + TypeName;
+        }
     }
 }

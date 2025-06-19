@@ -157,6 +157,28 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         }
 
         /// <summary>
+        /// Gets whether any of the base types of <paramref name="type"/> is decorated with attribute
+        /// equal to or derived from <paramref name="attributeBaseType"/>.
+        /// </summary>
+        /// <param name="type">The type to check.</param>
+        /// <param name="attributeBaseType">The type to compare attributes to.</param>
+        /// <returns><see langword="true"/> if <paramref name="type"/> is decorated with attribute equal to or derived from <paramref name="attributeBaseType"/>.</returns>
+        internal static bool HasInheritedAttribute(INamedTypeSymbol? type, INamedTypeSymbol attributeBaseType)
+        {
+            while (type != null)
+            {
+                if (type.GetAttributes().Any(attr => Utils.IsEqualToOrDerivedFrom(attr.AttributeClass, attributeBaseType)))
+                {
+                    return true;
+                }
+
+                type = type.BaseType;
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Produces the syntax necessary to qualify a simple name.
         /// </summary>
         /// <param name="qualifiers">The qualifiers (e.g. the namespace that qualifies a type).</param>

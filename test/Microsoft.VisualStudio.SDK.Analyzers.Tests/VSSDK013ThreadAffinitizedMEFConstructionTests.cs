@@ -64,6 +64,26 @@ class C
     }
 
     [Fact]
+    public async Task InheritedExport_Constructor_MainThreadRequired_Flagged()
+    {
+        var test = /* lang=c#-test */ @"
+using System.ComponentModel.Composition;
+
+[InheritedExport]
+class B {}
+
+class C : B
+{
+    public C()
+    {
+        [|Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread()|];
+    }
+}";
+
+        await Verify.VerifyAnalyzerAsync(test);
+    }
+
+    [Fact]
     public async Task ImportingConstructor_MainThreadAsserted_Flagged()
     {
         var test = /* lang=c#-test */ @"
