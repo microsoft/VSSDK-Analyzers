@@ -93,7 +93,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 return;
             }
 
-            if (!containingType.GetAttributes().Any(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, exportAttributeType)))
+            if (!containingType.GetAttributes().Any(attr => Utils.IsEqualToOrDerivedFrom(attr.AttributeClass, exportAttributeType)))
             {
                 // This type is not a MEF part, don't check it.
                 return;

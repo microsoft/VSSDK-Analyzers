@@ -44,6 +44,26 @@ class C
     }
 
     [Fact]
+    public async Task DerivedExport_Constructor_MainThreadRequired_Flagged()
+    {
+        var test = /* lang=c#-test */ @"
+using System.ComponentModel.Composition;
+
+class MyExportAttribute : ExportAttribute {}
+
+[MyExport]
+class C
+{
+    public C()
+    {
+        [|Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread()|];
+    }
+}";
+
+        await Verify.VerifyAnalyzerAsync(test);
+    }
+
+    [Fact]
     public async Task ImportingConstructor_MainThreadAsserted_Flagged()
     {
         var test = /* lang=c#-test */ @"
