@@ -59,7 +59,13 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 INamedTypeSymbol? partImportsSatisfiedNotificationInterface = startCompilation.Compilation.GetTypeByMetadataName(Types.IPartImportsSatisfiedNotification.FullName)?.OriginalDefinition;
                 INamedTypeSymbol? exportAttributeType = startCompilation.Compilation.GetTypeByMetadataName(Types.ExportAttribute.FullName)?.OriginalDefinition;
 
-                var operationKinds = ImmutableArray.Create<OperationKind>(
+                if (exportAttributeType is null)
+                {
+                    return;
+                }
+
+                startCompilation.RegisterOperationAction(
+                    Utils.DebuggableWrapper(c => this.AnalyzeOperation(c, exportAttributeType, importingConstructorAttribute, partImportsSatisfiedNotificationInterface)),
                     OperationKind.MethodReference,
                     OperationKind.InstanceReference,
                     OperationKind.FieldReference,
@@ -68,16 +74,12 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                     OperationKind.MemberInitializer, // For static member access
                     OperationKind.PropertyReference, // For property access
                     OperationKind.ObjectCreation); // For object creation scenarios
-
-                startCompilation.RegisterOperationAction(
-                    Utils.DebuggableWrapper(c => this.AnalyzeOperation(c, exportAttributeType, importingConstructorAttribute, partImportsSatisfiedNotificationInterface)),
-                    operationKinds);
             });
         }
 
         private void AnalyzeOperation(
             OperationAnalysisContext c,
-            INamedTypeSymbol? exportAttributeType,
+            INamedTypeSymbol exportAttributeType,
             INamedTypeSymbol? importingConstructorAttribute,
             INamedTypeSymbol? partImportsSatisfiedNotificationInterface)
         {
@@ -85,7 +87,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             IOperation operation = c.Operation;
             INamedTypeSymbol containingType = containingSymbol.ContainingType;
 
-            if (containingType is null || exportAttributeType is null)
+            if (containingType is null)
             {
                 // This code does not belong to a type, or we can't get a hold of [Export]Attribute. This analyzer does not apply.
                 return;
@@ -109,7 +111,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             // If there is a containing method, check if it's a parameterless constructor, or decorated with partImportsSatisfiedNotificationInterface or importingConstructorAttribute
             if (containingSymbol is IMethodSymbol methodSymbol)
             {
-                if (methodSymbol.MethodKind == MethodKind.Constructor && methodSymbol.Parameters.Length == 0)
+                if (methodSymbol is { MethodKind: MethodKind.Constructor, Parameters: [] })
                 {
                     // Check if there is any other constructor decorated with importingConstructorAttribute
                     if (containingType.Constructors.Any(ctor =>
@@ -150,9 +152,9 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                     IPropertyReferenceOperation op => op.Property,
                     IMethodReferenceOperation op => op.Method,
                     IObjectCreationOperation op => op.Constructor,
-                    IObjectOrCollectionInitializerOperation op => op.Parent is not null ? GetSymbolFromOperation(op.Parent) : null,
-                    IInstanceReferenceOperation op => op.Parent is not null ? GetSymbolFromOperation(op.Parent) : null,
-                    IMemberInitializerOperation op => op.Parent is not null ? GetSymbolFromOperation(op.Parent) : null,
+                    IObjectOrCollectionInitializerOperation { Parent: { } parent } => GetSymbolFromOperation(parent),
+                    IInstanceReferenceOperation { Parent: { } parent } => GetSymbolFromOperation(parent),
+                    IMemberInitializerOperation { Parent: { } parent } => GetSymbolFromOperation(parent),
                     _ => null,
                 };
             }

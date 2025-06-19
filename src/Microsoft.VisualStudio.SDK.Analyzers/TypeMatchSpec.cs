@@ -134,6 +134,3 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         public override string ToString() => this.ContainingType.ToString() + "." + this.Name;
     }
 }
-#pragma warning restore SA1649 // File name should match first type name
-#pragma warning restore SA1600 // Elements should be documented
-#pragma warning restore SA1611 // Element parameters should be documented
