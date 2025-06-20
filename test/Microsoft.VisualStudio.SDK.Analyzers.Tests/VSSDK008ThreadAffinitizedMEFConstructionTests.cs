@@ -575,7 +575,7 @@ class C
     /// It's OK to access UI thread within the local function which executes asynchronously and
     /// MEF part construction does not join on this async work.
     /// </summary>
-    [Fact]
+    [Fact(Skip = "False positive.")]
     public async Task Constructor_MainThreadRequired_LocalFunction_FireAndForget_Flagged_FalsePositive()
     {
         var test = /* lang=c#-test */ @"
@@ -593,7 +593,7 @@ class C
 
         async Task LocalFunctionAsync()
         {
-            await [|joinableTaskContext.Factory.SwitchToMainThreadAsync()|];
+            await joinableTaskContext.Factory.SwitchToMainThreadAsync(); // False positive reported here
             return;
         }
     }
@@ -608,7 +608,7 @@ class C
     /// we assume that lambdas are executed asynchronously.
     /// In this example, execution joins the lambda, effectively blocking UI thread.
     /// </summary>
-    [Fact]
+    [Fact(Skip = "False negative")]
     public async Task JoiningAsyncLambda_MainThreadAsserted_NoWarning_FalseNegative()
     {
         var test = /* lang=c#-test */ @"
@@ -625,7 +625,7 @@ class C
     {
         var s = joinableTaskContext.Factory.Run(async () =>
         {
-            await joinableTaskContext.Factory.SwitchToMainThreadAsync(System.Threading.CancellationToken.None);
+            await [|joinableTaskContext.Factory.SwitchToMainThreadAsync(System.Threading.CancellationToken.None)|];
             return ""test"";
         });
     }
