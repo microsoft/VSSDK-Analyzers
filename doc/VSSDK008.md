@@ -108,12 +108,6 @@ class MyMEFComponent
 }
 ```
 
-### Use free-threaded dependencies
-Replace UI thread-affinitized dependencies with thread-safe alternatives during construction:
-```
-TBD
-```
-
 ### Use thread-safe initialization
 
 Initialize UI thread-affinitized dependencies on demand, after the MEF part has been constructed.
