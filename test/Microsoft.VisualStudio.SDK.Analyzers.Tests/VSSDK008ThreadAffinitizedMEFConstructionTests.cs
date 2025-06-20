@@ -3,10 +3,10 @@
 
 using Xunit;
 using Verify = CSharpCodeFixVerifier<
-    Microsoft.VisualStudio.SDK.Analyzers.VSSDK013ThreadAffinitizedMEFConstruction,
+    Microsoft.VisualStudio.SDK.Analyzers.VSSDK008ThreadAffinitizedMEFConstruction,
     Microsoft.CodeAnalysis.Testing.EmptyCodeFixProvider>;
 
-public class VSSDK013ThreadAffinitizedMEFConstructionTests
+public class VSSDK008ThreadAffinitizedMEFConstructionTests
 {
     [Fact]
     public async Task NoExport_NoWarning()

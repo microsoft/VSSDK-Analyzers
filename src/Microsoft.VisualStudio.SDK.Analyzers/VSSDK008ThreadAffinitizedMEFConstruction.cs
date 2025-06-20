@@ -9,19 +9,23 @@ using Microsoft.CodeAnalysis.Operations;
 namespace Microsoft.VisualStudio.SDK.Analyzers
 {
     /// <summary>
-    /// Identifies cases where a class decorated with [Export] accesses any member bound to UI thread from
-    /// - Constructor with no params
-    /// - Constructor decorated with [ImportingConstructor]
-    /// - Field or property initializer
+    /// Identifies cases where a class decorated with [Export] accesses any member bound to UI thread from:
+    /// - Constructor with no params.
+    /// - Constructor decorated with [ImportingConstructor].
+    /// - Field or property initializer.
     /// - implementation of IPartImportsSatisfiedNotification.OnImportsSatisfied.
+    /// Supported edge cases:
+    /// - Base class decorated with [InheritedExport].
+    /// - class decorated with attribute derived from ExportAttribute.
+    /// - exported member, not a class.
     /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class VSSDK013ThreadAffinitizedMEFConstruction : DiagnosticAnalyzer
+    public class VSSDK008ThreadAffinitizedMEFConstruction : DiagnosticAnalyzer
     {
         /// <summary>
         /// The value to use for <see cref="DiagnosticDescriptor.Id"/> in generated diagnostics.
         /// </summary>
-        public const string Id = "VSSDK013";
+        public const string Id = "VSSDK008";
 
         /// <summary>
         /// A reusable descriptor for diagnostics produced by this analyzer.
@@ -81,7 +85,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         private void AnalyzeOperation(
             OperationAnalysisContext c,
             INamedTypeSymbol exportAttributeType,
-            INamedTypeSymbol inheritedExportAttribute,
+            INamedTypeSymbol? inheritedExportAttribute,
             INamedTypeSymbol? importingConstructorAttribute,
             INamedTypeSymbol? partImportsSatisfiedNotificationInterface)
         {
