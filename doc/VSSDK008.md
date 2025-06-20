@@ -1,17 +1,29 @@
 # VSSDK008 Avoid UI thread in MEF Part construction
 
-The Visual Studio Editor is composed using MEF (Managed Extensibility Framework). In this document, we will refer to each extensibility contribution as _MEF part_.
+Historically, the Visual Studio Editor initialized its components on the UI thread. However, to improve startup performance, Visual Studio is evolving to load Editor components on background threads.
 
-Code is free-threaded if it (and all code it invokes transitively) can complete on the caller's thread, no matter which thread that is. 
-Code that is not free-threaded is said to be thread-affinitized, meaning some of its work may require execution on a particular thread.
-MEF activation code paths (importing constructors, OnImportsSatisfied callbacks, and any code called from them) should be free-threaded.
+The Visual Studio Editor is composed using MEF (Managed Extensibility Framework), and Editor components are referred to as **MEF parts**.
 
-So far, the Visual Studio Editor has initialized all MEF parts on the UI thread.
-As an effort to improve startup performance, Visual Studio will begin to load MEF parts on the background thread.
+**MEF activation code paths** (importing constructors, `OnImportsSatisfied` callbacks, and any code called from them) should be free-threaded to ensure proper Visual Studio performance.
+
+**Free-threaded code** is code that (and all code it invokes transitively) can complete on the caller's thread, no matter which thread that is.
+
+**Thread-affinitized code** requires execution on a particular thread, typically the UI thread. Such code may directly or indirectly call methods or access objects that must run on the UI thread.
+
+## Analyzer
 This analyzer identifies cases where a class decorated with `[Export]` or `[InheritedExport]` (or derivatives) accesses members bound to the UI thread during construction.
 When Visual Studio makes attempt to load a UI thread-affinitized part, its initialization will throw an exception and the MEF part will be unusable, potentially making other parts that depend on it, also unusuable.
 
-For more information on thread-affinitized code, see [Visual Studio threading cookbook][VisualStudioThreadingCookbook].
+The analyzer examines:
+- Default constructors
+- Constructors decorated with `[ImportingConstructor]`
+- Field or property initializers
+- Implementations of `IPartImportsSatisfiedNotification.OnImportsSatisfied`
+
+In addition to supporting classes decorated with `[Export]` attribute, this analyzer supports:
+- Base class decorated with `[InheritedExport]`.
+- Attributes derived from `ExportAttribute`.
+- Exported member, not a class.
 
 ## Examples of patterns that are flagged by this analyzer
 ```
@@ -144,10 +156,31 @@ class MyMEFComponent
 }
 ```
 
-#### False negative: 
+#### False negative: No flow analysis
 
-To reduce amount of false positives, the analyzer ignores code within lambdas. 
-The analyzer assumes that lambdas would be invoked after initialization.
+The analyzer does not perform flow analysis to inspect methods called by the MEF initialization methods.
+```
+using System.ComponentModel.Composition;
+
+[Export]
+class MyMEFComponent
+{
+    public MyMEFComponent()
+    {
+        // The analyzer doesn't flag this, despite UI thread affinity
+        AnotherMethod();
+    }
+
+    public void AnotherMethod()
+    {
+        Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
+    }
+}";
+```
+
+#### False negative: lambdas
+
+To reduce amount of false positives, the analyzer ignores code within lambdas, assumeing that lambdas would be invoked after initialization.
 For example, the allows defining `AsyncLazy` in the constructor, which would be evaluated on demand after initialization.
 
 Therefore, this analyzer will miss an edge case of synchronously executing a lambda during construction:
