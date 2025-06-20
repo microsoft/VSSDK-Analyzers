@@ -91,11 +91,15 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
 
             if (containingType is null)
             {
-                // This code does not belong to a type, or we can't get a hold of [Export]Attribute. This analyzer does not apply.
+                // This code does not belong to a type. This analyzer does not apply.
                 return;
             }
 
-            if (!containingType.GetAttributes().Any(attr => Utils.IsEqualToOrDerivedFrom(attr.AttributeClass, exportAttributeType)))
+            if (containingSymbol.GetAttributes().Any(attr => Utils.IsEqualToOrDerivedFrom(attr.AttributeClass, exportAttributeType)))
+            {
+                // The member itself has an export attribute. Analyzer applies, there's no need to check the containing type.
+            }
+            else if (!containingType.GetAttributes().Any(attr => Utils.IsEqualToOrDerivedFrom(attr.AttributeClass, exportAttributeType)))
             {
                 // It looks like this type is not a MEF part, so try to return early without checking it.
 

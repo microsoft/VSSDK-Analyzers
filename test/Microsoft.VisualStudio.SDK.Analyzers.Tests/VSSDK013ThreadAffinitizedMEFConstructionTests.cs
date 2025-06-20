@@ -215,6 +215,44 @@ class C
     }
 
     [Fact]
+    public async Task MemberExport_FieldInitializer_MainThreadAsserted_Flagged()
+    {
+        var test = /* lang=c#-test */ @"
+using System.ComponentModel.Composition;
+
+class C
+{
+    [Export]
+    object o = [|Microsoft.VisualStudio.Shell.UIContext.FromUIContextGuid(System.Guid.Empty)|];
+
+    public C()
+    {
+    }
+}";
+
+        await Verify.VerifyAnalyzerAsync(test);
+    }
+
+    [Fact]
+    public async Task MemberExport_PropertyInitializer_MainThreadAsserted_Flagged()
+    {
+        var test = /* lang=c#-test */ @"
+using System.ComponentModel.Composition;
+
+class C
+{
+    [Export]
+    object o { get; } = [|Microsoft.VisualStudio.Shell.UIContext.FromUIContextGuid(System.Guid.Empty)|];
+
+    public C()
+    {
+    }
+}";
+
+        await Verify.VerifyAnalyzerAsync(test);
+    }
+
+    [Fact]
     public async Task LazyPropertyInitializer_MainThreadAsserted_NoWarning()
     {
         var test = /* lang=c#-test */ @"
