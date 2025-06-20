@@ -69,31 +69,54 @@ class MyMEFComponentWithUIThreadField
 
 ### Defer UI thread work
 
-Instead of accessing UI thread-affined members during MEF part construction, defer that work until after construction by using techniques like lazy initialization:using System.ComponentModel.Composition;
+Instead of accessing UI thread-affined members during MEF part construction, defer that work until after construction by using techniques like lazy initialization:
 ```
+using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Threading;
 
 [Export]
 class MyMEFComponent
 {
-    private readonly AsyncLazy<object> _uiContextObject;
+    // Option 1: Use a property
+    private readonly IServiceProvider _serviceProvider;
+    private readonly JoinableTaskContext _joinableTaskContext;
+    private IVsTextManager4? _textManager;
+    private IVsTextManager TextManager
+    {
+        get
+        {
+            _joinableTaskContext.AssertUIThread();
+            return _textManager ??= (IVsTextManager)_serviceProvider.GetService(typeof(SVsTextManager));
+        }
+    }
+
+    // Option 2: use AsyncLazy to defer UI thread work
+    private readonly AsyncLazy<IVsTextManager> _lazyTextManager;
 
     [ImportingConstructor]
-    public MyMEFComponent(JoinableTaskContext joinableTaskContext)
+    public MyMEFComponent(
+        [Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider,
+        JoinableTaskContext joinableTaskContext)
     {
-        // Use AsyncLazy to defer UI thread work
-        _uiContextObject = new AsyncLazy<object>(async () =>
+        _lazyTextManager = new AsyncLazy<IVsTextManager>(async () =>
         {
             await joinableTaskContext.Factory.SwitchToMainThreadAsync();
-            return UIContext.FromUIContextGuid(Guid.Empty);
+            return (IVsTextManager)_serviceProvider.GetService(typeof(SVsTextManager));
         }, joinableTaskContext.Factory);
     }
 }
 ```
+
+### Use free-threaded dependencies
+Replace UI thread-affinitized dependencies with thread-safe alternatives during construction:
+```
+TBD
+```
+
 ### Use thread-safe initialization
 
-Replace UI thread dependencies with thread-safe alternatives during construction:
+Initialize UI thread-affinitized dependencies on demand, after the MEF part has been constructed.
 ```
 using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Shell;
