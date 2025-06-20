@@ -69,6 +69,8 @@ class MyMEFComponentWithUIThreadField
 ### Defer UI thread work
 
 Instead of accessing UI thread-affined members during MEF part construction, defer that work until after construction by using techniques like lazy initialization:
+
+Using a property:
 ```
 using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Shell;
@@ -77,7 +79,6 @@ using Microsoft.VisualStudio.Threading;
 [Export]
 class MyMEFComponent
 {
-    // Option 1: Use a property
     private readonly IServiceProvider _serviceProvider;
     private readonly JoinableTaskContext _joinableTaskContext;
     private IVsTextManager4? _textManager;
@@ -90,7 +91,26 @@ class MyMEFComponent
         }
     }
 
-    // Option 2: use AsyncLazy to defer UI thread work
+    [ImportingConstructor]
+    public MyMEFComponent(
+        [Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider,
+        JoinableTaskContext joinableTaskContext)
+    {
+        _joinableTaskContext = joinableTaskContext;
+        _serviceProvider = serviceProvider;
+    }
+}
+```
+
+Using `AsyncLazy`:
+```
+using System.ComponentModel.Composition;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Threading;
+
+[Export]
+class MyMEFComponent
+{
     private readonly AsyncLazy<IVsTextManager> _lazyTextManager;
 
     [ImportingConstructor]
@@ -103,33 +123,6 @@ class MyMEFComponent
             await joinableTaskContext.Factory.SwitchToMainThreadAsync();
             return (IVsTextManager)_serviceProvider.GetService(typeof(SVsTextManager));
         }, joinableTaskContext.Factory);
-    }
-}
-```
-
-### Use thread-safe initialization
-
-Initialize UI thread-affinitized dependencies on demand, after the MEF part has been constructed.
-```
-using System.ComponentModel.Composition;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Threading;
-
-[Export]
-class MyMEFComponent
-{
-    private readonly JoinableTaskContext _joinableTaskContext;
-    
-    [ImportingConstructor]
-    public MyMEFComponent(JoinableTaskContext joinableTaskContext)
-    {
-        _joinableTaskContext = joinableTaskContext;
-    }
-    
-    public async Task InitializeAsync()
-    {
-        // Switch to UI thread only when actually needed
-        await _joinableTaskContext.Factory.SwitchToMainThreadAsync();
     }
 }
 ```
