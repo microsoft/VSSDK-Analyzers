@@ -11,8 +11,8 @@ The Visual Studio Editor is composed using MEF (Managed Extensibility Framework)
 **Thread-affinitized code** requires execution on a particular thread, typically the UI thread. Such code may directly or indirectly call methods or access objects that must run on the UI thread.
 
 ## Analyzer
-This analyzer identifies cases where a class decorated with `[Export]` or `[InheritedExport]` (or derivatives) accesses members bound to the UI thread during construction.
-When Visual Studio makes attempt to load a UI thread-affinitized part, its initialization will throw an exception and the MEF part will be unusable, potentially making other parts that depend on it, also unusuable.
+This analyzer identifies classes or member decorated with `[Export]`, `[InheritedExport]` or their derivatives. It then checks if initialization of these members has UI thread affinity.
+When Visual Studio makes attempt to load a UI thread-affinitized part, its initialization will either throw an exception, rendering the MEF unusable, or lead to a deadlock, freezing Visual Studio.
 
 The analyzer examines:
 - Default constructors
@@ -23,7 +23,6 @@ The analyzer examines:
 In addition to supporting classes decorated with `[Export]` attribute, this analyzer supports:
 - Base class decorated with `[InheritedExport]`.
 - Attributes derived from `ExportAttribute`.
-- Exported member, not a class.
 
 ## Examples of patterns that are flagged by this analyzer
 ```
