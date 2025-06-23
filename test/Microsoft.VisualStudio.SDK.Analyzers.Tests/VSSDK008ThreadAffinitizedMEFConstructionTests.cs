@@ -315,7 +315,11 @@ class C
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    /// <summary>
+    /// This test showcases a false negative: without complex flow analysis,
+    /// we're unable to warn against transitive UI thread affinity.
+    /// </summary>
+    [Fact(Skip = "False negative.")]
     public async Task Member_MainThreadRequired_NoWarning()
     {
         var test = /* lang=c#-test */ @"
@@ -330,14 +334,13 @@ class C
 
     public void X()
     {
-        Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
+        [|Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread()|];
     }
 }";
 
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    // TODO: This test would require flow analysis
     [Fact]
     public async Task Constructor_IndirectMainThreadRequired_NoWarning()
     {
@@ -524,7 +527,6 @@ internal class C
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    // TODO: it's not reproing the exception
     [Fact]
     public async Task ObjectOrCollectionInitializer_Benign_NoWarning()
     {
