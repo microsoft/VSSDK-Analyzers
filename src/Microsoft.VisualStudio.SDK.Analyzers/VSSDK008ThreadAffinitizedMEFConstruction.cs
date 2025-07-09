@@ -188,8 +188,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             {
                 // Analyze the target symbol within the context
                 Location operationLocation = operation.Syntax.GetLocation();
-                Location? firstSyntaxlocation = targetSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax(c.CancellationToken).GetLocation();
-                this.AnalyzeMemberWithinContext(targetSymbol.ContainingType, targetSymbol, c, firstSyntaxlocation ?? operationLocation);
+                this.AnalyzeMemberWithinContext(targetSymbol.ContainingType, targetSymbol, c, operationLocation);
             }
         }
 
