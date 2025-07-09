@@ -59,22 +59,29 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             context.RegisterCompilationStartAction(startCompilation =>
             {
                 this.MembersRequiringMainThread = AdditionalFilesHelpers.GetMembersRequiringMainThread(startCompilation.Options, startCompilation.CancellationToken);
-                INamedTypeSymbol? exportAttributeType = startCompilation.Compilation.GetTypeByMetadataName(Types.ExportAttribute.FullName)?.OriginalDefinition
-                    ?? startCompilation.Compilation.GetTypeByMetadataName(Types.Mef2ExportAttribute.FullName)?.OriginalDefinition;
-                INamedTypeSymbol? importingConstructorAttribute = startCompilation.Compilation.GetTypeByMetadataName(Types.ImportingConstructorAttribute.FullName)?.OriginalDefinition
-                    ?? startCompilation.Compilation.GetTypeByMetadataName(Types.Mef2ImportingConstructorAttribute.FullName)?.OriginalDefinition;
+                INamedTypeSymbol? exportAttributeType = startCompilation.Compilation.GetTypeByMetadataName(Types.ExportAttribute.FullName)?.OriginalDefinition;
+                INamedTypeSymbol? mef2ExportAttributeType = startCompilation.Compilation.GetTypeByMetadataName(Types.Mef2ExportAttribute.FullName)?.OriginalDefinition;
+                INamedTypeSymbol? importingConstructorAttribute = startCompilation.Compilation.GetTypeByMetadataName(Types.ImportingConstructorAttribute.FullName)?.OriginalDefinition;
+                INamedTypeSymbol? mef2ImportingConstructorAttribute = startCompilation.Compilation.GetTypeByMetadataName(Types.Mef2ImportingConstructorAttribute.FullName)?.OriginalDefinition;
                 INamedTypeSymbol? inheritedExportAttribute = startCompilation.Compilation.GetTypeByMetadataName(Types.InheritedExportAttribute.FullName)?.OriginalDefinition;
                 INamedTypeSymbol? partImportsSatisfiedNotificationInterface = startCompilation.Compilation.GetTypeByMetadataName(Types.IPartImportsSatisfiedNotification.FullName)?.OriginalDefinition;
-                INamedTypeSymbol? partImportsSatisfiedAttribute = startCompilation.Compilation.GetTypeByMetadataName(Types.Mef2OnImportsSatisfiedAttribute.FullName)?.OriginalDefinition; // TODO: implement
+                INamedTypeSymbol? mef2OnPartImportsSatisfiedAttribute = startCompilation.Compilation.GetTypeByMetadataName(Types.Mef2OnImportsSatisfiedAttribute.FullName)?.OriginalDefinition;
 
-                if (exportAttributeType is null)
+                if (exportAttributeType is null && mef2ExportAttributeType is null)
                 {
                     // This code does not use MEF
                     return;
                 }
 
                 startCompilation.RegisterOperationAction(
-                    Utils.DebuggableWrapper(c => this.AnalyzeOperation(c, exportAttributeType, inheritedExportAttribute, importingConstructorAttribute, partImportsSatisfiedNotificationInterface)),
+                    Utils.DebuggableWrapper(c => this.AnalyzeOperation(c,
+                        exportAttributeType,
+                        mef2ExportAttributeType,
+                        importingConstructorAttribute,
+                        mef2ImportingConstructorAttribute,
+                        inheritedExportAttribute,
+                        partImportsSatisfiedNotificationInterface,
+                        mef2OnPartImportsSatisfiedAttribute)),
                     OperationKind.MethodReference,
                     OperationKind.InstanceReference,
                     OperationKind.FieldReference,
@@ -88,10 +95,13 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
 
         private void AnalyzeOperation(
             OperationAnalysisContext c,
-            INamedTypeSymbol exportAttributeType,
-            INamedTypeSymbol? inheritedExportAttribute,
+            INamedTypeSymbol? exportAttributeType,
+            INamedTypeSymbol? mef2ExportAttributeType,
             INamedTypeSymbol? importingConstructorAttribute,
-            INamedTypeSymbol? partImportsSatisfiedNotificationInterface)
+            INamedTypeSymbol? mef2ImportingConstructorAttribute,
+            INamedTypeSymbol? inheritedExportAttribute,
+            INamedTypeSymbol? partImportsSatisfiedNotificationInterface,
+            INamedTypeSymbol? mef2OnPartImportsSatisfiedAttribute)
         {
             ISymbol containingSymbol = c.ContainingSymbol;
             IOperation operation = c.Operation;
@@ -103,11 +113,13 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 return;
             }
 
-            if (containingSymbol.GetAttributes().Any(attr => Utils.IsEqualToOrDerivedFrom(attr.AttributeClass, exportAttributeType)))
+            if ((exportAttributeType is not null && containingSymbol.GetAttributes().Any(attr => Utils.IsEqualToOrDerivedFrom(attr.AttributeClass, exportAttributeType)))
+                || (mef2ExportAttributeType is not null && containingSymbol.GetAttributes().Any(attr => Utils.IsEqualToOrDerivedFrom(attr.AttributeClass, mef2ExportAttributeType))))
             {
                 // The member itself has an export attribute. Analyzer applies, there's no need to check the containing type.
             }
-            else if (!containingType.GetAttributes().Any(attr => Utils.IsEqualToOrDerivedFrom(attr.AttributeClass, exportAttributeType)))
+            else if ((exportAttributeType is not null && !containingType.GetAttributes().Any(attr => Utils.IsEqualToOrDerivedFrom(attr.AttributeClass, exportAttributeType)))
+                && (mef2ExportAttributeType is not null && !containingType.GetAttributes().Any(attr => Utils.IsEqualToOrDerivedFrom(attr.AttributeClass, mef2ExportAttributeType))))
             {
                 // It looks like this type is not a MEF part, so try to return early without checking it.
 
@@ -153,7 +165,8 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
 
                     // Parameterless constructor must be free threaded
                 }
-                else if (methodSymbol.GetAttributes().Any(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, importingConstructorAttribute)))
+                else if ((importingConstructorAttribute is not null && methodSymbol.GetAttributes().Any(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, importingConstructorAttribute)))
+                    || (mef2ImportingConstructorAttribute is not null && methodSymbol.GetAttributes().Any(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, mef2ImportingConstructorAttribute))))
                 {
                     // Constructor decorated with ImportingConstructorAttribute must be free threaded
                 }
@@ -162,6 +175,10 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                     && containingType.AllInterfaces.Contains(partImportsSatisfiedNotificationInterface, SymbolEqualityComparer.Default))
                 {
                     // OnImportsSatisfied implementation must be free threaded
+                }
+                else if (mef2OnPartImportsSatisfiedAttribute is not null && methodSymbol.GetAttributes().Any(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, mef2OnPartImportsSatisfiedAttribute)))
+                {
+                    // Method decorated with OnImportsSatisfiedAttribute must be free threaded
                 }
                 else
                 {
