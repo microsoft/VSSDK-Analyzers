@@ -59,13 +59,17 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             context.RegisterCompilationStartAction(startCompilation =>
             {
                 this.MembersRequiringMainThread = AdditionalFilesHelpers.GetMembersRequiringMainThread(startCompilation.Options, startCompilation.CancellationToken);
-                INamedTypeSymbol? exportAttributeType = startCompilation.Compilation.GetTypeByMetadataName(Types.ExportAttribute.FullName)?.OriginalDefinition;
-                INamedTypeSymbol? importingConstructorAttribute = startCompilation.Compilation.GetTypeByMetadataName(Types.ImportingConstructorAttribute.FullName)?.OriginalDefinition;
+                INamedTypeSymbol? exportAttributeType = startCompilation.Compilation.GetTypeByMetadataName(Types.ExportAttribute.FullName)?.OriginalDefinition
+                    ?? startCompilation.Compilation.GetTypeByMetadataName(Types.Mef2ExportAttribute.FullName)?.OriginalDefinition;
+                INamedTypeSymbol? importingConstructorAttribute = startCompilation.Compilation.GetTypeByMetadataName(Types.ImportingConstructorAttribute.FullName)?.OriginalDefinition
+                    ?? startCompilation.Compilation.GetTypeByMetadataName(Types.Mef2ImportingConstructorAttribute.FullName)?.OriginalDefinition;
                 INamedTypeSymbol? inheritedExportAttribute = startCompilation.Compilation.GetTypeByMetadataName(Types.InheritedExportAttribute.FullName)?.OriginalDefinition;
                 INamedTypeSymbol? partImportsSatisfiedNotificationInterface = startCompilation.Compilation.GetTypeByMetadataName(Types.IPartImportsSatisfiedNotification.FullName)?.OriginalDefinition;
+                INamedTypeSymbol? partImportsSatisfiedAttribute = startCompilation.Compilation.GetTypeByMetadataName(Types.Mef2OnImportsSatisfiedAttribute.FullName)?.OriginalDefinition; // TODO: implement
 
                 if (exportAttributeType is null)
                 {
+                    // This code does not use MEF
                     return;
                 }
 

@@ -688,14 +688,14 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         }
 
         /// <summary>
-        /// Describes the <see cref="System.Composition.OnImportsSatisfiedAttribute"/> type.
+        /// Describes the <see cref="System.ComponentModel.Composition.InheritedExportAttribute"/> type.
         /// </summary>
-        internal static class OnImportsSatisfiedAttribute
+        internal static class InheritedExportAttribute
         {
             /// <summary>
-            /// Gets the simple name of the <see cref="System.Composition.OnImportsSatisfiedAttribute"/> type.
+            /// Gets the simple name of the <see cref="System.ComponentModel.Composition.InheritedExportAttribute"/> type.
             /// </summary>
-            internal const string TypeName = nameof(System.Composition.OnImportsSatisfiedAttribute);
+            internal const string TypeName = nameof(System.ComponentModel.Composition.InheritedExportAttribute);
 
             /// <summary>
             /// Gets an array of the nesting namespaces for this type.
@@ -714,14 +714,66 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         }
 
         /// <summary>
-        /// Describes the <see cref="System.ComponentModel.Composition.InheritedExportAttribute"/> type.
+        /// Describes the <see cref="System.ComponentModel.Composition.ExportAttribute"/> type.
         /// </summary>
-        internal static class InheritedExportAttribute
+        internal static class Mef2ExportAttribute
         {
             /// <summary>
-            /// Gets the simple name of the <see cref="System.ComponentModel.Composition.InheritedExportAttribute"/> type.
+            /// Gets the simple name of the <see cref="System.Composition.ExportAttribute"/> type.
             /// </summary>
-            internal const string TypeName = nameof(System.ComponentModel.Composition.InheritedExportAttribute);
+            internal const string TypeName = nameof(System.Composition.ExportAttribute);
+
+            /// <summary>
+            /// Gets an array of the nesting namespaces for this type.
+            /// </summary>
+            internal static readonly IReadOnlyList<string> Namespace = Namespaces.SystemComposition;
+
+            /// <summary>
+            /// Gets the <see cref="Microsoft.CodeAnalysis.CSharp.Syntax.TypeSyntax"/> for this type.
+            /// </summary>
+            internal static TypeSyntax TypeSyntax { get; } = Utils.QualifyName(Namespace, SyntaxFactory.IdentifierName(TypeName));
+
+            /// <summary>
+            /// Gets the fully-qualified name of this type as a string.
+            /// </summary>
+            internal static string FullName { get; } = string.Join(".", Namespace) + "." + TypeName;
+        }
+
+        /// <summary>
+        /// Describes the <see cref="System.ComponentModel.Composition.ImportingConstructorAttribute"/> type.
+        /// </summary>
+        internal static class Mef2ImportingConstructorAttribute
+        {
+            /// <summary>
+            /// Gets the simple name of the <see cref="System.Composition.ImportingConstructorAttribute"/> type.
+            /// </summary>
+            internal const string TypeName = nameof(System.Composition.ImportingConstructorAttribute);
+
+            /// <summary>
+            /// Gets an array of the nesting namespaces for this type.
+            /// </summary>
+            internal static readonly IReadOnlyList<string> Namespace = Namespaces.SystemComposition;
+
+            /// <summary>
+            /// Gets the <see cref="Microsoft.CodeAnalysis.CSharp.Syntax.TypeSyntax"/> for this type.
+            /// </summary>
+            internal static TypeSyntax TypeSyntax { get; } = Utils.QualifyName(Namespace, SyntaxFactory.IdentifierName(TypeName));
+
+            /// <summary>
+            /// Gets the fully-qualified name of this type as a string.
+            /// </summary>
+            internal static string FullName { get; } = string.Join(".", Namespace) + "." + TypeName;
+        }
+
+        /// <summary>
+        /// Describes the <see cref="System.Composition.OnImportsSatisfiedAttribute"/> type.
+        /// </summary>
+        internal static class Mef2OnImportsSatisfiedAttribute
+        {
+            /// <summary>
+            /// Gets the simple name of the <see cref="System.Composition.OnImportsSatisfiedAttribute"/> type.
+            /// </summary>
+            internal const string TypeName = nameof(System.Composition.OnImportsSatisfiedAttribute);
 
             /// <summary>
             /// Gets an array of the nesting namespaces for this type.
