@@ -74,7 +74,8 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 }
 
                 startCompilation.RegisterOperationAction(
-                    Utils.DebuggableWrapper(c => this.AnalyzeOperation(c,
+                    Utils.DebuggableWrapper(context => this.AnalyzeOperation(
+                        context,
                         exportAttributeType,
                         mef2ExportAttributeType,
                         importingConstructorAttribute,
@@ -94,7 +95,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         }
 
         private void AnalyzeOperation(
-            OperationAnalysisContext c,
+            OperationAnalysisContext context,
             INamedTypeSymbol? exportAttributeType,
             INamedTypeSymbol? mef2ExportAttributeType,
             INamedTypeSymbol? importingConstructorAttribute,
@@ -103,8 +104,8 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             INamedTypeSymbol? partImportsSatisfiedNotificationInterface,
             INamedTypeSymbol? mef2OnPartImportsSatisfiedAttribute)
         {
-            ISymbol containingSymbol = c.ContainingSymbol;
-            IOperation operation = c.Operation;
+            ISymbol containingSymbol = context.ContainingSymbol;
+            IOperation operation = context.Operation;
             INamedTypeSymbol containingType = containingSymbol.ContainingType;
 
             if (containingType is null)
@@ -209,7 +210,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             {
                 // Analyze the target symbol within the context
                 Location operationLocation = operation.Syntax.GetLocation();
-                this.AnalyzeMemberWithinContext(targetSymbol.ContainingType, targetSymbol, c, operationLocation);
+                this.AnalyzeMemberWithinContext(targetSymbol.ContainingType, targetSymbol, context, operationLocation);
             }
         }
 
