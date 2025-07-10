@@ -2,6 +2,10 @@
 
 Historically, the Visual Studio Editor initialized its components on the UI thread. However, to improve startup performance, Visual Studio is evolving to load Editor components on background threads.
 
+Attempts to load extensions on background thread may lead to the extension crashing, if it uses UI-thread affinitized code. The purpose of this analyzer is to identify potential issues and ensure that VS extension can be loaded on the background thread.
+
+### Definitions
+
 The Visual Studio Editor is composed using MEF (Managed Extensibility Framework), and Editor components are referred to as **MEF parts**.
 
 **MEF activation code paths** (importing constructors, `OnImportsSatisfied` callbacks, and any code called from them) should be free-threaded to ensure proper Visual Studio performance.
@@ -10,15 +14,18 @@ The Visual Studio Editor is composed using MEF (Managed Extensibility Framework)
 
 **Thread-affinitized code** requires execution on a particular thread, typically the UI thread. Such code may directly or indirectly call methods or access objects that must run on the UI thread.
 
+For more information about verifying that your code is fully free-threaded, see the ["Visual Studio Threading Cookbook"][VisualStudioThreadingCookbook]
+
 ## Analyzer
-This analyzer identifies classes or member decorated with `[Export]`, `[InheritedExport]` or their derivatives. It then checks if initialization of these members has UI thread affinity.
+This analyzer identifies classes or member decorated with `[Export]`, `[InheritedExport]` or their derivatives, from either `System.ComponentModel.Composition` or `System.Composition` namespace.
+It then checks if initialization of these members has UI thread affinity.
 When Visual Studio makes attempt to load a UI thread-affinitized part, its initialization will either throw an exception, rendering the MEF unusable, or lead to a deadlock, freezing Visual Studio.
 
 The analyzer examines:
 - Default constructors
 - Constructors decorated with `[ImportingConstructor]`
 - Field or property initializers
-- Implementations of `IPartImportsSatisfiedNotification.OnImportsSatisfied`
+- Methods that implement `IPartImportsSatisfiedNotification.OnImportsSatisfied` or are decorated with `[OnImportsSatisfied]`
 
 In addition to supporting classes decorated with `[Export]` attribute, this analyzer supports:
 - Base class decorated with `[InheritedExport]`.
@@ -66,11 +73,29 @@ class MyMEFComponentWithUIThreadField
 ```
 ## Solution
 
-### Defer UI thread work
+Instead of accessing UI thread-affined members during MEF part construction, defer that work until after construction by using techniques like lazy initialization.
 
-Instead of accessing UI thread-affined members during MEF part construction, defer that work until after construction by using techniques like lazy initialization:
+Flagged code with UI thread affinity:
+```
+using System.ComponentModel.Composition;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Threading;
 
-Using a property:
+[Export]
+class MyMEFComponent
+{
+    private IVsTextManager4 _textManager;
+
+    [ImportingConstructor]
+    public MyMEFComponent(
+        [Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
+    {
+        _textManager = (IVsTextManager4)serviceProvider.GetService(typeof(SVsTextManager));
+    }
+}
+```
+
+Get service using a property:
 ```
 using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Shell;
@@ -102,7 +127,7 @@ class MyMEFComponent
 }
 ```
 
-Using `AsyncLazy`:
+Get service using `AsyncLazy`:
 ```
 using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Shell;
@@ -157,9 +182,9 @@ class MyMEFComponent
         {
             // Since this runs asynchronously after construction,
             // it's acceptable to switch to the UI thread here
-            #pragma warning disable VSSDK008
+#pragma warning disable VSSDK008
             await joinableTaskContext.Factory.SwitchToMainThreadAsync();
-            #pragma warning restore VSSDK008
+#pragma warning restore VSSDK008
         }
     }
 }
@@ -190,7 +215,7 @@ class MyMEFComponent
 #### False negative: lambdas
 
 To reduce amount of false positives, the analyzer ignores code within lambdas, assumeing that lambdas would be invoked after initialization.
-For example, the allows defining `AsyncLazy` in the constructor, which would be evaluated on demand after initialization.
+For example, see the example above where `AsyncLazy` is defined in the constructor. The lambda would be evaluated on demand after initialization.
 
 Therefore, this analyzer will miss an edge case of synchronously executing a lambda during construction:
 ```
@@ -213,7 +238,7 @@ class MyMEFComponent
 }
 ```
 
-## Benefits
+## Outcome
 
 Visual Studio 17.14 can preload MEF parts on background threads when the following Preview Features are enabled:
 - "Initialize editor parts asynchronously during solution load"
