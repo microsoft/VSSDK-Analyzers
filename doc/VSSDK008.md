@@ -1,4 +1,4 @@
-# VSSDK008 Avoid UI thread in MEF Part construction
+# VSSDK008 Avoid UI thread affinity in MEF Part construction
 
 Historically, the Visual Studio Editor initialized its components on the UI thread. However, to improve startup performance, Visual Studio is evolving to load Editor components on background threads.
 
