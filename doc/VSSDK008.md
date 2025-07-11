@@ -1,22 +1,24 @@
 # VSSDK008 Avoid UI thread affinity in MEF Part construction
 
-Historically, the Visual Studio initialized its components on the UI thread. However, to improve startup performance, Visual Studio is evolving to load components on background threads.
-
-Attempts to load extensions on background thread may lead to the extension crashing, if it uses UI-thread affinitized code. The purpose of this analyzer is to identify potential issues and ensure that VS extension can be loaded on the background thread.
+[JoinableTaskFactory threading rules](https://microsoft.github.io/vs-threading/docs/threading_rules.html), which Visual Studio observes, require that code that requires the main thread follow certain rules.
+MEF is not a JoinableTaskFactory-aware library, and as MEF parts are often activated as singletons, deadlocks can easily be introduced when activating a MEF part incurs a dependency on the main thread.
+To avoid these deadlocks, main thread dependencies along MEF part activation paths are not allowed.
 
 ### Definitions
 
-Visual Studio is composed using [Managed Extensibility Framework (MEF)][ManagedExtensibilityFramework], and components are referred to as **MEF parts**.
+Visual Studio is composed using [Managed Extensibility Framework (MEF)][ManagedExtensibilityFramework], and classes that export into a MEF catalog are referred to as **MEF parts**.
 
 **MEF activation code paths** (importing constructors, `OnImportsSatisfied` callbacks, and any code called from them) should be free-threaded to ensure proper Visual Studio performance.
 
 **Free-threaded code** is code that (and all code it invokes transitively) can complete on the caller's thread, no matter which thread that is.
 
-**Thread-affinitized code** requires execution on a particular thread, typically the UI thread. Such code may directly or indirectly call methods or access objects that must run on the UI thread.
+**Thread-affinitized code** requires execution on a particular thread, typically the UI thread.
+Such code may directly or indirectly call methods or access objects that must run on the UI thread.
 
 For more information about verifying that your code is fully free-threaded, see the [Visual Studio Threading Cookbook][VisualStudioThreadingCookbook]
 
 ## Analyzer
+
 This analyzer identifies classes or member decorated with `[Export]`, `[InheritedExport]` or their derivatives, from either `System.ComponentModel.Composition` or `System.Composition` namespace.
 It then checks if initialization of these members has UI thread affinity.
 When Visual Studio makes attempt to load a UI thread-affinitized part, its initialization will either throw an exception, rendering the MEF unusable, or lead to a deadlock, freezing Visual Studio.
@@ -32,7 +34,8 @@ In addition to supporting classes decorated with `[Export]` attribute, this anal
 - Attributes derived from `ExportAttribute`.
 
 ## Examples of patterns that are flagged by this analyzer
-```
+
+```cs
 using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Shell;
 
@@ -71,12 +74,14 @@ class MyMEFComponentWithUIThreadField
     object context = UIContext.FromUIContextGuid(Guid.Empty);
 }
 ```
+
 ## Solution
 
 Instead of accessing UI thread-affined members during MEF part construction, defer that work until after construction by using techniques like lazy initialization.
 
 Flagged code with UI thread affinity:
-```
+
+```cs
 using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Threading;
@@ -96,7 +101,8 @@ class MyMEFComponent
 ```
 
 Get service using a property:
-```
+
+```cs
 using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Threading;
@@ -128,7 +134,8 @@ class MyMEFComponent
 ```
 
 Get service using `AsyncLazy`:
-```
+
+```cs
 using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Threading;
@@ -164,7 +171,7 @@ Since these operations execute asynchronously and don't block MEF part construct
 If you encounter false positives, you may suppress the warning using `#pragma warning disable VSSDK008`
 with a justification comment explaining why the code is actually safe.
 
-```
+```cs
 using Microsoft.VisualStudio.Threading;
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
@@ -193,7 +200,8 @@ class MyMEFComponent
 #### False negative: No flow analysis
 
 The analyzer does not perform flow analysis to inspect methods called by the MEF initialization methods.
-```
+
+```cs
 using System.ComponentModel.Composition;
 
 [Export]
@@ -209,7 +217,7 @@ class MyMEFComponent
     {
         Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
     }
-}";
+}
 ```
 
 #### False negative: lambdas
@@ -218,7 +226,8 @@ To reduce amount of false positives, the analyzer ignores code within lambdas, a
 For example, see the example above where `AsyncLazy` is defined in the constructor. The lambda would be evaluated on demand after initialization.
 
 Therefore, this analyzer will miss an edge case of synchronously executing a lambda during construction:
-```
+
+```cs
 using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Threading;
 
@@ -238,15 +247,19 @@ class MyMEFComponent
 }
 ```
 
-## Outcome
+## Background
 
-Visual Studio 17.14 can preload MEF parts on background threads when the following Preview Features are enabled:
+Historically, Visual Studio initialized its components on the UI thread.
+However, to improve startup performance, Visual Studio is evolving to load components on background threads.
+This can cause deadlocks to manifest that previously were hidden.
+
+Editor extensions in Visual Studio 17.14 may be preloaded on background threads when the following Preview Features are enabled:
+
 - "Initialize editor parts asynchronously during solution load"
 - "Asynchronously Load Documents During Solution Load"
 
-In the future releases, these Preview Features will be enabled. 
-By following this guidance, your extension will continue to work as Visual Studio begins to enforce the threading rule 
-requiring MEF parts contruction to be free-threaded.
+In the future releases, these Preview Features will be enabled by default.
+By following this guidance, your extension will continue to work as Visual Studio begins to enforce the threading rule requiring MEF parts contruction to be free-threaded.
 
 [ManagedExtensibilityFramework]: https://learn.microsoft.com/en-us/dotnet/framework/mef/
 [VisualStudioThreadingCookbook]: https://microsoft.github.io/vs-threading/docs/cookbook_vs.html#how-do-i-effectively-verify-that-my-code-is-fully-free-threaded
