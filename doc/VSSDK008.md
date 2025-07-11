@@ -1,12 +1,12 @@
 # VSSDK008 Avoid UI thread affinity in MEF Part construction
 
-Historically, the Visual Studio Editor initialized its components on the UI thread. However, to improve startup performance, Visual Studio is evolving to load Editor components on background threads.
+Historically, the Visual Studio initialized its components on the UI thread. However, to improve startup performance, Visual Studio is evolving to load components on background threads.
 
 Attempts to load extensions on background thread may lead to the extension crashing, if it uses UI-thread affinitized code. The purpose of this analyzer is to identify potential issues and ensure that VS extension can be loaded on the background thread.
 
 ### Definitions
 
-The Visual Studio Editor is composed using MEF (Managed Extensibility Framework), and Editor components are referred to as **MEF parts**.
+Visual Studio is composed using MEF (Managed Extensibility Framework), and components are referred to as **MEF parts**.
 
 **MEF activation code paths** (importing constructors, `OnImportsSatisfied` callbacks, and any code called from them) should be free-threaded to ensure proper Visual Studio performance.
 
