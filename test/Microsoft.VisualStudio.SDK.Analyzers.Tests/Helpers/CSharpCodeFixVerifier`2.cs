@@ -78,14 +78,12 @@ public static class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
         {
             this.ReferenceAssemblies = includeVisualStudioSdk ? VsSdkReferences : DefaultReferences;
 
-            this.TestState.AdditionalFilesFactories.Add(() =>
-            {
-                const string additionalFilePrefix = "AdditionalFiles.";
-                return from resourceName in Assembly.GetExecutingAssembly().GetManifestResourceNames()
-                       where resourceName.StartsWith(additionalFilePrefix, StringComparison.Ordinal)
-                       let content = ReadManifestResource(Assembly.GetExecutingAssembly(), resourceName)
-                       select (filename: resourceName.Substring(additionalFilePrefix.Length), SourceText.From(content));
-            });
+            const string additionalFilePrefix = "AdditionalFiles.";
+            this.TestState.AdditionalFiles.AddRange(
+                from resourceName in Assembly.GetExecutingAssembly().GetManifestResourceNames()
+                where resourceName.StartsWith(additionalFilePrefix, StringComparison.Ordinal)
+                let content = ReadManifestResource(Assembly.GetExecutingAssembly(), resourceName)
+                select (filename: resourceName.Substring(additionalFilePrefix.Length), SourceText.From(content)));
         }
 
         private static string ReadManifestResource(Assembly assembly, string resourceName)
