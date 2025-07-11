@@ -6,7 +6,7 @@ Attempts to load extensions on background thread may lead to the extension crash
 
 ### Definitions
 
-Visual Studio is composed using MEF (Managed Extensibility Framework), and components are referred to as **MEF parts**.
+Visual Studio is composed using [Managed Extensibility Framework (MEF)][ManagedExtensibilityFramework], and components are referred to as **MEF parts**.
 
 **MEF activation code paths** (importing constructors, `OnImportsSatisfied` callbacks, and any code called from them) should be free-threaded to ensure proper Visual Studio performance.
 
@@ -14,7 +14,7 @@ Visual Studio is composed using MEF (Managed Extensibility Framework), and compo
 
 **Thread-affinitized code** requires execution on a particular thread, typically the UI thread. Such code may directly or indirectly call methods or access objects that must run on the UI thread.
 
-For more information about verifying that your code is fully free-threaded, see the ["Visual Studio Threading Cookbook"][VisualStudioThreadingCookbook]
+For more information about verifying that your code is fully free-threaded, see the [Visual Studio Threading Cookbook][VisualStudioThreadingCookbook]
 
 ## Analyzer
 This analyzer identifies classes or member decorated with `[Export]`, `[InheritedExport]` or their derivatives, from either `System.ComponentModel.Composition` or `System.Composition` namespace.
@@ -248,5 +248,6 @@ In the future releases, these Preview Features will be enabled.
 By following this guidance, your extension will continue to work as Visual Studio begins to enforce the threading rule 
 requiring MEF parts contruction to be free-threaded.
 
+[ManagedExtensibilityFramework]: https://learn.microsoft.com/en-us/dotnet/framework/mef/
 [VisualStudioThreadingCookbook]: https://microsoft.github.io/vs-threading/docs/cookbook_vs.html#how-do-i-effectively-verify-that-my-code-is-fully-free-threaded
 [FireAndForget]: https://aka.ms/vsthreadingcookbook#void-returning-fire-and-forget-methods
