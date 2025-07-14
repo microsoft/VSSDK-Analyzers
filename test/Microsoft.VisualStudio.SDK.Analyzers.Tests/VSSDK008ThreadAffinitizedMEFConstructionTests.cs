@@ -278,6 +278,41 @@ class C
         await Verify.VerifyAnalyzerAsync(test);
     }
 
+    /// <summary>
+    /// This test showcases a false negative, where the analyzer does not report
+    /// UI thread dependency inside the async lambda. To reduce number of false positives,
+    /// we assume that lambdas are executed asynchronously.
+    /// In this example, execution joins the lambda, effectively blocking UI thread.
+    /// </summary>
+    [Fact(Skip = "False negative")]
+    public async Task LazyPropertyInitializer_MainThreadAsserted_Joined_NoWarning_FalseNegative()
+    {
+        var test = /* lang=c#-test */ @"
+using System.ComponentModel.Composition;
+using Microsoft.VisualStudio.Threading;
+
+[Export]
+class C
+{
+    private readonly AsyncLazy<object> _o;
+
+    [ImportingConstructor]
+    public C(JoinableTaskContext joinableTaskContext)
+    {
+        _o = new(async() =>
+        {
+            await joinableTaskContext.Factory.SwitchToMainThreadAsync(System.Threading.CancellationToken.None);
+            return Microsoft.VisualStudio.Shell.UIContext.FromUIContextGuid(System.Guid.Empty);
+        });
+
+        // False negative: Execution joins UI thread when getting value of AsyncLazy, yet analyzer does not flag this.
+        var value = [|_o.GetValue()|]; // This is an anti-pattern for demonstration purpopes only.
+    }
+}";
+
+        await Verify.VerifyAnalyzerAsync(test);
+    }
+
     [Fact]
     public async Task PropertyGetter_MainThreadAsserted_NoWarning()
     {
@@ -598,38 +633,6 @@ class C
             await joinableTaskContext.Factory.SwitchToMainThreadAsync(); // False positive reported here
             return;
         }
-    }
-}";
-
-        await Verify.VerifyAnalyzerAsync(test);
-    }
-
-    /// <summary>
-    /// This test showcases a false negative, where VSSDK013 does not report
-    /// UI thread dependency inside the async lambda. To reduce number of false positives,
-    /// we assume that lambdas are executed asynchronously.
-    /// In this example, execution joins the lambda, effectively blocking UI thread.
-    /// </summary>
-    [Fact(Skip = "False negative")]
-    public async Task JoiningAsyncLambda_MainThreadAsserted_NoWarning_FalseNegative()
-    {
-        var test = /* lang=c#-test */ @"
-using System.ComponentModel.Composition;
-using Microsoft.VisualStudio.Threading;
-
-[Export]
-class C
-{
-    private readonly AsyncLazy<object> _o;
-
-    [ImportingConstructor]
-    public C(JoinableTaskContext joinableTaskContext)
-    {
-        var s = joinableTaskContext.Factory.Run(async () =>
-        {
-            await [|joinableTaskContext.Factory.SwitchToMainThreadAsync(System.Threading.CancellationToken.None)|];
-            return ""test"";
-        });
     }
 }";
 
