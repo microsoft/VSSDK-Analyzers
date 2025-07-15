@@ -12,6 +12,7 @@ ID | Title | Category
 [VSSDK005](VSSDK005.md) | Use the JoinableTaskContext singleton | Reliability
 [VSSDK006](VSSDK006.md) | Check service exists | Reliability
 [VSSDK007](VSSDK007.md) | Avoid ThreadHelper for fire and forget tasks | Reliability
+[VSSDK008](VSSDK008.md) | Avoid UI thread in MEF Part construction | Reliability
 
 This analyzer package also depends on the [Microsoft.VisualStudio.Threading.Analyzers][2] package, which adds [many more analyzers][3].
 

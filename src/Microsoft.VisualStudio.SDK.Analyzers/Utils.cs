@@ -1,11 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -161,6 +157,28 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         }
 
         /// <summary>
+        /// Gets whether any of the base types of <paramref name="type"/> is decorated with attribute
+        /// equal to or derived from <paramref name="attributeBaseType"/>.
+        /// </summary>
+        /// <param name="type">The type to check.</param>
+        /// <param name="attributeBaseType">The type to compare attributes to.</param>
+        /// <returns><see langword="true"/> if <paramref name="type"/> is decorated with attribute equal to or derived from <paramref name="attributeBaseType"/>.</returns>
+        internal static bool HasInheritedAttribute(INamedTypeSymbol? type, INamedTypeSymbol attributeBaseType)
+        {
+            while (type != null)
+            {
+                if (type.GetAttributes().Any(attr => Utils.IsEqualToOrDerivedFrom(attr.AttributeClass, attributeBaseType)))
+                {
+                    return true;
+                }
+
+                type = type.BaseType;
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Produces the syntax necessary to qualify a simple name.
         /// </summary>
         /// <param name="qualifiers">The qualifiers (e.g. the namespace that qualifies a type).</param>
@@ -278,6 +296,74 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             syntaxRoot = syntaxRoot.AddUsings(usingTaskDirective);
 
             return syntaxRoot.GetAnnotatedNodes(trackAnnotation).Single();
+        }
+
+        /// <summary>
+        /// Whether the array contains element matching the <paramref name="symbol"/>.
+        /// </summary>
+        /// <param name="methods">Array of elements that specify members.</param>
+        /// <param name="symbol">Symbol under test.</param>
+        /// <returns><see langword="true" /> if the <paramref name="methods"/> contains element matching <paramref name="symbol"/>.</returns>
+        internal static bool Contains(this ImmutableArray<QualifiedMember> methods, ISymbol symbol)
+        {
+            foreach (QualifiedMember method in methods)
+            {
+                if (method.IsMatch(symbol))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Whether the array contains element matching the <paramref name="typeSymbol"/> and <paramref name="memberSymbol"/>.
+        /// </summary>
+        /// <param name="types">Array of elements that specify types.</param>
+        /// <param name="typeSymbol">Type symbol under test.</param>
+        /// <param name="memberSymbol">Member symbol under test.</param>
+        /// <returns><see langword="true" /> if the <paramref name="types"/> contains element matching <paramref name="typeSymbol"/> and <paramref name="memberSymbol"/>.</returns>
+        internal static bool Contains(this ImmutableArray<TypeMatchSpec> types, ITypeSymbol? typeSymbol, ISymbol? memberSymbol)
+        {
+            TypeMatchSpec matching = default(TypeMatchSpec);
+            foreach (TypeMatchSpec type in types)
+            {
+                if (type.IsMatch(typeSymbol, memberSymbol))
+                {
+                    if (matching.IsEmpty || matching.IsWildcard)
+                    {
+                        matching = type;
+                        if (!matching.IsWildcard)
+                        {
+                            // It's an exact match, so return it immediately.
+                            return !matching.InvertedLogic;
+                        }
+                    }
+                }
+            }
+
+            return !matching.IsEmpty && !matching.InvertedLogic;
+        }
+
+        /// <summary>
+        /// Returns whether <paramref name="node"/> is a child of a lambda or delegate.
+        /// </summary>
+        /// <param name="node">Syntax node to check.</param>
+        /// <returns><see langword="true" /> if the <paramref name="node"/> is a child node of lambda or delegate syntax.</returns>
+        internal static bool IsChildOfDelegateOrLambda(SyntaxNode? node)
+        {
+            while (node != null)
+            {
+                if (node is AnonymousFunctionExpressionSyntax)
+                {
+                    return true;
+                }
+
+                node = node.Parent;
+            }
+
+            return false;
         }
 
         private static bool LaunchDebuggerExceptionFilter()

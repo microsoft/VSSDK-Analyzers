@@ -3,13 +3,14 @@
 
 using System.Collections.Immutable;
 using System.Net;
-using System.Threading.Tasks;
+using System.Reflection;
+using Microsoft;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
-using Microsoft.CodeAnalysis.Testing.Verifiers;
+using Microsoft.CodeAnalysis.Text;
 
 public static class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
     where TAnalyzer : DiagnosticAnalyzer, new()
@@ -76,6 +77,19 @@ public static class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
         public Test(bool includeVisualStudioSdk = true)
         {
             this.ReferenceAssemblies = includeVisualStudioSdk ? VsSdkReferences : DefaultReferences;
+
+            const string additionalFilePrefix = "AdditionalFiles.";
+            this.TestState.AdditionalFiles.AddRange(
+                from resourceName in Assembly.GetExecutingAssembly().GetManifestResourceNames()
+                where resourceName.StartsWith(additionalFilePrefix, StringComparison.Ordinal)
+                let content = ReadManifestResource(Assembly.GetExecutingAssembly(), resourceName)
+                select (filename: resourceName.Substring(additionalFilePrefix.Length), SourceText.From(content)));
+        }
+
+        private static string ReadManifestResource(Assembly assembly, string resourceName)
+        {
+            using var reader = new StreamReader(assembly.GetManifestResourceStream(resourceName) ?? throw Assumes.Fail("Resource not found."));
+            return reader.ReadToEnd();
         }
     }
 }
