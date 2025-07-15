@@ -19,7 +19,7 @@ For more information about verifying that your code is fully free-threaded, see 
 
 ## Analyzer
 
-This analyzer identifies classes or member decorated with `[Export]`, `[InheritedExport]` or their derivatives, from either `System.ComponentModel.Composition` or `System.Composition` namespace.
+This analyzer identifies classes or members decorated with `[Export]`, `[InheritedExport]` or their derivatives, from either `System.ComponentModel.Composition` or `System.Composition` namespace.
 It then checks if initialization of these members has UI thread affinity.
 When Visual Studio makes attempt to load a UI thread-affinitized part, its initialization will either throw an exception, rendering the MEF unusable, or lead to a deadlock, freezing Visual Studio.
 
@@ -166,10 +166,10 @@ The analyzer has some limitations and may report false positives or underreport 
 #### False positive: Fire-and-forget async methods
 
 The analyzer may flag UI thread access inside asynchronous methods that are started but not awaited during construction (["fire-and-forget"][FireAndForget]).
-Since these operations execute asynchronously and don't block MEF part construction, they are generally acceptable.
+Since these operations execute asynchronously and do not block MEF part construction, they are generally acceptable.
 
 If you encounter false positives, you may suppress the warning using `#pragma warning disable VSSDK008`
-with a justification comment explaining why the code is actually safe.
+with a justification comment explaining why the code is safe.
 
 ```cs
 using Microsoft.VisualStudio.Threading;
@@ -222,7 +222,7 @@ class MyMEFComponent
 
 #### False negative: lambdas
 
-To reduce amount of false positives, the analyzer ignores code within lambdas, assumeing that lambdas would be invoked after initialization.
+To reduce number of false positives, the analyzer ignores code within lambdas, assuming that lambdas would be invoked after initialization.
 For example, see the example above where `AsyncLazy` is defined in the constructor. The lambda would be evaluated on demand after initialization.
 
 Therefore, this analyzer will miss an edge case of synchronously executing a lambda during construction:
@@ -234,15 +234,19 @@ using Microsoft.VisualStudio.Threading;
 [Export]
 class MyMEFComponent
 {
+    private readonly AsyncLazy<object> _o;
+
     [ImportingConstructor]
     public MyMEFComponent(JoinableTaskContext joinableTaskContext)
     {
-        // The analyzer doesn't flag this, despite UI thread affinity
-        var result = joinableTaskContext.Factory.Run(async () =>
+        _o = new(async() =>
         {
-            await joinableTaskContext.Factory.SwitchToMainThreadAsync();
-            return "result";
+            await joinableTaskContext.Factory.SwitchToMainThreadAsync(System.Threading.CancellationToken.None);
+            return Microsoft.VisualStudio.Shell.UIContext.FromUIContextGuid(System.Guid.Empty);
         });
+
+        // False negative: Execution joins UI thread when getting value of AsyncLazy, yet analyzer does not flag this.
+        var value = _o.GetValue(); // This is an anti-pattern for demonstration purpopes only.
     }
 }
 ```
@@ -259,7 +263,7 @@ Editor extensions in Visual Studio 17.14 may be preloaded on background threads 
 - "Asynchronously Load Documents During Solution Load"
 
 In the future releases, these Preview Features will be enabled by default.
-By following this guidance, your extension will continue to work as Visual Studio begins to enforce the threading rule requiring MEF parts contruction to be free-threaded.
+By following this guidance, your extension will continue to work as Visual Studio begins to enforce the threading rule requiring MEF parts construction to be free-threaded.
 
 [ManagedExtensibilityFramework]: https://learn.microsoft.com/en-us/dotnet/framework/mef/
 [VisualStudioThreadingCookbook]: https://microsoft.github.io/vs-threading/docs/cookbook_vs.html#how-do-i-effectively-verify-that-my-code-is-fully-free-threaded

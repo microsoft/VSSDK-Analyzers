@@ -160,7 +160,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                         !SymbolEqualityComparer.Default.Equals(ctor, methodSymbol)
                         && ctor.GetAttributes().Any(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, importingConstructorAttribute))))
                     {
-                        // A different constructor is marked as importing contructor. It's OK if this constructor has UI thread dependency.
+                        // A different constructor is marked as importing constructor. It's OK if this constructor has UI thread dependency.
                         return;
                     }
 
@@ -190,7 +190,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
 
             ISymbol? targetSymbol = GetSymbolFromOperation(operation);
 
-            ISymbol? GetSymbolFromOperation(IOperation operation)
+            static ISymbol? GetSymbolFromOperation(IOperation operation)
             {
                 return operation switch
                 {
@@ -206,7 +206,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 };
             }
 
-            if (targetSymbol != null)
+            if (targetSymbol is not null)
             {
                 // Analyze the target symbol within the context
                 Location operationLocation = operation.Syntax.GetLocation();
