@@ -85,7 +85,6 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                         mef2OnPartImportsSatisfiedAttribute)),
                     OperationKind.MethodReference,
                     OperationKind.InstanceReference,
-                    OperationKind.FieldReference,
                     OperationKind.ObjectOrCollectionInitializer,
                     OperationKind.Invocation, // Method calls
                     OperationKind.MemberInitializer, // For static member access
@@ -120,7 +119,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 // The member itself has an export attribute. Analyzer applies, there's no need to check the containing type.
             }
             else if ((exportAttributeType is not null && !containingType.GetAttributes().Any(attr => Utils.IsEqualToOrDerivedFrom(attr.AttributeClass, exportAttributeType)))
-                || (mef2ExportAttributeType is not null && !containingType.GetAttributes().Any(attr => Utils.IsEqualToOrDerivedFrom(attr.AttributeClass, mef2ExportAttributeType))))
+                && (mef2ExportAttributeType is not null && !containingType.GetAttributes().Any(attr => Utils.IsEqualToOrDerivedFrom(attr.AttributeClass, mef2ExportAttributeType))))
             {
                 // It looks like this type is not a MEF part, so try to return early without checking it.
 
@@ -195,7 +194,6 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 return operation switch
                 {
                     IInvocationOperation op => op.TargetMethod,
-                    IFieldReferenceOperation op => op.Field,
                     IPropertyReferenceOperation op => op.Property,
                     IMethodReferenceOperation op => op.Method,
                     IObjectCreationOperation op => op.Constructor,

@@ -460,7 +460,7 @@ class C
     }
 
     [Fact]
-    public async Task FieldInitializer_Benign_NoWarning()
+    public async Task FieldAccess_NoWarning()
     {
         var test = /* lang=c#-test */ @"
 using System.ComponentModel.Composition;
@@ -468,7 +468,7 @@ using System.ComponentModel.Composition;
 [Export]
 class C
 {
-    object o = new object();
+    object o = Microsoft.VisualStudio.Shell.TaskListItem.contextNameKeyword;
 
     public C()
     {
@@ -570,8 +570,6 @@ using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Utilities;
 
 [Export]
-[Name(PartName)]
-[Order(Before = ""default"")]
 internal class C
 {
     public const string PartName = ""PartName"";

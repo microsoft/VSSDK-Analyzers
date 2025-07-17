@@ -66,7 +66,7 @@ public static class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
         private static readonly ReferenceAssemblies DefaultReferences = ReferenceAssemblies.NetFramework.Net472.Wpf;
         private static readonly ReferenceAssemblies VsSdkReferences = DefaultReferences
             .AddPackages(ImmutableArray.Create(
-                new PackageIdentity("Microsoft.VisualStudio.Shell.15.0", "16.5.29911.84")));
+                new PackageIdentity("Microsoft.VisualStudio.Shell.15.0", "17.12.40392")));
 
         static Test()
         {

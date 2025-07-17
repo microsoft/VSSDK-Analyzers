@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Threading.Tasks;
 using Xunit;
 using Verify = CSharpCodeFixVerifier<
     Microsoft.VisualStudio.SDK.Analyzers.VSSDK001DeriveFromAsyncPackageAnalyzer,
@@ -232,11 +231,12 @@ namespace NS
 {
     using System;
     using System.Threading;
+    using System.Threading.Tasks;
     using Microsoft.VisualStudio.Shell;
 
     class Test : AsyncPackage
     {
-        protected override async System.Threading.Tasks.Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
+        protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
             Console.WriteLine(""before"");
 
