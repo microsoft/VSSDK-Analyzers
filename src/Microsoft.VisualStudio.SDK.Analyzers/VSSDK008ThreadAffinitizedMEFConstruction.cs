@@ -85,7 +85,6 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                         mef2OnPartImportsSatisfiedAttribute)),
                     OperationKind.MethodReference,
                     OperationKind.InstanceReference,
-                    OperationKind.FieldReference,
                     OperationKind.ObjectOrCollectionInitializer,
                     OperationKind.Invocation, // Method calls
                     OperationKind.MemberInitializer, // For static member access
@@ -195,7 +194,6 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 return operation switch
                 {
                     IInvocationOperation op => op.TargetMethod,
-                    IFieldReferenceOperation op => op.Field,
                     IPropertyReferenceOperation op => op.Property,
                     IMethodReferenceOperation op => op.Method,
                     IObjectCreationOperation op => op.Constructor,
