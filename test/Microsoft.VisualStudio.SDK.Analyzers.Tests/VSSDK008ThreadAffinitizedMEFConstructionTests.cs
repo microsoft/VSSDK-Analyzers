@@ -570,8 +570,6 @@ using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Utilities;
 
 [Export]
-[Name(PartName)]
-[Order(Before = ""default"")]
 internal class C
 {
     public const string PartName = ""PartName"";
