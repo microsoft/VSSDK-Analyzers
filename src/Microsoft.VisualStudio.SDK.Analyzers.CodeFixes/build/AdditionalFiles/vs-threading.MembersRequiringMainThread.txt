@@ -3,6 +3,7 @@
 
 # Main-thread required
 [Microsoft.Internal.VisualStudio.Shell.Interop.*]
+[Microsoft.Internal.VisualStudio.Shell.KeyBindingHelper]
 [Microsoft.VisualStudio.OLE.Interop.*]
 [Microsoft.VisualStudio.Shell.Interop.*]
 [Microsoft.VisualStudio.Shell.Package]::GetService
