@@ -37,7 +37,7 @@ to the feeds that packages for this repo come from, if any.
 
 Building, testing, and packing this repository can be done by using the standard dotnet CLI commands (e.g. `dotnet build`, `dotnet test`, `dotnet pack`, etc.).
 
-[pwsh]: https://docs.microsoft.com/powershell/scripting/install/installing-powershell?view=powershell-6
+[pwsh]: https://learn.microsoft.com/powershell/scripting/install/installing-powershell
 
 ## Bug reports
 
@@ -45,7 +45,25 @@ If you have a bug report, please file an issue.
 If you can send a pull request with a repro of the bug in the form of a unit test, please do submit that PR
 and link to it from the Issue you file.
 
+## Releases
+
+Use `nbgv tag` to create a tag for a particular commit that you mean to release.
+[Learn more about `nbgv` and its `tag` and `prepare-release` commands](https://dotnet.github.io/Nerdbank.GitVersioning/docs/nbgv-cli.html).
+
+Push the tag.
+
+### GitHub Actions
+
+When your repo is hosted by GitHub and you are using GitHub Actions, you should create a GitHub Release using the standard GitHub UI.
+Having previously used `nbgv tag` and pushing the tag will help you identify the precise commit and name to use for this release.
+
+After publishing the release, the `.github/workflows/release.yml` workflow will be automatically triggered, which will:
+
 ## Pull Requests
+
+1. Find the most recent `.github/workflows/build.yml` GitHub workflow run of the tagged release.
+1. Upload the `deployables` artifact from that workflow run to your GitHub Release.
+1. If you have `NUGET_API_KEY` defined as a secret variable for your repo or org, any nuget packages in the `deployables` artifact will be pushed to nuget.org.
 
 We love to get pull requests. If you have a bug fix to offer or a new analyzer, please send us a pull request.
 
@@ -53,7 +71,7 @@ Every new feature or bug fix should be accompanied by unit tests to cover your c
 
 ## Tutorial and API documentation
 
-API and hand-written docs are found under the `docfx/` directory. and are built by [docfx](https://dotnet.github.io/docfx/).
+API and hand-written docs are found under the `docfx/` directory and are built by [docfx](https://dotnet.github.io/docfx/).
 
 You can make changes and host the site locally to preview them by switching to that directory and running the `dotnet docfx --serve` command.
 After making a change, you can rebuild the docs site while the localhost server is running by running `dotnet docfx` again from a separate terminal.
@@ -75,11 +93,11 @@ If Renovate is not creating pull requests when you expect it to, check that the 
 ### Maintaining your repo based on this template
 
 The best way to keep your repo in sync with Library.Template's evolving features and best practices is to periodically merge the template into your repo:
-`
+
 ```ps1
 git fetch
 git checkout origin/main
-.\tools\MergeFrom-Template.ps1
+./tools/MergeFrom-Template.ps1
 # resolve any conflicts, then commit the merge commit.
 git push origin -u HEAD
 ```
