@@ -46,6 +46,8 @@ variables:
 extends:
   template: azure-pipelines/MicroBuild.1ES.Official.yml@MicroBuildTemplate
   parameters:
+    settings:
+      networkIsolationPolicy: Permissive,CFSClean
     sdl:
       sourceAnalysisPool: VSEngSS-MicroBuild2022-1ES
       codeSignValidation:
@@ -67,6 +69,7 @@ extends:
       - template: /azure-pipelines/build.yml@self
         parameters:
           Is1ESPT: true
+          Is1ESPTOfficial: true
           RealSign: true
           # ShouldSkipOptimize: ${{ parameters.ShouldSkipOptimize }}
           EnableAPIScan: ${{ parameters.EnableAPIScan }}

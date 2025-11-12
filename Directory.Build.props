@@ -15,6 +15,7 @@
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
+    <RestoreEnablePackagePruning>true</RestoreEnablePackagePruning>
 
     <!-- We depend on a bunch of VS SDK assemblies only for `nameof` and xml doc comment refs. -->
     <NoWarn>$(NoWarn);NU1701</NoWarn>
@@ -48,7 +49,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <LangVersion Condition="'$(MSBuildProjectExtension)'=='.csproj'">13</LangVersion>
+    <LangVersion Condition="'$(MSBuildProjectExtension)'=='.csproj'">14</LangVersion>
     <LangVersion Condition="'$(MSBuildProjectExtension)'=='.vbproj'">16.9</LangVersion>
   </PropertyGroup>
 
