@@ -25,7 +25,7 @@
     <PackageVersion Include="xunit.assert" Version="2.9.3" />
   </ItemGroup>
   <ItemGroup Label="Library.Template">
-    <PackageVersion Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.1.0" />
+    <PackageVersion Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.3.2" />
     <PackageVersion Include="Microsoft.Testing.Extensions.CrashDump" Version="$(MicrosoftTestingPlatformVersion)" />
     <PackageVersion Include="Microsoft.Testing.Extensions.HangDump" Version="$(MicrosoftTestingPlatformVersion)" />
     <PackageVersion Include="Microsoft.Testing.Extensions.TrxReport" Version="$(MicrosoftTestingPlatformVersion)" />
