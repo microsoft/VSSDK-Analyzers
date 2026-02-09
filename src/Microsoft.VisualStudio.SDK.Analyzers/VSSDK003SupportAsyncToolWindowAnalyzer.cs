@@ -10,12 +10,11 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
-using Microsoft.VisualStudio.Shell;
 
 namespace Microsoft.VisualStudio.SDK.Analyzers
 {
     /// <summary>
-    /// Identifies cases where a <see cref="ToolWindowPane" /> is proffered by a VS package without supporting asynchronous initialization.
+    /// Identifies cases where a "ToolWindowPane" is proffered by a VS package without supporting asynchronous initialization.
     /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class VSSDK003SupportAsyncToolWindowAnalyzer : DiagnosticAnalyzer

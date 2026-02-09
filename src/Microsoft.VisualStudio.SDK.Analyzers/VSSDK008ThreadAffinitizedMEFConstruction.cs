@@ -40,7 +40,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             isEnabledByDefault: true);
 
         /// <inheritdoc />
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = [Descriptor];
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(Descriptor);
 
         private ImmutableArray<TypeMatchSpec> MembersRequiringMainThread { get; set; }
 
