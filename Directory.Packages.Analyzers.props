@@ -11,7 +11,7 @@
     <PackageVersion Update="Microsoft.CodeAnalysis.VisualBasic" version="$(CodeAnalysisVersionForAnalyzers)" />
     <PackageVersion Update="Microsoft.CodeAnalysis.VisualBasic.Workspaces" version="$(CodeAnalysisVersionForAnalyzers)" />
     <PackageVersion Update="System.Collections.Immutable" Version="5.0.0" />
-    <PackageVersion Update="System.Memory" Version="4.5.4" />
+    <PackageVersion Update="System.Memory" Version="4.6.0" />
     <PackageVersion Update="System.Reflection.Metadata" Version="5.0.0" />
     <PackageVersion Update="System.Runtime.CompilerServices.Unsafe" Version="5.0.0" />
     <PackageVersion Update="System.Text.Json" Version="4.7.2" />
