@@ -4,5 +4,13 @@
 		"github>microsoft/vs-renovate-presets:microbuild",
 		"github>microsoft/vs-renovate-presets:vs_main_dependencies"
 	],
-	"packageRules": []
+	"packageRules": [
+		{
+			"description": "Packages in Directory.Packages.Analyzers.props have carefully chosen versions for VS 2019 Update 11 compatibility",
+			"matchFileNames": [
+				"Directory.Packages.Analyzers.props"
+			],
+			"enabled": false
+		}
+	]
 }
