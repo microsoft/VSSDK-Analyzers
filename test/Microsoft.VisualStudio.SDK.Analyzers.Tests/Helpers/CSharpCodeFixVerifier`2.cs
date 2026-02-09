@@ -3,13 +3,14 @@
 
 using System.Collections.Immutable;
 using System.Net;
-using System.Threading.Tasks;
+using System.Reflection;
+using Microsoft;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
-using Microsoft.CodeAnalysis.Testing.Verifiers;
+using Microsoft.CodeAnalysis.Text;
 
 public static class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
     where TAnalyzer : DiagnosticAnalyzer, new()
@@ -62,10 +63,14 @@ public static class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
         private static readonly MetadataReference PresentationFrameworkReference = MetadataReference.CreateFromFile(typeof(System.Windows.Controls.UserControl).Assembly.Location);
         private static readonly MetadataReference MPFReference = MetadataReference.CreateFromFile(typeof(Microsoft.VisualStudio.Shell.Package).Assembly.Location);
 
-        private static readonly ReferenceAssemblies DefaultReferences = ReferenceAssemblies.NetFramework.Net472.Wpf;
+        private static readonly string NuGetConfigPath = FindNuGetConfigPath();
+
+        private static readonly ReferenceAssemblies DefaultReferences = ReferenceAssemblies.NetFramework.Net472.Wpf
+            .WithNuGetConfigFilePath(NuGetConfigPath);
+
         private static readonly ReferenceAssemblies VsSdkReferences = DefaultReferences
             .AddPackages(ImmutableArray.Create(
-                new PackageIdentity("Microsoft.VisualStudio.Shell.15.0", "16.5.29911.84")));
+                new PackageIdentity("Microsoft.VisualStudio.Shell.15.0", "17.12.40392")));
 
         static Test()
         {
@@ -76,6 +81,36 @@ public static class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
         public Test(bool includeVisualStudioSdk = true)
         {
             this.ReferenceAssemblies = includeVisualStudioSdk ? VsSdkReferences : DefaultReferences;
+
+            const string additionalFilePrefix = "AdditionalFiles.";
+            this.TestState.AdditionalFiles.AddRange(
+                from resourceName in Assembly.GetExecutingAssembly().GetManifestResourceNames()
+                where resourceName.StartsWith(additionalFilePrefix, StringComparison.Ordinal)
+                let content = ReadManifestResource(Assembly.GetExecutingAssembly(), resourceName)
+                select (filename: resourceName.Substring(additionalFilePrefix.Length), SourceText.From(content)));
+        }
+
+        private static string ReadManifestResource(Assembly assembly, string resourceName)
+        {
+            using var reader = new StreamReader(assembly.GetManifestResourceStream(resourceName) ?? throw Assumes.Fail("Resource not found."));
+            return reader.ReadToEnd();
+        }
+
+        private static string FindNuGetConfigPath()
+        {
+            string? path = AppContext.BaseDirectory;
+            while (path is not null)
+            {
+                string candidate = Path.Combine(path, "nuget.config");
+                if (File.Exists(candidate))
+                {
+                    return candidate;
+                }
+
+                path = Path.GetDirectoryName(path);
+            }
+
+            throw new FileNotFoundException("Could not find NuGet.config by searching up from " + AppContext.BaseDirectory);
         }
     }
 }

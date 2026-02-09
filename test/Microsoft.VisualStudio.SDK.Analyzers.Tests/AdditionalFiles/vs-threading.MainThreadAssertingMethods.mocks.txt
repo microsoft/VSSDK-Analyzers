@@ -1,0 +1,4 @@
+[Microsoft.VisualStudio.Shell.UIContext]
+[Microsoft.VisualStudio.Shell.ThreadHelper]::ThrowIfNotOnUIThread
+[Microsoft.VisualStudio.Threading.JoinableTaskFactory]::SwitchToMainThreadAsync
+[Microsoft.VisualStudio.Shell.TaskListItem]

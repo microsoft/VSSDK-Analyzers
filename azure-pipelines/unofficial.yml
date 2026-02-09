@@ -36,6 +36,10 @@ parameters:
   displayName: Enable Production SDL
   type: boolean
   default: false
+- name: PublishCodeCoverage
+  displayName: Publish code coverage
+  type: boolean
+  default: true
 
 resources:
   repositories:
@@ -50,21 +54,25 @@ variables:
 extends:
   template: azure-pipelines/MicroBuild.1ES.Unofficial.yml@MicroBuildTemplate
   parameters:
+    settings:
+      networkIsolationPolicy: Permissive,CFSClean
     sdl:
-      sourceAnalysisPool: VSEngSS-MicroBuild2022-1ES
+      sourceAnalysisPool: VSEng-MicroBuildVSStable
+      credscan:
+        enabled: false
       suppression:
         suppressionFile: $(System.DefaultWorkingDirectory)\azure-pipelines\falsepositives.gdnsuppress
       enableProductionSDL: ${{ parameters.EnableProductionSDL }}
       codeSignValidation:
         enabled: ${{ parameters.EnableProductionSDL }}
         break: true
-        additionalTargetsGlobPattern: -|Variables-*\*.ps1;-|APIScanInputs-*\**;-|test_symbols-*\**;-|MicroBuild\**
+        additionalTargetsGlobPattern: -|Variables-*\*.ps1;-|APIScanInputs-*\**;-|test_symbols-*\**;-|MicroBuild\**;-|$(Build.ArtifactStagingDirectory)\VSInsertion-Windows\vs-insertion-script.ps1
         policyFile: $(MBSIGN_APPFOLDER)\CSVTestSignPolicy.xml
       policheck:
         enabled: ${{ parameters.EnableProductionSDL }}
         exclusionsFile: $(System.DefaultWorkingDirectory)\azure-pipelines\PoliCheckExclusions.xml
       sbom:
-        enabled: ${{ parameters.EnableProductionSDL }}
+        enabled: false # Skip 1ES SBOM because microbuild has our own sbom system
     stages:
     - stage: Build
       variables:
@@ -76,7 +84,7 @@ extends:
           RealSign: false
           # ShouldSkipOptimize: ${{ parameters.ShouldSkipOptimize }}
           EnableAPIScan: ${{ parameters.EnableAPIScan }}
-          windowsPool: VSEngSS-MicroBuild2022-1ES
+          windowsPool: VSEng-MicroBuildVSStable
           linuxPool:
             name: AzurePipelines-EO
             demands:
@@ -84,7 +92,8 @@ extends:
             os: Linux
           macOSPool:
             name: Azure Pipelines
-            vmImage: macOS-14
+            vmImage: macOS-15
             os: macOS
           EnableMacOSBuild: ${{ parameters.EnableMacOSBuild }}
           RunTests: ${{ parameters.RunTests }}
+          PublishCodeCoverage: ${{ parameters.PublishCodeCoverage }}

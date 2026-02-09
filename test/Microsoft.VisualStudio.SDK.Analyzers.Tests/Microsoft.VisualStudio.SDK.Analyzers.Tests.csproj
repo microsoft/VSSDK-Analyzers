@@ -10,14 +10,12 @@
     <PackageReference Include="Microsoft.Build.Utilities.Core" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing.XUnit" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.VisualStudio.Designer.Interfaces" PrivateAssets="all" />
     <PackageReference Include="Microsoft.VisualStudio.Validation" PrivateAssets="all" />
     <PackageReference Include="System.ValueTuple" />
     <PackageReference Include="xunit.assert" ExcludeAssets="compile" />
-    <PackageReference Include="xunit.runner.visualstudio" />
-    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="xunit.v3.mtp-v2" />
 
     <!-- Avoid dependencies on earlier insecure Newtownsoft.Json -->
     <PackageReference Include="Newtonsoft.Json" />
@@ -30,6 +28,16 @@
 
   <ItemGroup>
     <Reference Include="PresentationFramework" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="$(PkgMicrosoft_VisualStudio_Threading_Analyzers)\buildTransitive\AdditionalFiles\**"
+      LinkBase="BuiltIn.AdditionalFiles">
+      <LogicalName>AdditionalFiles.%(FileName)%(Extension)</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AdditionalFiles\**">
+      <LogicalName>AdditionalFiles.%(FileName)%(Extension)</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>
