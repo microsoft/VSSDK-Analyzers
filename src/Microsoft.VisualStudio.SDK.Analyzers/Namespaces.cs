@@ -14,87 +14,77 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         /// <summary>
         /// Gets an array for each element in the namespace Microsoft.
         /// </summary>
-        internal static readonly ImmutableArray<string> Microsoft = [
-            nameof(Microsoft),
-        ];
+        internal static readonly ImmutableArray<string> Microsoft = ImmutableArray.Create(
+            nameof(Microsoft));
 
         /// <summary>
         /// Gets an array for each element in the namespace Microsoft.VisualStudio.Shell.
         /// </summary>
-        internal static readonly ImmutableArray<string> MicrosoftVisualStudioShell = [
+        internal static readonly ImmutableArray<string> MicrosoftVisualStudioShell = ImmutableArray.Create(
             nameof(Microsoft),
             nameof(VisualStudio),
-            "Shell",
-        ];
+            "Shell");
 
         /// <summary>
         /// Gets an array for each element in the namespace Microsoft.VisualStudio.Shell.Interop.
         /// </summary>
-        internal static readonly ImmutableArray<string> MicrosoftVisualStudioShellInterop = [
+        internal static readonly ImmutableArray<string> MicrosoftVisualStudioShellInterop = ImmutableArray.Create(
             nameof(Microsoft),
             nameof(VisualStudio),
             "Shell",
-            "Interop",
-        ];
+            "Interop");
 
         /// <summary>
         /// Gets an array for each element in the namespace Microsoft.VisualStudio.OLE.Interop.
         /// </summary>
-        internal static readonly ImmutableArray<string> MicrosoftVisualStudioOLEInterop = [
+        internal static readonly ImmutableArray<string> MicrosoftVisualStudioOLEInterop = ImmutableArray.Create(
             nameof(Microsoft),
             nameof(VisualStudio),
             "OLE",
-            "Interop",
-        ];
+            "Interop");
 
         /// <summary>
         /// Gets an array for each element in the namespace Microsoft.VisualStudio.Threading.
         /// </summary>
-        internal static readonly ImmutableArray<string> MicrosoftVisualStudioThreading = [
+        internal static readonly ImmutableArray<string> MicrosoftVisualStudioThreading = ImmutableArray.Create(
             nameof(Microsoft),
             nameof(VisualStudio),
-            "Threading",
-        ];
+            "Threading");
 
         /// <summary>
         /// Gets an array for each element in the namespace System.
         /// </summary>
-        internal static readonly ImmutableArray<string> System = [
-            nameof(System),
-        ];
+        internal static readonly ImmutableArray<string> System = ImmutableArray.Create(
+            nameof(System));
 
         /// <summary>
         /// Gets an array for each element in the namespace System.Threading.
         /// </summary>
-        internal static readonly ImmutableArray<string> SystemThreading = [
+        internal static readonly ImmutableArray<string> SystemThreading = ImmutableArray.Create(
             nameof(System),
-            nameof(global::System.Threading),
-        ];
+            nameof(global::System.Threading));
 
         /// <summary>
         /// Gets an array for each element in the namespace System.Threading.Tasks.
         /// </summary>
-        internal static readonly ImmutableArray<string> SystemThreadingTasks = [
+        internal static readonly ImmutableArray<string> SystemThreadingTasks = ImmutableArray.Create(
             nameof(System),
             nameof(global::System.Threading),
-            nameof(global::System.Threading.Tasks),
-        ];
+            nameof(global::System.Threading.Tasks));
 
         /// <summary>
         /// Gets an array for each element in the namespace System.ComponentModel.Composition.
         /// </summary>
-        internal static readonly ImmutableArray<string> SystemComponentModelComposition = [
+        internal static readonly ImmutableArray<string> SystemComponentModelComposition = ImmutableArray.Create(
             nameof(System),
             nameof(global::System.ComponentModel),
-            nameof(global::System.ComponentModel.Composition),
-        ];
+            "Composition");
 
         /// <summary>
         /// Gets an array for each element in the namespace System.Composition.
         /// </summary>
-        internal static readonly ImmutableArray<string> SystemComposition = [
+        internal static readonly ImmutableArray<string> SystemComposition = ImmutableArray.Create(
             nameof(System),
-            nameof(global::System.Composition),
-        ];
+            "Composition");
     }
 }

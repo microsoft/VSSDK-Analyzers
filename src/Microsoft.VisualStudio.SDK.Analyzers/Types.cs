@@ -605,14 +605,14 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         internal static class MEFv1
         {
             /// <summary>
-            /// Describes the <see cref="System.ComponentModel.Composition.ExportAttribute"/> type.
+            /// Describes the System.ComponentModel.Composition.ExportAttribute type.
             /// </summary>
             internal static class ExportAttribute
             {
                 /// <summary>
-                /// Gets the simple name of the <see cref="System.ComponentModel.Composition.ExportAttribute"/> type.
+                /// Gets the simple name of the System.ComponentModel.Composition.ExportAttribute type.
                 /// </summary>
-                internal const string TypeName = nameof(System.ComponentModel.Composition.ExportAttribute);
+                internal const string TypeName = "ExportAttribute";
 
                 /// <summary>
                 /// Gets an array of the nesting namespaces for this type.
@@ -631,14 +631,14 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             }
 
             /// <summary>
-            /// Describes the <see cref="System.ComponentModel.Composition.ImportingConstructorAttribute"/> type.
+            /// Describes the System.ComponentModel.Composition.ImportingConstructorAttribute type.
             /// </summary>
             internal static class ImportingConstructorAttribute
             {
                 /// <summary>
-                /// Gets the simple name of the <see cref="System.ComponentModel.Composition.ImportingConstructorAttribute"/> type.
+                /// Gets the simple name of the System.ComponentModel.Composition.ImportingConstructorAttribute type.
                 /// </summary>
-                internal const string TypeName = nameof(System.ComponentModel.Composition.ImportingConstructorAttribute);
+                internal const string TypeName = "ImportingConstructorAttribute";
 
                 /// <summary>
                 /// Gets an array of the nesting namespaces for this type.
@@ -657,17 +657,17 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             }
 
             /// <summary>
-            /// Describes the <see cref="System.ComponentModel.Composition.IPartImportsSatisfiedNotification"/> type.
+            /// Describes the System.ComponentModel.Composition.IPartImportsSatisfiedNotification type.
             /// </summary>
             internal static class IPartImportsSatisfiedNotification
             {
                 /// <summary>
-                /// Gets the simple name of the <see cref="System.ComponentModel.Composition.IPartImportsSatisfiedNotification"/> type.
+                /// Gets the simple name of the System.ComponentModel.Composition.IPartImportsSatisfiedNotification type.
                 /// </summary>
-                internal const string TypeName = nameof(System.ComponentModel.Composition.IPartImportsSatisfiedNotification);
+                internal const string TypeName = "IPartImportsSatisfiedNotification";
 
                 /// <summary>
-                /// Gets the method name of <see cref="System.ComponentModel.Composition.IPartImportsSatisfiedNotification.OnImportsSatisfied"/>.
+                /// Gets the method name of System.ComponentModel.Composition.IPartImportsSatisfiedNotification.OnImportsSatisfied.
                 /// </summary>
                 internal const string OnImportsSatisfied = "OnImportsSatisfied";
 
@@ -687,20 +687,20 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 internal static string FullName { get; } = string.Join(".", Namespace) + "." + TypeName;
 
                 /// <summary>
-                /// Gets the full name of <see cref="System.ComponentModel.Composition.IPartImportsSatisfiedNotification.OnImportsSatisfied"/>.
+                /// Gets the full name of System.ComponentModel.Composition.IPartImportsSatisfiedNotification.OnImportsSatisfied.
                 /// </summary>
                 internal static string OnImportsSatisfiedFullName { get; } = string.Join(".", Namespace) + "." + TypeName + "." + OnImportsSatisfied;
             }
 
             /// <summary>
-            /// Describes the <see cref="System.ComponentModel.Composition.InheritedExportAttribute"/> type.
+            /// Describes the System.ComponentModel.Composition.InheritedExportAttribute type.
             /// </summary>
             internal static class InheritedExportAttribute
             {
                 /// <summary>
-                /// Gets the simple name of the <see cref="System.ComponentModel.Composition.InheritedExportAttribute"/> type.
+                /// Gets the simple name of the System.ComponentModel.Composition.InheritedExportAttribute type.
                 /// </summary>
-                internal const string TypeName = nameof(System.ComponentModel.Composition.InheritedExportAttribute);
+                internal const string TypeName = "InheritedExportAttribute";
 
                 /// <summary>
                 /// Gets an array of the nesting namespaces for this type.
@@ -725,14 +725,14 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         internal static class MEFv2
         {
             /// <summary>
-            /// Describes the <see cref="System.Composition.ExportAttribute"/> type.
+            /// Describes the System.Composition.ExportAttribute type.
             /// </summary>
             internal static class ExportAttribute
             {
                 /// <summary>
-                /// Gets the simple name of the <see cref="System.Composition.ExportAttribute"/> type.
+                /// Gets the simple name of the System.Composition.ExportAttribute type.
                 /// </summary>
-                internal const string TypeName = nameof(System.Composition.ExportAttribute);
+                internal const string TypeName = "ExportAttribute";
 
                 /// <summary>
                 /// Gets an array of the nesting namespaces for this type.
@@ -751,14 +751,14 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             }
 
             /// <summary>
-            /// Describes the <see cref="System.Composition.ImportingConstructorAttribute"/> type.
+            /// Describes the System.Composition.ImportingConstructorAttribute type.
             /// </summary>
             internal static class ImportingConstructorAttribute
             {
                 /// <summary>
-                /// Gets the simple name of the <see cref="System.Composition.ImportingConstructorAttribute"/> type.
+                /// Gets the simple name of the System.Composition.ImportingConstructorAttribute type.
                 /// </summary>
-                internal const string TypeName = nameof(System.Composition.ImportingConstructorAttribute);
+                internal const string TypeName = "ImportingConstructorAttribute";
 
                 /// <summary>
                 /// Gets an array of the nesting namespaces for this type.
@@ -777,14 +777,14 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             }
 
             /// <summary>
-            /// Describes the <see cref="System.Composition.OnImportsSatisfiedAttribute"/> type.
+            /// Describes the System.Composition.OnImportsSatisfiedAttribute type.
             /// </summary>
             internal static class OnImportsSatisfiedAttribute
             {
                 /// <summary>
-                /// Gets the simple name of the <see cref="System.Composition.OnImportsSatisfiedAttribute"/> type.
+                /// Gets the simple name of the System.Composition.OnImportsSatisfiedAttribute type.
                 /// </summary>
-                internal const string TypeName = nameof(System.Composition.OnImportsSatisfiedAttribute);
+                internal const string TypeName = "OnImportsSatisfiedAttribute";
 
                 /// <summary>
                 /// Gets an array of the nesting namespaces for this type.
