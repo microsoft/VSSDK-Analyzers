@@ -9,12 +9,11 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
-using Microsoft.VisualStudio.Shell;
 
 namespace Microsoft.VisualStudio.SDK.Analyzers
 {
     /// <summary>
-    /// Tasks created from <see cref="ThreadHelper.JoinableTaskFactory"/> must be awaited or joined.
+    /// Tasks created from "ThreadHelper.JoinableTaskFactory" must be awaited or joined.
     /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class VSSDK007ThreadHelperJTFRunAsync : DiagnosticAnalyzer
@@ -167,7 +166,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         }
 
         /// <summary>
-        /// Determines whether the given invocation expression includes a <see cref="Threading.JoinableTask.Join"/> method.
+        /// Determines whether the given invocation expression includes a "Threading.JoinableTask.Join" method.
         /// </summary>
         private static bool IsSynchronouslyJoined(SyntaxNodeAnalysisContext context, InvocationExpressionSyntax invocationExpr)
         {
@@ -185,7 +184,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         }
 
         /// <summary>
-        /// Determines whether the <see cref="Threading.JoinableTask"/> returned from the RunAsync invocation is assigned to a variable, and if so
+        /// Determines whether the "Threading.JoinableTask" returned from the RunAsync invocation is assigned to a variable, and if so
         /// returns the variable's syntax node and identifier token.
         /// </summary>
         private static bool IsJoinableTaskAssigned(InvocationExpressionSyntax invocationExpr, out SyntaxNode? assignedToNode, out SyntaxToken? assignedToToken)
@@ -322,7 +321,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         }
 
         /// <summary>
-        /// Determine whether the given variable calls the <see cref="Threading.JoinableTask.JoinAsync"/> method in an await expression.
+        /// Determine whether the given variable calls the "Threading.JoinableTask.JoinAsync" method in an await expression.
         /// </summary>
         private static bool VariableAwaitsJoinAsyncMethod(string variableName, AwaitExpressionSyntax awaitExpr)
         {

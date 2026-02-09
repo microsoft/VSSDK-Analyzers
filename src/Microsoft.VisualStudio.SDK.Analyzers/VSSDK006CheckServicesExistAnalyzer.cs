@@ -159,7 +159,8 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
 
                                 if (derefs.Any())
                                 {
-                                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, assignment.Left.GetLocation(), derefs));
+                                    Location invocationLocation = ((InvocationExpressionSyntax)invocationExpression.Syntax).Expression.GetLocation();
+                                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, invocationLocation, new[] { assignment.Left.GetLocation() }.Concat(derefs)));
                                 }
                             }
                         }
@@ -181,7 +182,8 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                                 ImmutableArray<Location> derefs = this.ScanBlockForDereferencesWithoutNullCheck(semanticModel, leftSymbol, containingBlock, context.CancellationToken);
                                 if (derefs.Any())
                                 {
-                                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, variableDeclarator.Identifier.GetLocation(), derefs));
+                                    Location invocationLocation = ((InvocationExpressionSyntax)invocationExpression.Syntax).Expression.GetLocation();
+                                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, invocationLocation, new[] { variableDeclarator.Identifier.GetLocation() }.Concat(derefs)));
                                 }
                             }
                         }

@@ -4,4 +4,5 @@
     <!-- Avoid compile error about missing namespace when combining ImplicitUsings with .NET Framework target frameworks. -->
     <Using Remove="System.Net.Http" Condition="'$(TargetFrameworkIdentifier)'=='.NETFramework'" />
   </ItemGroup>
+  <Import Project="Directory.Packages.Analyzers.props" Condition="'$(IsAnalyzerProject)'=='true'" />
 </Project>

@@ -37,11 +37,16 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         {
             Diagnostic diagnostic = context.Diagnostics.First();
             SyntaxNode? root = await context.Document.GetSyntaxRootAsync(context.CancellationToken);
-            SyntaxNode? node = root?.FindNode(diagnostic.Location.SourceSpan, getInnermostNodeForTie: true);
+            if (root is null || diagnostic.AdditionalLocations.Count == 0)
+            {
+                return;
+            }
+
+            // The first additional location points to the assignment target or variable declarator.
+            SyntaxNode? node = root.FindNode(diagnostic.AdditionalLocations[0].SourceSpan, getInnermostNodeForTie: true);
             if (node != null)
             {
                 SyntaxNode? presentArgument = node is VariableDeclaratorSyntax declaratorSyntax ? SyntaxFactory.IdentifierName(declaratorSyntax.Identifier)
-                    : node.Parent is InvocationExpressionSyntax ? null // direct GetService result invocation
                     : node is NameSyntax ? node
                     : node is MemberAccessExpressionSyntax ? node
                     : null;

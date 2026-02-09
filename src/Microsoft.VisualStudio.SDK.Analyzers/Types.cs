@@ -12,19 +12,19 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
     internal static class Types
     {
         /// <summary>
-        /// Describes the <see cref="Microsoft.Assumes"/> type.
+        /// Describes the "Microsoft.Assumes" type.
         /// </summary>
         internal static class Assumes
         {
             /// <summary>
-            /// Gets the simple name of the <see cref="Microsoft.Assumes"/> type.
+            /// Gets the simple name of the "Microsoft.Assumes" type.
             /// </summary>
-            internal const string TypeName = nameof(Microsoft.Assumes);
+            internal const string TypeName = "Assumes";
 
             /// <summary>
-            /// The name of the <see cref="Microsoft.Assumes.Present{T}(T)"/> method.
+            /// The name of the "Microsoft.Assumes.Present{T}(T)" method.
             /// </summary>
-            internal const string Present = nameof(Microsoft.Assumes.Present);
+            internal const string Present = "Present";
 
             /// <summary>
             /// Gets an array of the nesting namespaces for this type.
@@ -105,14 +105,14 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         }
 
         /// <summary>
-        /// Describes the <see cref="Shell.ServiceProvider"/> type.
+        /// Describes the "Shell.ServiceProvider" type.
         /// </summary>
         internal static class ServiceProvider
         {
             /// <summary>
-            /// Gets the simple name of the <see cref="Shell.ServiceProvider"/> type.
+            /// Gets the simple name of the "Shell.ServiceProvider" type.
             /// </summary>
-            internal const string TypeName = nameof(Shell.ServiceProvider);
+            internal const string TypeName = "ServiceProvider";
 
             /// <summary>
             /// The name of the GetService method.
@@ -136,19 +136,19 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         }
 
         /// <summary>
-        /// Describes the <see cref="Shell.IAsyncServiceProvider"/> type.
+        /// Describes the "Shell.IAsyncServiceProvider" type.
         /// </summary>
         internal static class IAsyncServiceProvider
         {
             /// <summary>
-            /// Gets the simple name of the <see cref="Shell.IAsyncServiceProvider"/> type.
+            /// Gets the simple name of the "Shell.IAsyncServiceProvider" type.
             /// </summary>
-            internal const string TypeName = nameof(Shell.IAsyncServiceProvider);
+            internal const string TypeName = "IAsyncServiceProvider";
 
             /// <summary>
-            /// The name of the <see cref="Shell.IAsyncServiceProvider.GetServiceAsync"/> method.
+            /// The name of the "Shell.IAsyncServiceProvider.GetServiceAsync" method.
             /// </summary>
-            internal const string GetServiceAsync = nameof(Shell.IAsyncServiceProvider.GetServiceAsync);
+            internal const string GetServiceAsync = "GetServiceAsync";
 
             /// <summary>
             /// Gets an array of the nesting namespaces for this type.
@@ -167,14 +167,14 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         }
 
         /// <summary>
-        /// Describes the <see cref="Shell.AsyncPackage"/> type.
+        /// Describes the "Shell.AsyncPackage" type.
         /// </summary>
         internal static class AsyncPackage
         {
             /// <summary>
-            /// Gets the simple name of the <see cref="Shell.AsyncPackage"/> type.
+            /// Gets the simple name of the "Shell.AsyncPackage" type.
             /// </summary>
-            internal const string TypeName = nameof(Shell.AsyncPackage);
+            internal const string TypeName = "AsyncPackage";
 
             /// <summary>
             /// The name of the InitializeAsync method.
@@ -208,14 +208,14 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         }
 
         /// <summary>
-        /// Describes the <see cref="Shell.Package"/> type.
+        /// Describes the "Shell.Package" type.
         /// </summary>
         internal static class Package
         {
             /// <summary>
-            /// Gets the simple name of the <see cref="Shell.Package"/> type.
+            /// Gets the simple name of the "Shell.Package" type.
             /// </summary>
-            internal const string TypeName = nameof(Shell.Package);
+            internal const string TypeName = "Package";
 
             /// <summary>
             /// The name of the Initialize method.
@@ -244,14 +244,14 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         }
 
         /// <summary>
-        /// Describes the <see cref="Shell.PackageUtilities"/> type.
+        /// Describes the "Shell.PackageUtilities" type.
         /// </summary>
         internal static class PackageUtilities
         {
             /// <summary>
-            /// Gets the simple name of the <see cref="Shell.PackageUtilities"/> type.
+            /// Gets the simple name of the "Shell.PackageUtilities" type.
             /// </summary>
-            internal const string TypeName = nameof(Shell.PackageUtilities);
+            internal const string TypeName = "PackageUtilities";
 
             /// <summary>
             /// The name of the QueryService method.
@@ -282,7 +282,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             /// <summary>
             /// Gets the simple name of the <see cref="System.Threading.CancellationToken"/> type.
             /// </summary>
-            internal const string TypeName = nameof(System.Threading.CancellationToken);
+            internal const string TypeName = "CancellationToken";
 
             /// <summary>
             /// Gets an array of the nesting namespaces for this type.
@@ -303,7 +303,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             /// <summary>
             /// Gets the simple name of the <see cref="System.Threading.Tasks.Task"/> type.
             /// </summary>
-            internal const string TypeName = nameof(System.Threading.Tasks.Task);
+            internal const string TypeName = "Task";
 
             /// <summary>
             /// Gets an array of the nesting namespaces for this type.
@@ -317,19 +317,19 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         }
 
         /// <summary>
-        /// Describes the <see cref="Shell.ThreadHelper"/> type.
+        /// Describes the "Shell.ThreadHelper" type.
         /// </summary>
         internal static class ThreadHelper
         {
             /// <summary>
-            /// Gets the simple name of the <see cref="Shell.ThreadHelper"/> type.
+            /// Gets the simple name of the "Shell.ThreadHelper" type.
             /// </summary>
-            internal const string TypeName = nameof(Shell.ThreadHelper);
+            internal const string TypeName = "ThreadHelper";
 
             /// <summary>
-            /// The name of the <see cref="Shell.ThreadHelper.JoinableTaskFactory"/> property.
+            /// The name of the "Shell.ThreadHelper.JoinableTaskFactory" property.
             /// </summary>
-            internal const string JoinableTaskFactory = nameof(Shell.ThreadHelper.JoinableTaskFactory);
+            internal const string JoinableTaskFactory = "JoinableTaskFactory";
 
             /// <summary>
             /// Gets an array of the nesting namespaces for this type.
@@ -348,14 +348,14 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         }
 
         /// <summary>
-        /// Describes the <see cref="Threading.JoinableTaskContext"/> type.
+        /// Describes the "Threading.JoinableTaskContext" type.
         /// </summary>
         internal static class JoinableTaskContext
         {
             /// <summary>
-            /// Gets the simple name of the <see cref="Threading.JoinableTaskContext"/> type.
+            /// Gets the simple name of the "Threading.JoinableTaskContext" type.
             /// </summary>
-            internal const string TypeName = nameof(Threading.JoinableTaskContext);
+            internal const string TypeName = "JoinableTaskContext";
 
             /// <summary>
             /// Gets an array of the nesting namespaces for this type.
@@ -374,19 +374,19 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         }
 
         /// <summary>
-        /// Describes the <see cref="Threading.JoinableTaskFactory"/> type.
+        /// Describes the "Threading.JoinableTaskFactory" type.
         /// </summary>
         internal static class JoinableTaskFactory
         {
             /// <summary>
-            /// Gets the simple name of the <see cref="Threading.JoinableTaskFactory"/> type.
+            /// Gets the simple name of the "Threading.JoinableTaskFactory" type.
             /// </summary>
             internal const string TypeName = "JoinableTaskFactory";
 
             /// <summary>
             /// The name of the <see cref="JoinableTaskFactory.SwitchToMainThreadAsync"/> method.
             /// </summary>
-            internal const string SwitchToMainThreadAsync = nameof(JoinableTaskFactory.SwitchToMainThreadAsync);
+            internal const string SwitchToMainThreadAsync = "SwitchToMainThreadAsync";
 
             /// <summary>
             /// The name of the <see cref="JoinableTaskFactory.RunAsync"/> method.
@@ -400,22 +400,22 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         }
 
         /// <summary>
-        /// Describes the <see cref="Threading.JoinableTask"/> type.
+        /// Describes the "Threading.JoinableTask" type.
         /// </summary>
         internal static class JoinableTask
         {
             /// <summary>
-            /// Gets the simple name of the <see cref="Threading.JoinableTask"/> type.
+            /// Gets the simple name of the "Threading.JoinableTask" type.
             /// </summary>
             internal const string TypeName = "JoinableTask";
 
             /// <summary>
-            /// The name of the <see cref="Threading.JoinableTask.Join"/> method.
+            /// The name of the "Threading.JoinableTask.Join" method.
             /// </summary>
             internal const string Join = "Join";
 
             /// <summary>
-            /// The name of the <see cref="Threading.JoinableTask.JoinAsync"/> method.
+            /// The name of the "Threading.JoinableTask.JoinAsync" method.
             /// </summary>
             internal const string JoinAsync = "JoinAsync";
         }
@@ -428,7 +428,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             /// <summary>
             /// Gets the simple name of the <see cref="System.IProgress{T}"/> type.
             /// </summary>
-            internal const string TypeName = nameof(System.IProgress<int>);
+            internal const string TypeName = "IProgress";
 
             /// <summary>
             /// Gets an array of the nesting namespaces for this type.
@@ -449,14 +449,14 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         }
 
         /// <summary>
-        /// Describes the <see cref="Shell.ServiceProgressData"/> type.
+        /// Describes the "Shell.ServiceProgressData" type.
         /// </summary>
         internal static class ServiceProgressData
         {
             /// <summary>
-            /// Gets the simple name of the <see cref="Shell.ServiceProgressData"/> type.
+            /// Gets the simple name of the "Shell.ServiceProgressData" type.
             /// </summary>
-            internal const string TypeName = nameof(Shell.ServiceProgressData);
+            internal const string TypeName = "ServiceProgressData";
 
             /// <summary>
             /// Gets an array of the nesting namespaces for this type.
@@ -470,19 +470,19 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         }
 
         /// <summary>
-        /// Describes the <see cref="Shell.PackageRegistrationAttribute"/> type.
+        /// Describes the "Shell.PackageRegistrationAttribute" type.
         /// </summary>
         internal static class PackageRegistrationAttribute
         {
             /// <summary>
-            /// Gets the simple name of the <see cref="Shell.PackageRegistrationAttribute"/> type.
+            /// Gets the simple name of the "Shell.PackageRegistrationAttribute" type.
             /// </summary>
-            internal const string TypeName = nameof(Shell.PackageRegistrationAttribute);
+            internal const string TypeName = "PackageRegistrationAttribute";
 
             /// <summary>
-            /// Gets the name of the <see cref="Shell.PackageRegistrationAttribute.AllowsBackgroundLoading"/> property.
+            /// Gets the name of the "Shell.PackageRegistrationAttribute.AllowsBackgroundLoading" property.
             /// </summary>
-            internal const string AllowsBackgroundLoading = nameof(Shell.PackageRegistrationAttribute.AllowsBackgroundLoading);
+            internal const string AllowsBackgroundLoading = "AllowsBackgroundLoading";
 
             /// <summary>
             /// Gets an array of the nesting namespaces for this type.
@@ -501,14 +501,14 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         }
 
         /// <summary>
-        /// Describes the <see cref="Shell.ProvideToolWindowAttribute"/> type.
+        /// Describes the "Shell.ProvideToolWindowAttribute" type.
         /// </summary>
         internal static class ProvideToolWindowAttribute
         {
             /// <summary>
-            /// Gets the simple name of the <see cref="Shell.ProvideToolWindowAttribute"/> type.
+            /// Gets the simple name of the "Shell.ProvideToolWindowAttribute" type.
             /// </summary>
-            internal const string TypeName = nameof(Shell.ProvideToolWindowAttribute);
+            internal const string TypeName = "ProvideToolWindowAttribute";
 
             /// <summary>
             /// Gets an array of the nesting namespaces for this type.
@@ -527,14 +527,14 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         }
 
         /// <summary>
-        /// Describes the <see cref="Shell.ProvideAutoLoadAttribute"/> type.
+        /// Describes the "Shell.ProvideAutoLoadAttribute" type.
         /// </summary>
         internal static class ProvideAutoLoadAttribute
         {
             /// <summary>
-            /// Gets the simple name of the <see cref="Shell.ProvideAutoLoadAttribute"/> type.
+            /// Gets the simple name of the "Shell.ProvideAutoLoadAttribute" type.
             /// </summary>
-            internal const string TypeName = nameof(Shell.ProvideAutoLoadAttribute);
+            internal const string TypeName = "ProvideAutoLoadAttribute";
 
             /// <summary>
             /// Gets an array of the nesting namespaces for this type.
@@ -553,12 +553,12 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         }
 
         /// <summary>
-        /// Describes the <see cref="Shell.PackageAutoLoadFlags"/> type.
+        /// Describes the "Shell.PackageAutoLoadFlags" type.
         /// </summary>
         internal static class PackageAutoLoadFlags
         {
             /// <summary>
-            /// Gets the simple name of the <see cref="Shell.PackageAutoLoadFlags"/> type.
+            /// Gets the simple name of the "Shell.PackageAutoLoadFlags" type.
             /// </summary>
             internal const string TypeName = "PackageAutoLoadFlags";
 
@@ -568,7 +568,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             internal static readonly IReadOnlyList<string> Namespace = Namespaces.MicrosoftVisualStudioShell;
 
             /// <summary>
-            /// Copy of auto load flag values from <see cref="Shell.PackageAutoLoadFlags"/>.
+            /// Copy of auto load flag values from "Shell.PackageAutoLoadFlags".
             /// </summary>
             internal enum Values
             {
@@ -605,14 +605,14 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         internal static class MEFv1
         {
             /// <summary>
-            /// Describes the <see cref="System.ComponentModel.Composition.ExportAttribute"/> type.
+            /// Describes the System.ComponentModel.Composition.ExportAttribute type.
             /// </summary>
             internal static class ExportAttribute
             {
                 /// <summary>
-                /// Gets the simple name of the <see cref="System.ComponentModel.Composition.ExportAttribute"/> type.
+                /// Gets the simple name of the System.ComponentModel.Composition.ExportAttribute type.
                 /// </summary>
-                internal const string TypeName = nameof(System.ComponentModel.Composition.ExportAttribute);
+                internal const string TypeName = "ExportAttribute";
 
                 /// <summary>
                 /// Gets an array of the nesting namespaces for this type.
@@ -631,14 +631,14 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             }
 
             /// <summary>
-            /// Describes the <see cref="System.ComponentModel.Composition.ImportingConstructorAttribute"/> type.
+            /// Describes the System.ComponentModel.Composition.ImportingConstructorAttribute type.
             /// </summary>
             internal static class ImportingConstructorAttribute
             {
                 /// <summary>
-                /// Gets the simple name of the <see cref="System.ComponentModel.Composition.ImportingConstructorAttribute"/> type.
+                /// Gets the simple name of the System.ComponentModel.Composition.ImportingConstructorAttribute type.
                 /// </summary>
-                internal const string TypeName = nameof(System.ComponentModel.Composition.ImportingConstructorAttribute);
+                internal const string TypeName = "ImportingConstructorAttribute";
 
                 /// <summary>
                 /// Gets an array of the nesting namespaces for this type.
@@ -657,17 +657,17 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             }
 
             /// <summary>
-            /// Describes the <see cref="System.ComponentModel.Composition.IPartImportsSatisfiedNotification"/> type.
+            /// Describes the System.ComponentModel.Composition.IPartImportsSatisfiedNotification type.
             /// </summary>
             internal static class IPartImportsSatisfiedNotification
             {
                 /// <summary>
-                /// Gets the simple name of the <see cref="System.ComponentModel.Composition.IPartImportsSatisfiedNotification"/> type.
+                /// Gets the simple name of the System.ComponentModel.Composition.IPartImportsSatisfiedNotification type.
                 /// </summary>
-                internal const string TypeName = nameof(System.ComponentModel.Composition.IPartImportsSatisfiedNotification);
+                internal const string TypeName = "IPartImportsSatisfiedNotification";
 
                 /// <summary>
-                /// Gets the method name of <see cref="System.ComponentModel.Composition.IPartImportsSatisfiedNotification.OnImportsSatisfied"/>.
+                /// Gets the method name of System.ComponentModel.Composition.IPartImportsSatisfiedNotification.OnImportsSatisfied.
                 /// </summary>
                 internal const string OnImportsSatisfied = "OnImportsSatisfied";
 
@@ -687,20 +687,20 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 internal static string FullName { get; } = string.Join(".", Namespace) + "." + TypeName;
 
                 /// <summary>
-                /// Gets the full name of <see cref="System.ComponentModel.Composition.IPartImportsSatisfiedNotification.OnImportsSatisfied"/>.
+                /// Gets the full name of System.ComponentModel.Composition.IPartImportsSatisfiedNotification.OnImportsSatisfied.
                 /// </summary>
                 internal static string OnImportsSatisfiedFullName { get; } = string.Join(".", Namespace) + "." + TypeName + "." + OnImportsSatisfied;
             }
 
             /// <summary>
-            /// Describes the <see cref="System.ComponentModel.Composition.InheritedExportAttribute"/> type.
+            /// Describes the System.ComponentModel.Composition.InheritedExportAttribute type.
             /// </summary>
             internal static class InheritedExportAttribute
             {
                 /// <summary>
-                /// Gets the simple name of the <see cref="System.ComponentModel.Composition.InheritedExportAttribute"/> type.
+                /// Gets the simple name of the System.ComponentModel.Composition.InheritedExportAttribute type.
                 /// </summary>
-                internal const string TypeName = nameof(System.ComponentModel.Composition.InheritedExportAttribute);
+                internal const string TypeName = "InheritedExportAttribute";
 
                 /// <summary>
                 /// Gets an array of the nesting namespaces for this type.
@@ -725,14 +725,14 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         internal static class MEFv2
         {
             /// <summary>
-            /// Describes the <see cref="System.Composition.ExportAttribute"/> type.
+            /// Describes the System.Composition.ExportAttribute type.
             /// </summary>
             internal static class ExportAttribute
             {
                 /// <summary>
-                /// Gets the simple name of the <see cref="System.Composition.ExportAttribute"/> type.
+                /// Gets the simple name of the System.Composition.ExportAttribute type.
                 /// </summary>
-                internal const string TypeName = nameof(System.Composition.ExportAttribute);
+                internal const string TypeName = "ExportAttribute";
 
                 /// <summary>
                 /// Gets an array of the nesting namespaces for this type.
@@ -751,14 +751,14 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             }
 
             /// <summary>
-            /// Describes the <see cref="System.Composition.ImportingConstructorAttribute"/> type.
+            /// Describes the System.Composition.ImportingConstructorAttribute type.
             /// </summary>
             internal static class ImportingConstructorAttribute
             {
                 /// <summary>
-                /// Gets the simple name of the <see cref="System.Composition.ImportingConstructorAttribute"/> type.
+                /// Gets the simple name of the System.Composition.ImportingConstructorAttribute type.
                 /// </summary>
-                internal const string TypeName = nameof(System.Composition.ImportingConstructorAttribute);
+                internal const string TypeName = "ImportingConstructorAttribute";
 
                 /// <summary>
                 /// Gets an array of the nesting namespaces for this type.
@@ -777,14 +777,14 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             }
 
             /// <summary>
-            /// Describes the <see cref="System.Composition.OnImportsSatisfiedAttribute"/> type.
+            /// Describes the System.Composition.OnImportsSatisfiedAttribute type.
             /// </summary>
             internal static class OnImportsSatisfiedAttribute
             {
                 /// <summary>
-                /// Gets the simple name of the <see cref="System.Composition.OnImportsSatisfiedAttribute"/> type.
+                /// Gets the simple name of the System.Composition.OnImportsSatisfiedAttribute type.
                 /// </summary>
-                internal const string TypeName = nameof(System.Composition.OnImportsSatisfiedAttribute);
+                internal const string TypeName = "OnImportsSatisfiedAttribute";
 
                 /// <summary>
                 /// Gets an array of the nesting namespaces for this type.
