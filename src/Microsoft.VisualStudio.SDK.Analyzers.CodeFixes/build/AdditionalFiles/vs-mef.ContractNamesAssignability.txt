@@ -1,5 +1,6 @@
 # VS SDK service broker pattern
-Microsoft.VisualStudio.Shell.ServiceBroker.IServiceBroker <= Microsoft.VisualStudio.Shell.SVsFullAccessServiceBroker
-Microsoft.VisualStudio.Shell.Interop.IAsyncServiceProvider <= Microsoft.VisualStudio.Shell.SAsyncServiceProvider
-Microsoft.VisualStudio.Shell.Interop.IAsyncServiceProvider2 <= Microsoft.VisualStudio.Shell.SAsyncServiceProvider
+Microsoft.ServiceHub.Framework.IServiceBroker <= Microsoft.VisualStudio.Shell.ServiceBroker.SVsFullAccessServiceBroker
+Microsoft.VisualStudio.Shell.IAsyncServiceProvider <= Microsoft.VisualStudio.Shell.Interop.SAsyncServiceProvider
+Microsoft.VisualStudio.Shell.IAsyncServiceProvider2 <= Microsoft.VisualStudio.Shell.Interop.SAsyncServiceProvider
+Microsoft.VisualStudio.Shell.IAsyncServiceProvider3 <= Microsoft.VisualStudio.Shell.Interop.SAsyncServiceProvider
 Microsoft.VisualStudio.Shell.IAsyncServiceProvider <= Microsoft.VisualStudio.Shell.SVsServiceProvider
