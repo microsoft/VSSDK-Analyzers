@@ -4,10 +4,10 @@ description: Merges the latest Library.Template into this repo (at position of H
 
 # Instructions
 
-1. Run `tools\MergeFrom-Template.ps1`
+1. Run `tools/MergeFrom-Template.ps1`
 2. Resolve merge conflicts, taking into account conflict resolution policy below.
 3. Validate the changes, as described in the validation section below.
-4. Commiting your changes (if applicable).
+4. Committing your changes (if applicable).
 
 ## Conflict resolution policy
 
@@ -20,6 +20,8 @@ For example the template uses MTPv2 for test projects, but a repo might have cho
 When resolving merge conflicts, consider whether it looks like the relevant code file is older than it should be given the changes the template is bringing in.
 Ask the user when in doubt as to whether the conflict should be resolved in favor of 'catching up' with the template or keeping the current changes.
 
+Use #runSubagent to analyze and resolve merge conflicts across files in parallel.
+
 ### Keep Current files
 
 Conflicts in the following files should always be resolved by keeping the current version (i.e. discard incoming changes):
@@ -31,7 +33,7 @@ Conflicts in the following files should always be resolved by keeping the curren
 Very typically, when the incoming change is to a file that was deleted locally, the correct resolution is to re-delete the file.
 
 In some cases however, the deleted file may have incoming changes that should be applied to other files.
-The `test\Library.Tests\Library.Tests.csproj` file is very typical of this.
+The `test/Library.Tests/Library.Tests.csproj` file is very typical of this.
 Changes to this file should very typically be applied to any and all test projects in the repo.
 You are responsible for doing this in addition to re-deleting this template file.
 
@@ -42,10 +44,15 @@ Use #runSubagent for each step.
 
 1. Verify that `dotnet restore` succeeds. Fix any issues that come up.
 2. Verify that `dotnet build` succeeds.
-3. Verify that tests succeed by running `tools\dotnet-test-cloud.ps1`.
+3. Verify that tests succeed by running `tools/dotnet-test-cloud.ps1`.
 
 While these validations are described using `dotnet` CLI commands, some repos require using full msbuild.exe.
 You can detect this by checking the `azure-pipelines/dotnet.yml` or `.github/workflows/build.yml` files for use of one or the other tool.
+
+You are *not* responsible for fixing issues that the merge did not cause.
+If validation fails for reasons that seem unrelated to the changes brought in by the merge, advise the user and ask how they'd like you to proceed.
+That said, sometimes merges will bring in SDK or dependency updates that can cause breaks in seemingly unrelated areas.
+In such cases, you should investigate and solve the issues as needed.
 
 ## Committing your changes
 
