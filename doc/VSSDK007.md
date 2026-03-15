@@ -33,7 +33,7 @@ class MyCoolPackage : AsyncPackage
             await Task.Delay(100);
         }).Task.Forget();
 
-        // Note: Extension methods like Task.Forget and FileAndForget do not make ThreadHelper safe for fire and forget
+        // Note: Extension methods like Task.Forget and FireAndForget do not make ThreadHelper safe for fire and forget
     }
 
     public void StartOperation3()
