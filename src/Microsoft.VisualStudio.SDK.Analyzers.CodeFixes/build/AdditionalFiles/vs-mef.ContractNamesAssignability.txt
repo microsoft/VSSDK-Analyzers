@@ -4,3 +4,4 @@ Microsoft.VisualStudio.Shell.IAsyncServiceProvider <= Microsoft.VisualStudio.She
 Microsoft.VisualStudio.Shell.IAsyncServiceProvider2 <= Microsoft.VisualStudio.Shell.Interop.SAsyncServiceProvider
 Microsoft.VisualStudio.Shell.IAsyncServiceProvider3 <= Microsoft.VisualStudio.Shell.Interop.SAsyncServiceProvider
 Microsoft.VisualStudio.Shell.IAsyncServiceProvider <= Microsoft.VisualStudio.Shell.SVsServiceProvider
+Microsoft.VisualStudio.Shell.IAsyncServiceProvider2 <= Microsoft.VisualStudio.Shell.SVsServiceProvider
