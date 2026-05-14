@@ -33,22 +33,22 @@ pipelines:
         credscan:
           lastModifiedDate: 2024-10-31
         eslint:
-          lastModifiedDate: 2024-10-31
+          lastModifiedDate: 2026-05-14
         armory:
-          lastModifiedDate: 2024-10-31
+          lastModifiedDate: 2026-05-14
         policheck:
-          lastModifiedDate: 2024-10-31
+          lastModifiedDate: 2026-05-14
         psscriptanalyzer:
-          lastModifiedDate: 2024-10-31
+          lastModifiedDate: 2026-05-14
         accessibilityinsights:
           lastModifiedDate: 2025-06-06
       binary:
         credscan:
           lastModifiedDate: 2024-10-31
         binskim:
-          lastModifiedDate: 2025-01-14
+          lastModifiedDate: 2026-05-14
         spotbugs:
-          lastModifiedDate: 2024-10-31
+          lastModifiedDate: 2026-05-14
   14128:
     retail:
       source:
