@@ -470,6 +470,78 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         }
 
         /// <summary>
+        /// Describes the "Shell.VsTaskLibraryHelper" type.
+        /// </summary>
+        internal static class VsTaskLibraryHelper
+        {
+            /// <summary>
+            /// Gets the simple name of the "Shell.VsTaskLibraryHelper" type.
+            /// </summary>
+            internal const string TypeName = "VsTaskLibraryHelper";
+
+            /// <summary>
+            /// The name of the "Shell.VsTaskLibraryHelper.StartOnIdle" method.
+            /// </summary>
+            internal const string StartOnIdle = "StartOnIdle";
+
+            /// <summary>
+            /// The name of the "Shell.VsTaskLibraryHelper.RunAsync" method.
+            /// </summary>
+            internal const string RunAsync = "RunAsync";
+
+            /// <summary>
+            /// The name of the "Shell.VsTaskLibraryHelper.WithPriority" method.
+            /// </summary>
+            internal const string WithPriority = "WithPriority";
+
+            /// <summary>
+            /// Gets an array of the nesting namespaces for this type.
+            /// </summary>
+            internal static readonly IReadOnlyList<string> Namespace = Namespaces.MicrosoftVisualStudioShell;
+
+            /// <summary>
+            /// Gets the fully-qualified name of this type as a string.
+            /// </summary>
+            internal static string FullName { get; } = string.Join(".", Namespace) + "." + TypeName;
+        }
+
+        /// <summary>
+        /// Describes the "Shell.VsTaskRunContext" type.
+        /// </summary>
+        internal static class VsTaskRunContext
+        {
+            /// <summary>
+            /// Gets the simple name of the "Shell.VsTaskRunContext" type.
+            /// </summary>
+            internal const string TypeName = "VsTaskRunContext";
+
+            /// <summary>
+            /// The name of the "Shell.VsTaskRunContext.UIThreadBackgroundPriority" enum value.
+            /// </summary>
+            internal const string UIThreadBackgroundPriority = nameof(UIThreadBackgroundPriority);
+
+            /// <summary>
+            /// The name of the "Shell.VsTaskRunContext.UIThreadIdlePriority" enum value.
+            /// </summary>
+            internal const string UIThreadIdlePriority = nameof(UIThreadIdlePriority);
+
+            /// <summary>
+            /// The name of the "Shell.VsTaskRunContext.UIThreadNormalPriority" enum value.
+            /// </summary>
+            internal const string UIThreadNormalPriority = nameof(UIThreadNormalPriority);
+
+            /// <summary>
+            /// Gets an array of the nesting namespaces for this type.
+            /// </summary>
+            internal static readonly IReadOnlyList<string> Namespace = Namespaces.MicrosoftVisualStudioShell;
+
+            /// <summary>
+            /// Gets the fully-qualified name of this type as a string.
+            /// </summary>
+            internal static string FullName { get; } = string.Join(".", Namespace) + "." + TypeName;
+        }
+
+        /// <summary>
         /// Describes the "Shell.PackageRegistrationAttribute" type.
         /// </summary>
         internal static class PackageRegistrationAttribute
