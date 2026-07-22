@@ -28,6 +28,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Link the parser source directly so tests stay in sync with product code without reflection/InternalsVisibleTo. -->
+    <Compile Include="..\..\src\Microsoft.VisualStudio.SDK.Analyzers\AdditionalFilesParsing.cs"
+      Link="AdditionalFilesParsing.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="PresentationFramework" />
   </ItemGroup>
 

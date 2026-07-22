@@ -21,10 +21,6 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         private static readonly Regex FileNamePatternForMethodsThatAssertMainThread = new Regex(@"^vs-threading\.MainThreadAssertingMethods(\..*)?.txt$", FileNamePatternRegexOptions);
         private static readonly Regex FileNamePatternForMethodsThatSwitchToMainThread = new Regex(@"^vs-threading\.MainThreadSwitchingMethods(\..*)?.txt$", FileNamePatternRegexOptions);
 
-        private static readonly TimeSpan RegexMatchTimeout = TimeSpan.FromSeconds(5);  // Prevent expensive CPU hang in Regex.Match if backtracking occurs due to pathological input (see vs-threading #485).
-        private static readonly Regex NegatableTypeOrMemberReferenceRegex = new Regex(@"^(?<negated>!)?\[(?<typeName>[^\[\]\:]+)+\](?:\:\:(?<memberName>\S+))?\s*$", RegexOptions.Singleline | RegexOptions.CultureInvariant, RegexMatchTimeout);
-        private static readonly char[] QualifiedIdentifierSeparators = new[] { '.' };
-
         /// <summary>
         /// Gets memebers that require main thread, from all available files matching <see cref="FileNamePatternForMembersRequiringMainThread"/>.
         /// </summary>
@@ -44,29 +40,42 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         {
             foreach (string line in ReadAdditionalFiles(analyzerOptions, fileNamePattern, cancellationToken))
             {
-                Match? match = null;
-                try
-                {
-                    match = NegatableTypeOrMemberReferenceRegex.Match(line);
-                }
-                catch (RegexMatchTimeoutException)
-                {
-                    throw new InvalidOperationException($"Regex.Match timeout when parsing line: {line}");
-                }
-
-                if (!match.Success)
+                if (!AdditionalFilesParsing.TryParseNegatableTypeOrMemberReference(line, out bool negated, out ReadOnlyMemory<char> typeNameMemory, out string? memberNameValue))
                 {
                     throw new InvalidOperationException($"Parsing error on line: {line}");
                 }
 
-                bool inverted = match.Groups["negated"].Success;
-                string[] typeNameElements = match.Groups["typeName"].Value.Split(QualifiedIdentifierSeparators);
-                string typeName = typeNameElements[typeNameElements.Length - 1];
-                var containingNamespace = typeNameElements.Take(typeNameElements.Length - 1).ToImmutableArray();
+                (ImmutableArray<string> containingNamespace, string typeName) = SplitQualifiedIdentifier(typeNameMemory);
                 var type = new QualifiedType(containingNamespace, typeName);
-                QualifiedMember member = match.Groups["memberName"].Success ? new QualifiedMember(type, match.Groups["memberName"].Value) : default(QualifiedMember);
-                yield return new TypeMatchSpec(type, member, inverted);
+                QualifiedMember member = memberNameValue is not null ? new QualifiedMember(type, memberNameValue) : default(QualifiedMember);
+                yield return new TypeMatchSpec(type, member, negated);
             }
+        }
+
+        private static (ImmutableArray<string> ContainingNamespace, string TypeName) SplitQualifiedIdentifier(ReadOnlyMemory<char> qualifiedName)
+        {
+            ReadOnlySpan<char> qualifiedNameSpan = qualifiedName.Span;
+            int lastDot = qualifiedNameSpan.LastIndexOf('.');
+            if (lastDot < 0)
+            {
+                return (ImmutableArray<string>.Empty, qualifiedName.ToString());
+            }
+
+            string typeName = qualifiedName.Slice(lastDot + 1).ToString();
+            ReadOnlySpan<char> namespacePart = qualifiedNameSpan.Slice(0, lastDot);
+            ImmutableArray<string>.Builder namespaceBuilder = ImmutableArray.CreateBuilder<string>();
+
+            int segmentStart = 0;
+            for (int i = 0; i <= namespacePart.Length; i++)
+            {
+                if (i == namespacePart.Length || namespacePart[i] == '.')
+                {
+                    namespaceBuilder.Add(namespacePart.Slice(segmentStart, i - segmentStart).ToString());
+                    segmentStart = i + 1;
+                }
+            }
+
+            return (namespaceBuilder.ToImmutable(), typeName);
         }
 
         private static IEnumerable<string> ReadAdditionalFiles(AnalyzerOptions analyzerOptions, Regex fileNamePattern, CancellationToken cancellationToken)
