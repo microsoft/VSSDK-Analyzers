@@ -47,7 +47,7 @@ internal static class AdditionalFilesParsing
         {
             pos += 2;
             int memberNameStart = pos;
-            while (pos < span.Length && !char.IsWhiteSpace(span[pos]))
+            while (pos < span.Length && span[pos] != ':' && !char.IsWhiteSpace(span[pos]))
             {
                 pos++;
             }
@@ -106,7 +106,7 @@ internal static class AdditionalFilesParsing
         pos += 2;
 
         int memberNameStart = pos;
-        while (pos < span.Length && !char.IsWhiteSpace(span[pos]))
+        while (pos < span.Length && span[pos] != ':' && !char.IsWhiteSpace(span[pos]))
         {
             pos++;
         }

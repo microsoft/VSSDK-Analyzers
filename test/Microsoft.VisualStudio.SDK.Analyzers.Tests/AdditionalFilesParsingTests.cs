@@ -48,26 +48,26 @@ public class AdditionalFilesParsingTests
         Assert.Null(memberName);
     }
 
-    [Fact]
-    public void TryParseNegatableTypeOrMemberReference_RejectsMissingMemberAfterSeparator()
+    [Theory]
+    [InlineData("[My.Namespace.Widget]::")]
+    [InlineData("!![My.Namespace.Widget]::Initialize")]
+    [InlineData("[My.Namespace.Widget] ::Initialize")]
+    [InlineData("[My.Namespace.Widget]:Initialize")]
+    [InlineData("[My.Namespace.Widget]:::Initialize")]
+    public void TryParseNegatableTypeOrMemberReference_RejectsMalformedCases(string input)
     {
-        bool success = AdditionalFilesParsing.TryParseNegatableTypeOrMemberReference("[My.Namespace.Widget]::", out _, out _, out _);
+        bool success = AdditionalFilesParsing.TryParseNegatableTypeOrMemberReference(input, out _, out _, out _);
 
         Assert.False(success);
     }
 
-    [Fact]
-    public void TryParseMemberReference_RejectsTypeOnlyLine()
+    [Theory]
+    [InlineData("[My.Namespace.Widget]")]
+    [InlineData("[My.Namespace.Widget]::Initialize extra")]
+    [InlineData("[My.Namespace.Widget]:::Initialize")]
+    public void TryParseMemberReference_RejectsMalformedCases(string input)
     {
-        bool success = AdditionalFilesParsing.TryParseMemberReference("[My.Namespace.Widget]", out _, out _);
-
-        Assert.False(success);
-    }
-
-    [Fact]
-    public void TryParseMemberReference_RejectsNonWhitespaceTrailingCharacters()
-    {
-        bool success = AdditionalFilesParsing.TryParseMemberReference("[My.Namespace.Widget]::Initialize extra", out _, out _);
+        bool success = AdditionalFilesParsing.TryParseMemberReference(input, out _, out _);
 
         Assert.False(success);
     }
