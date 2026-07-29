@@ -28,6 +28,16 @@ public class AdditionalFilesParsingTests
     }
 
     [Fact]
+    public void TryParseNegatableTypeOrMemberReference_RejectsInputThatCausesRegexBacktracking()
+    {
+        string malformed = "[" + new string('A', 30);
+
+        bool success = AdditionalFilesParsing.TryParseNegatableTypeOrMemberReference(malformed, out _, out _, out _);
+
+        Assert.False(success);
+    }
+
+    [Fact]
     public void TryParseMemberReference_ParsesValidLine()
     {
         bool success = AdditionalFilesParsing.TryParseMemberReference("[My.Namespace.Widget]::Initialize", out ReadOnlyMemory<char> typeName, out string? memberName);
