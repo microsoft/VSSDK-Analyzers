@@ -6,13 +6,13 @@
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
     <MicrosoftTestingPlatformVersion>2.3.3</MicrosoftTestingPlatformVersion>
     <MicroBuildVersion>2.0.226</MicroBuildVersion>
-    <CodeAnalysisVersion>5.6.0</CodeAnalysisVersion>
+    <CodeAnalysisVersion>5.9.0</CodeAnalysisVersion>
     <CodefixTestingVersion>1.1.2</CodefixTestingVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="MessagePack" Version="2.5.302" />
     <PackageVersion Include="Microsoft.Build.Utilities.Core" Version="18.0.2" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="5.6.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="5.9.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="$(CodeAnalysisVersion)" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Common" version="$(CodeAnalysisVersion)" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing.XUnit" Version="$(CodefixTestingVersion)" />
@@ -29,7 +29,7 @@
     <PackageVersion Include="Microsoft.VisualStudio.Threading" Version="17.14.15" />
     <PackageVersion Include="Microsoft.VisualStudio.Validation" Version="17.13.22" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageVersion Include="System.Collections.Immutable" Version="10.0.1" Condition="'$(IsTestProject)'!='true'" />
+    <PackageVersion Include="System.Collections.Immutable" Version="10.0.10" Condition="'$(IsTestProject)'!='true'" />
     <PackageVersion Include="System.ValueTuple" Version="4.6.2" />
     <PackageVersion Include="xunit.assert" Version="2.9.3" />
   </ItemGroup>
