@@ -66,8 +66,11 @@ After publishing the release, the `.github/workflows/release.yml` workflow will 
 ## Pull Requests
 
 1. Find the most recent `.github/workflows/build.yml` GitHub workflow run of the tagged release.
-1. Upload the `deployables` artifact from that workflow run to your GitHub Release.
-1. If you have `NUGET_API_KEY` defined as a secret variable for your repo or org, any nuget packages in the `deployables` artifact will be pushed to nuget.org.
+1. Upload the `deployables-Linux` artifact from that workflow run to your GitHub Release.
+1. Any nuget packages in the `deployables-Linux` artifact will be pushed to nuget.org.
+
+The workflow is written to leverage NuGet.org Trusted Publishing.
+You should set `NUGET_USER` as a repo secret to satisfy Trusted Publishing requirements.
 
 We love to get pull requests. If you have a bug fix to offer or a new analyzer, please send us a pull request.
 
