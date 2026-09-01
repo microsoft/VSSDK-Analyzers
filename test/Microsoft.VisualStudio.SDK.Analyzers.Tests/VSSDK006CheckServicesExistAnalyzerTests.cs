@@ -904,6 +904,23 @@ class Test : Package {
     }
 
     [Fact]
+    public async Task LocalAssigned_CheckedByConditionalExpression_GetService_ThenUsedAsync()
+    {
+        var test = /* lang=c#-test */ @"
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+
+class Test : Package {
+    private int GetServiceHashCode() {
+        var svc = this.GetService(typeof(SVsBuildManagerAccessor)) as IVsBuildManagerAccessor;
+        return svc != null ? svc.GetHashCode() : 0;
+    }
+}
+";
+        await Verify.VerifyAnalyzerAsync(test);
+    }
+
+    [Fact]
     public async Task LocalAssigned_CheckedByIfIsNotNull_GetService_ThenUsedAsync()
     {
         var test = /* lang=c#-test */ @"

@@ -231,16 +231,16 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                                                                              && IsSymbol(o.Expression);
                 bool IsPatternMatchNotNullCheck(IsPatternExpressionSyntax o) => o.Pattern is UnaryPatternSyntax patternSyntax
                                                                                 && IsSymbol(o.Expression);
+                bool ContainsNonNullCheck(ExpressionSyntax expression) =>
+                    expression.DescendantNodesAndSelf().OfType<BinaryExpressionSyntax>().Any(
+                        o => IsEqualsOrExclamationEqualsCheck(o) || IsPatternMatchTypeCheck(o))
+                    || expression.DescendantNodesAndSelf().OfType<IsPatternExpressionSyntax>().Any(
+                        o => IsPatternMatchNullCheck(o) || IsPatternMatchNotNullCheck(o));
 
-                if (node is IfStatementSyntax ifStatement)
+                if ((node is IfStatementSyntax ifStatement && ContainsNonNullCheck(ifStatement.Condition))
+                    || (node is ConditionalExpressionSyntax conditionalExpression && ContainsNonNullCheck(conditionalExpression.Condition)))
                 {
-                    if (ifStatement.Condition.DescendantNodesAndSelf().OfType<BinaryExpressionSyntax>().Any(
-                          o => IsEqualsOrExclamationEqualsCheck(o) || IsPatternMatchTypeCheck(o))
-                        || ifStatement.Condition.DescendantNodesAndSelf().OfType<IsPatternExpressionSyntax>().Any(
-                          o => IsPatternMatchNullCheck(o) || IsPatternMatchNotNullCheck(o)))
-                    {
-                        return true;
-                    }
+                    return true;
                 }
 
                 if (this.IsThrowingNullCheck(node, symbol, semanticModel, cancellationToken))
