@@ -73,14 +73,6 @@ public class VSSDK012UseLatestVisualStudioServicesVersionAnalyzer : DiagnosticAn
         Version latestVersion)
     {
         var propertyReference = (IPropertyReferenceOperation)context.Operation;
-        for (IOperation? ancestor = propertyReference.Parent; ancestor is not null; ancestor = ancestor.Parent)
-        {
-            if (ancestor is INameOfOperation)
-            {
-                return;
-            }
-        }
-
         IPropertySymbol property = propertyReference.Property;
         if (!SymbolEqualityComparer.Default.Equals(property.ContainingType, visualStudioServices) ||
             SymbolEqualityComparer.Default.Equals(property, latestProperty) ||
@@ -88,6 +80,14 @@ public class VSSDK012UseLatestVisualStudioServicesVersionAnalyzer : DiagnosticAn
             referencedVersion.CompareTo(latestVersion) >= 0)
         {
             return;
+        }
+
+        for (IOperation? ancestor = propertyReference.Parent; ancestor is not null; ancestor = ancestor.Parent)
+        {
+            if (ancestor is INameOfOperation)
+            {
+                return;
+            }
         }
 
         context.ReportDiagnostic(Diagnostic.Create(Descriptor, propertyReference.Syntax.GetLocation(), property.Name, latestProperty.Name));
