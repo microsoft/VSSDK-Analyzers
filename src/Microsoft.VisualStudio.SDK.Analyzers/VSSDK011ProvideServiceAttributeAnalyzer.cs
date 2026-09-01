@@ -28,7 +28,7 @@ public sealed class VSSDK011ProvideServiceAttributeAnalyzer : DiagnosticAnalyzer
     internal static readonly DiagnosticDescriptor Descriptor = new(
         id: Id,
         title: "Provide services asynchronously from AsyncPackage",
-        messageFormat: "Services provided by an AsyncPackage must be asynchronously queryable and registered with a Task-returning service factory",
+        messageFormat: "Services provided by an AsyncPackage must be asynchronously queryable and must not use a synchronous service factory",
         helpLinkUri: Utils.GetHelpLink(Id),
         category: "Performance",
         defaultSeverity: DiagnosticSeverity.Warning,

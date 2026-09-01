@@ -7,8 +7,9 @@ This analyzer flags:
 
 - `ProvideService` attributes on an `AsyncPackage`-derived class when `IsAsyncQueryable` is omitted
   or set to `false`.
-- Services registered on an `AsyncPackage` through the synchronous `IServiceContainer.AddService`
-  API instead of an asynchronous, `Task`-returning service factory.
+- Services registered on an `AsyncPackage` through the `IServiceContainer.AddService` overload that
+  accepts a synchronous `ServiceCreatorCallback`. The overload that accepts a service instance
+  directly is allowed.
 
 ## Example of a pattern that is flagged by this analyzer
 
@@ -31,7 +32,8 @@ class MyPackage : AsyncPackage
 ## Solution
 
 Set `IsAsyncQueryable` to `true` and register the service with an asynchronous, `Task`-returning service
-factory.
+factory. If the service instance already exists, it may instead be registered directly with the
+`IServiceContainer.AddService(Type, object)` overload.
 
 ```csharp
 [ProvideService(typeof(SMyService), IsAsyncQueryable = true)]
