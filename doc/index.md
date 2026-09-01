@@ -14,6 +14,7 @@ ID | Title | Category
 [VSSDK007](VSSDK007.md) | Avoid ThreadHelper for fire and forget tasks | Reliability
 [VSSDK008](VSSDK008.md) | Avoid UI thread in MEF Part construction | Reliability
 [VSSDK009](VSSDK009.md) | Use approved VsTaskRunContext values with VsTaskLibraryHelper | Reliability
+[VSSDK010](VSSDK010.md) | Remove unnecessary ProvideAutoLoad attribute | Performance
 
 This analyzer package also depends on the [Microsoft.VisualStudio.Threading.Analyzers][2] package, which adds [many more analyzers][3].
 
