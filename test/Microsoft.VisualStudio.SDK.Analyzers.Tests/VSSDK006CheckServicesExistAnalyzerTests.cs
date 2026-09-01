@@ -921,6 +921,41 @@ class Test : Package {
     }
 
     [Fact]
+    public async Task LocalAssigned_CheckedByConditionalExpressionWithLogicalAnd_GetService_ThenUsedAsync()
+    {
+        var test = /* lang=c#-test */ @"
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+
+class Test : Package {
+    private int GetServiceHashCode(bool enabled) {
+        var svc = this.GetService(typeof(SVsBuildManagerAccessor)) as IVsBuildManagerAccessor;
+        return svc != null && enabled ? svc.GetHashCode() : 0;
+    }
+}
+";
+        await Verify.VerifyAnalyzerAsync(test);
+    }
+
+    [Fact]
+    public async Task LocalAssigned_CheckedByConditionalExpressionWithLogicalOr_GetService_ThenUsedAsync()
+    {
+        var test = /* lang=c#-test */ @"
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+
+class Test : Package {
+    private int GetServiceHashCode(bool enabled) {
+        var svc = this.GetService(typeof(SVsBuildManagerAccessor)) as IVsBuildManagerAccessor;
+        return svc != null || enabled ? svc.GetHashCode() : 0;
+    }
+}
+";
+        DiagnosticResult expected = this.CreateDiagnostic(7, 19, 15, (7, 13, 3), (8, 41, 3));
+        await Verify.VerifyAnalyzerAsync(test, expected);
+    }
+
+    [Fact]
     public async Task LocalAssigned_CheckedByConditionalExpression_ThenUsedWithoutCheckAsync()
     {
         var test = /* lang=c#-test */ @"

@@ -257,33 +257,41 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
 
             private bool IsDereferenceGuardedByConditionalExpression(MemberAccessExpressionSyntax dereference, ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
             {
-                foreach (ConditionalExpressionSyntax conditionalExpression in dereference.Ancestors().OfType<ConditionalExpressionSyntax>())
+                bool? GetConditionValueThatGuaranteesNonNull(ExpressionSyntax condition)
                 {
-                    ExpressionSyntax condition = conditionalExpression.Condition;
                     while (condition is ParenthesizedExpressionSyntax parenthesizedExpression)
                     {
                         condition = parenthesizedExpression.Expression;
                     }
 
                     bool IsSymbol(SyntaxNode node) => SymbolEqualityComparer.Default.Equals(symbol, semanticModel.GetSymbolInfo(node, cancellationToken).Symbol);
-                    bool? nonNullWhenTrue = null;
                     if (condition is BinaryExpressionSyntax binaryExpression)
                     {
+                        if (binaryExpression.IsKind(SyntaxKind.LogicalAndExpression))
+                        {
+                            return GetConditionValueThatGuaranteesNonNull(binaryExpression.Left) == true
+                                || GetConditionValueThatGuaranteesNonNull(binaryExpression.Right) == true
+                                ? true
+                                : (bool?)null;
+                        }
+
                         bool comparesWithNull = (binaryExpression.Left.IsKind(SyntaxKind.NullLiteralExpression) && IsSymbol(binaryExpression.Right))
                             || (binaryExpression.Right.IsKind(SyntaxKind.NullLiteralExpression) && IsSymbol(binaryExpression.Left));
                         if (comparesWithNull && binaryExpression.IsKind(SyntaxKind.EqualsExpression))
                         {
-                            nonNullWhenTrue = false;
+                            return false;
                         }
-                        else if (comparesWithNull && binaryExpression.IsKind(SyntaxKind.NotEqualsExpression))
+
+                        if (comparesWithNull && binaryExpression.IsKind(SyntaxKind.NotEqualsExpression))
                         {
-                            nonNullWhenTrue = true;
+                            return true;
                         }
-                        else if (binaryExpression.OperatorToken.IsKind(SyntaxKind.IsKeyword)
+
+                        if (binaryExpression.OperatorToken.IsKind(SyntaxKind.IsKeyword)
                             && (binaryExpression.Right.IsKind(SyntaxKind.IdentifierName) || binaryExpression.Right.IsKind(SyntaxKind.PredefinedType))
                             && IsSymbol(binaryExpression.Left))
                         {
-                            nonNullWhenTrue = true;
+                            return true;
                         }
                     }
                     else if (condition is IsPatternExpressionSyntax patternExpression && IsSymbol(patternExpression.Expression))
@@ -291,17 +299,23 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                         if (patternExpression.Pattern is ConstantPatternSyntax constantPattern
                             && constantPattern.Expression.IsKind(SyntaxKind.NullLiteralExpression))
                         {
-                            nonNullWhenTrue = false;
+                            return false;
                         }
-                        else if (patternExpression.Pattern is UnaryPatternSyntax unaryPattern
+
+                        if (patternExpression.Pattern is UnaryPatternSyntax unaryPattern
                             && unaryPattern.Pattern is ConstantPatternSyntax negatedConstantPattern
                             && negatedConstantPattern.Expression.IsKind(SyntaxKind.NullLiteralExpression))
                         {
-                            nonNullWhenTrue = true;
+                            return true;
                         }
                     }
 
-                    ExpressionSyntax? nonNullBranch = nonNullWhenTrue switch
+                    return null;
+                }
+
+                foreach (ConditionalExpressionSyntax conditionalExpression in dereference.Ancestors().OfType<ConditionalExpressionSyntax>())
+                {
+                    ExpressionSyntax? nonNullBranch = GetConditionValueThatGuaranteesNonNull(conditionalExpression.Condition) switch
                     {
                         true => conditionalExpression.WhenTrue,
                         false => conditionalExpression.WhenFalse,
