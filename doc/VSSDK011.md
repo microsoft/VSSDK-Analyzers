@@ -1,7 +1,7 @@
 # VSSDK011 Provide services asynchronously from AsyncPackage
 
 Services proffered by an `AsyncPackage` should be asynchronously queryable so that requesting a service
-through `IAsyncServiceProvider.QueryServiceAsync` does not synchronously load the package.
+through `IAsyncServiceProvider.GetServiceAsync` does not synchronously load the package.
 
 This analyzer flags:
 

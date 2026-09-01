@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
@@ -108,7 +109,7 @@ public sealed class VSSDK011ProvideServiceAttributeAnalyzer : DiagnosticAnalyzer
             invocation.TargetMethod.Parameters.Length < 2 ||
             !SymbolEqualityComparer.Default.Equals(invocation.TargetMethod.Parameters[1].Type, serviceCreatorCallbackType) ||
             !Utils.IsEqualToOrDerivedFrom(context.ContainingSymbol.ContainingType, asyncPackageType) ||
-            !IsContainingTypeInstance(invocation.Instance))
+            !IsContainingTypeInstance(invocation.Instance, GetRootOperation(invocation), new HashSet<ISymbol>(SymbolEqualityComparer.Default)))
         {
             return;
         }
@@ -117,13 +118,85 @@ public sealed class VSSDK011ProvideServiceAttributeAnalyzer : DiagnosticAnalyzer
         context.ReportDiagnostic(Diagnostic.Create(Descriptor, serviceFactoryArgument?.Syntax.GetLocation() ?? invocation.Syntax.GetLocation()));
     }
 
-    private static bool IsContainingTypeInstance(IOperation? operation)
+    private static IOperation GetRootOperation(IOperation operation)
+    {
+        while (operation.Parent is not null)
+        {
+            operation = operation.Parent;
+        }
+
+        return operation;
+    }
+
+    private static bool IsContainingTypeInstance(IOperation? operation, IOperation rootOperation, HashSet<ISymbol> visitedSymbols)
     {
         while (operation is IConversionOperation conversion)
         {
             operation = conversion.Operand;
         }
 
-        return operation is IInstanceReferenceOperation { ReferenceKind: InstanceReferenceKind.ContainingTypeInstance };
+        return operation switch
+        {
+            IInstanceReferenceOperation { ReferenceKind: InstanceReferenceKind.ContainingTypeInstance } => true,
+            ILocalReferenceOperation localReference => IsAliasForContainingTypeInstance(localReference.Local, rootOperation, visitedSymbols),
+            IFieldReferenceOperation fieldReference => IsAliasForContainingTypeInstance(fieldReference.Field, rootOperation, visitedSymbols),
+            _ => false,
+        };
+    }
+
+    private static bool IsAliasForContainingTypeInstance(ISymbol symbol, IOperation rootOperation, HashSet<ISymbol> visitedSymbols)
+    {
+        if (!visitedSymbols.Add(symbol))
+        {
+            return false;
+        }
+
+        try
+        {
+            bool foundAssignment = false;
+            foreach (IOperation operation in rootOperation.DescendantsAndSelf())
+            {
+                IOperation? value = operation switch
+                {
+                    IVariableDeclaratorOperation declarator when
+                        SymbolEqualityComparer.Default.Equals(declarator.Symbol, symbol) => declarator.Initializer?.Value,
+                    ISimpleAssignmentOperation assignment when
+                        SymbolEqualityComparer.Default.Equals(GetReferencedSymbol(assignment.Target), symbol) => assignment.Value,
+                    _ => null,
+                };
+
+                if (value is null)
+                {
+                    continue;
+                }
+
+                foundAssignment = true;
+                if (!IsContainingTypeInstance(value, rootOperation, visitedSymbols))
+                {
+                    return false;
+                }
+            }
+
+            return foundAssignment;
+        }
+        finally
+        {
+            visitedSymbols.Remove(symbol);
+        }
+    }
+
+    private static ISymbol? GetReferencedSymbol(IOperation operation)
+    {
+        while (operation is IConversionOperation conversion)
+        {
+            operation = conversion.Operand;
+        }
+
+        return operation switch
+        {
+            ILocalReferenceOperation localReference => localReference.Local,
+            IFieldReferenceOperation fieldReference => fieldReference.Field,
+            _ => null,
+        };
     }
 }

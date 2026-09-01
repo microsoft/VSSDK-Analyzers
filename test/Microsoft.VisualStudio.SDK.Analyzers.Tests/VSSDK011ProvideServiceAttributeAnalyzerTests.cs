@@ -184,6 +184,68 @@ public class VSSDK011ProvideServiceAttributeAnalyzerTests
     }
 
     [Fact]
+    public async Task AsyncPackageWithSynchronousServiceFactoryThroughLocalAliasProducesDiagnosticAsync()
+    {
+        const string Test = /* lang=c#-test */ """
+            using System;
+            using System.ComponentModel.Design;
+            using Microsoft.VisualStudio.Shell;
+
+            class TestService
+            {
+            }
+
+            class TestPackage : AsyncPackage
+            {
+                private void RegisterService()
+                {
+                    IServiceContainer container = this;
+                    container.AddService(typeof(TestService), [|this.CreateService|]);
+                }
+
+                private object CreateService(IServiceContainer container, Type serviceType)
+                {
+                    return new TestService();
+                }
+            }
+            """;
+
+        await Verify.VerifyAnalyzerAsync(Test);
+    }
+
+    [Fact]
+    public async Task AsyncPackageWithSynchronousServiceFactoryThroughFieldAliasProducesDiagnosticAsync()
+    {
+        const string Test = /* lang=c#-test */ """
+            using System;
+            using System.ComponentModel.Design;
+            using Microsoft.VisualStudio.Shell;
+
+            class TestService
+            {
+            }
+
+            class TestPackage : AsyncPackage
+            {
+                private IServiceContainer serviceContainer;
+
+                private void RegisterService()
+                {
+                    this.serviceContainer = this;
+                    this.serviceContainer.AddService(typeof(TestService), [|this.CreateService|]);
+                }
+
+                private object CreateService(IServiceContainer container, Type serviceType)
+                {
+                    return new TestService();
+                }
+            }
+            """;
+
+        await Verify.VerifyAnalyzerAsync(Test);
+    }
+
+    [Fact]
     public async Task AsyncPackageAddingServiceToAnotherContainerProducesNoDiagnosticAsync()
     {
         const string Test = /* lang=c#-test */ """
