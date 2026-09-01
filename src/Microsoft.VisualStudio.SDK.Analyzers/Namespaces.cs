@@ -58,6 +58,14 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             nameof(System));
 
         /// <summary>
+        /// Gets an array for each element in the namespace System.ComponentModel.Design.
+        /// </summary>
+        internal static readonly ImmutableArray<string> SystemComponentModelDesign = ImmutableArray.Create(
+            nameof(System),
+            nameof(global::System.ComponentModel),
+            "Design");
+
+        /// <summary>
         /// Gets an array for each element in the namespace System.Threading.
         /// </summary>
         internal static readonly ImmutableArray<string> SystemThreading = ImmutableArray.Create(

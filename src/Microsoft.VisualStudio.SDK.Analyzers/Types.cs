@@ -105,6 +105,53 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         }
 
         /// <summary>
+        /// Describes the System.ComponentModel.Design.IServiceContainer type.
+        /// </summary>
+        internal static class IServiceContainer
+        {
+            /// <summary>
+            /// Gets the simple name of the System.ComponentModel.Design.IServiceContainer type.
+            /// </summary>
+            internal const string TypeName = "IServiceContainer";
+
+            /// <summary>
+            /// Gets the name of the System.ComponentModel.Design.IServiceContainer.AddService method.
+            /// </summary>
+            internal const string AddService = "AddService";
+
+            /// <summary>
+            /// Gets an array of the nesting namespaces for this type.
+            /// </summary>
+            internal static readonly IReadOnlyList<string> Namespace = Namespaces.SystemComponentModelDesign;
+
+            /// <summary>
+            /// Gets the fully-qualified name of this type as a string.
+            /// </summary>
+            internal static string FullName { get; } = string.Join(".", Namespace) + "." + TypeName;
+        }
+
+        /// <summary>
+        /// Describes the System.ComponentModel.Design.ServiceCreatorCallback type.
+        /// </summary>
+        internal static class ServiceCreatorCallback
+        {
+            /// <summary>
+            /// Gets the simple name of the System.ComponentModel.Design.ServiceCreatorCallback type.
+            /// </summary>
+            internal const string TypeName = "ServiceCreatorCallback";
+
+            /// <summary>
+            /// Gets an array of the nesting namespaces for this type.
+            /// </summary>
+            internal static readonly IReadOnlyList<string> Namespace = Namespaces.SystemComponentModelDesign;
+
+            /// <summary>
+            /// Gets the fully-qualified name of this type as a string.
+            /// </summary>
+            internal static string FullName { get; } = string.Join(".", Namespace) + "." + TypeName;
+        }
+
+        /// <summary>
         /// Describes the "Shell.ServiceProvider" type.
         /// </summary>
         internal static class ServiceProvider
@@ -617,6 +664,32 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             /// Gets the <see cref="Microsoft.CodeAnalysis.CSharp.Syntax.TypeSyntax"/> for this type.
             /// </summary>
             internal static TypeSyntax TypeSyntax { get; } = Utils.QualifyName(Namespace, SyntaxFactory.IdentifierName(TypeName));
+
+            /// <summary>
+            /// Gets the fully-qualified name of this type as a string.
+            /// </summary>
+            internal static string FullName { get; } = string.Join(".", Namespace) + "." + TypeName;
+        }
+
+        /// <summary>
+        /// Describes the "Shell.ProvideServiceAttribute" type.
+        /// </summary>
+        internal static class ProvideServiceAttribute
+        {
+            /// <summary>
+            /// Gets the simple name of the "Shell.ProvideServiceAttribute" type.
+            /// </summary>
+            internal const string TypeName = "ProvideServiceAttribute";
+
+            /// <summary>
+            /// Gets the name of the "Shell.ProvideServiceAttribute.IsAsyncQueryable" property.
+            /// </summary>
+            internal const string IsAsyncQueryable = "IsAsyncQueryable";
+
+            /// <summary>
+            /// Gets an array of the nesting namespaces for this type.
+            /// </summary>
+            internal static readonly IReadOnlyList<string> Namespace = Namespaces.MicrosoftVisualStudioShell;
 
             /// <summary>
             /// Gets the fully-qualified name of this type as a string.
