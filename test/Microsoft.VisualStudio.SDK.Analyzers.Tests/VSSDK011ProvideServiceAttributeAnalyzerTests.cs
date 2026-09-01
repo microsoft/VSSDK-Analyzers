@@ -229,9 +229,13 @@ public class VSSDK011ProvideServiceAttributeAnalyzerTests
             {
                 private IServiceContainer serviceContainer;
 
-                private void RegisterService()
+                public TestPackage()
                 {
                     this.serviceContainer = this;
+                }
+
+                private void RegisterService()
+                {
                     this.serviceContainer.AddService(typeof(TestService), [|this.CreateService|]);
                 }
 
@@ -262,6 +266,42 @@ public class VSSDK011ProvideServiceAttributeAnalyzerTests
                 private void RegisterService(IServiceContainer container)
                 {
                     container.AddService(typeof(TestService), this.CreateService);
+                }
+
+                private object CreateService(IServiceContainer container, Type serviceType)
+                {
+                    return new TestService();
+                }
+            }
+            """;
+
+        await Verify.VerifyAnalyzerAsync(Test);
+    }
+
+    [Fact]
+    public async Task AsyncPackageAddingServiceThroughUnrelatedContainerFieldProducesNoDiagnosticAsync()
+    {
+        const string Test = /* lang=c#-test */ """
+            using System;
+            using System.ComponentModel.Design;
+            using Microsoft.VisualStudio.Shell;
+
+            class TestService
+            {
+            }
+
+            class TestPackage : AsyncPackage
+            {
+                private IServiceContainer serviceContainer;
+
+                public TestPackage(IServiceContainer serviceContainer)
+                {
+                    this.serviceContainer = serviceContainer;
+                }
+
+                private void RegisterService()
+                {
+                    this.serviceContainer.AddService(typeof(TestService), this.CreateService);
                 }
 
                 private object CreateService(IServiceContainer container, Type serviceType)

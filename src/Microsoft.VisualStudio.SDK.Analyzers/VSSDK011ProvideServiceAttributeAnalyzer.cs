@@ -68,9 +68,21 @@ public sealed class VSSDK011ProvideServiceAttributeAnalyzer : DiagnosticAnalyzer
             INamedTypeSymbol? serviceCreatorCallbackType = context.Compilation.GetTypeByMetadataName(Types.ServiceCreatorCallback.FullName);
             if (serviceContainerType is not null && serviceCreatorCallbackType is not null)
             {
-                context.RegisterOperationAction(
-                    Utils.DebuggableWrapper((OperationAnalysisContext context) => AnalyzeInvocation(context, asyncPackageType, serviceContainerType, serviceCreatorCallbackType)),
-                    OperationKind.Invocation);
+                context.RegisterSymbolStartAction(
+                    context =>
+                    {
+                        var namedType = (INamedTypeSymbol)context.Symbol;
+                        if (!Utils.IsEqualToOrDerivedFrom(namedType.BaseType, asyncPackageType))
+                        {
+                            return;
+                        }
+
+                        var state = new ServiceRegistrationAnalysisState(namedType, serviceContainerType, serviceCreatorCallbackType);
+                        context.RegisterOperationAction(Utils.DebuggableWrapper(state.AnalyzeAssignment), OperationKind.SimpleAssignment);
+                        context.RegisterOperationAction(Utils.DebuggableWrapper(state.AnalyzeInvocation), OperationKind.Invocation);
+                        context.RegisterSymbolEndAction(Utils.DebuggableWrapper(state.AnalyzeSymbolEnd));
+                    },
+                    SymbolKind.NamedType);
             }
         });
     }
@@ -95,27 +107,6 @@ public sealed class VSSDK011ProvideServiceAttributeAnalyzer : DiagnosticAnalyzer
                 .FirstOrDefault(a => a.NameEquals?.Name.Identifier.ValueText == Types.ProvideServiceAttribute.IsAsyncQueryable);
             context.ReportDiagnostic(Diagnostic.Create(Descriptor, isAsyncQueryableArgument?.GetLocation() ?? attributeSyntax.GetLocation()));
         }
-    }
-
-    private static void AnalyzeInvocation(
-        OperationAnalysisContext context,
-        INamedTypeSymbol asyncPackageType,
-        INamedTypeSymbol serviceContainerType,
-        INamedTypeSymbol serviceCreatorCallbackType)
-    {
-        var invocation = (IInvocationOperation)context.Operation;
-        if (invocation.TargetMethod.Name != Types.IServiceContainer.AddService ||
-            !SymbolEqualityComparer.Default.Equals(invocation.TargetMethod.ContainingType, serviceContainerType) ||
-            invocation.TargetMethod.Parameters.Length < 2 ||
-            !SymbolEqualityComparer.Default.Equals(invocation.TargetMethod.Parameters[1].Type, serviceCreatorCallbackType) ||
-            !Utils.IsEqualToOrDerivedFrom(context.ContainingSymbol.ContainingType, asyncPackageType) ||
-            !IsContainingTypeInstance(invocation.Instance, GetRootOperation(invocation), new HashSet<ISymbol>(SymbolEqualityComparer.Default)))
-        {
-            return;
-        }
-
-        IArgumentOperation? serviceFactoryArgument = invocation.Arguments.FirstOrDefault(a => a.Parameter?.Ordinal == 1);
-        context.ReportDiagnostic(Diagnostic.Create(Descriptor, serviceFactoryArgument?.Syntax.GetLocation() ?? invocation.Syntax.GetLocation()));
     }
 
     private static IOperation GetRootOperation(IOperation operation)
@@ -198,5 +189,110 @@ public sealed class VSSDK011ProvideServiceAttributeAnalyzer : DiagnosticAnalyzer
             IFieldReferenceOperation fieldReference => fieldReference.Field,
             _ => null,
         };
+    }
+
+    private sealed class ServiceRegistrationAnalysisState
+    {
+        private readonly object syncObject = new();
+        private readonly INamedTypeSymbol packageType;
+        private readonly INamedTypeSymbol serviceContainerType;
+        private readonly INamedTypeSymbol serviceCreatorCallbackType;
+        private readonly Dictionary<IFieldSymbol, FieldAliasState> fieldAliases = new(SymbolEqualityComparer.Default);
+        private readonly List<(IFieldSymbol Field, Location Location)> fieldInvocations = new();
+
+        internal ServiceRegistrationAnalysisState(
+            INamedTypeSymbol packageType,
+            INamedTypeSymbol serviceContainerType,
+            INamedTypeSymbol serviceCreatorCallbackType)
+        {
+            this.packageType = packageType;
+            this.serviceContainerType = serviceContainerType;
+            this.serviceCreatorCallbackType = serviceCreatorCallbackType;
+        }
+
+        internal void AnalyzeAssignment(OperationAnalysisContext context)
+        {
+            var assignment = (ISimpleAssignmentOperation)context.Operation;
+            if (GetReferencedSymbol(assignment.Target) is not IFieldSymbol field ||
+                !SymbolEqualityComparer.Default.Equals(field.ContainingType, this.packageType))
+            {
+                return;
+            }
+
+            bool isPackageAlias = IsContainingTypeInstance(
+                assignment.Value,
+                GetRootOperation(assignment),
+                new HashSet<ISymbol>(SymbolEqualityComparer.Default));
+            lock (this.syncObject)
+            {
+                if (!this.fieldAliases.TryGetValue(field, out FieldAliasState? aliasState))
+                {
+                    aliasState = new FieldAliasState();
+                    this.fieldAliases.Add(field, aliasState);
+                }
+
+                aliasState.HasPackageAssignment |= isPackageAlias;
+                aliasState.HasOtherAssignment |= !isPackageAlias;
+            }
+        }
+
+        internal void AnalyzeInvocation(OperationAnalysisContext context)
+        {
+            var invocation = (IInvocationOperation)context.Operation;
+            if (invocation.TargetMethod.Name != Types.IServiceContainer.AddService ||
+                !SymbolEqualityComparer.Default.Equals(invocation.TargetMethod.ContainingType, this.serviceContainerType) ||
+                invocation.TargetMethod.Parameters.Length < 2 ||
+                !SymbolEqualityComparer.Default.Equals(invocation.TargetMethod.Parameters[1].Type, this.serviceCreatorCallbackType))
+            {
+                return;
+            }
+
+            IArgumentOperation? serviceFactoryArgument = invocation.Arguments.FirstOrDefault(a => a.Parameter?.Ordinal == 1);
+            Location location = serviceFactoryArgument?.Syntax.GetLocation() ?? invocation.Syntax.GetLocation();
+            IOperation? instance = invocation.Instance;
+            while (instance is IConversionOperation conversion)
+            {
+                instance = conversion.Operand;
+            }
+
+            if (instance is IFieldReferenceOperation fieldReference &&
+                SymbolEqualityComparer.Default.Equals(fieldReference.Field.ContainingType, this.packageType))
+            {
+                lock (this.syncObject)
+                {
+                    this.fieldInvocations.Add((fieldReference.Field, location));
+                }
+
+                return;
+            }
+
+            if (IsContainingTypeInstance(instance, GetRootOperation(invocation), new HashSet<ISymbol>(SymbolEqualityComparer.Default)))
+            {
+                context.ReportDiagnostic(Diagnostic.Create(Descriptor, location));
+            }
+        }
+
+        internal void AnalyzeSymbolEnd(SymbolAnalysisContext context)
+        {
+            lock (this.syncObject)
+            {
+                foreach ((IFieldSymbol field, Location location) in this.fieldInvocations)
+                {
+                    if (this.fieldAliases.TryGetValue(field, out FieldAliasState? aliasState) &&
+                        aliasState.HasPackageAssignment &&
+                        !aliasState.HasOtherAssignment)
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptor, location));
+                    }
+                }
+            }
+        }
+
+        private sealed class FieldAliasState
+        {
+            internal bool HasPackageAssignment { get; set; }
+
+            internal bool HasOtherAssignment { get; set; }
+        }
     }
 }
