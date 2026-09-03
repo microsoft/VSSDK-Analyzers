@@ -1,12 +1,21 @@
-# Getting Started
+# Getting started
 
 ## Installation
 
-Consume this library via its NuGet Package.
-Click on the badge to find its latest version and the instructions for consuming it that best apply to your project.
+Install the analyzer package into the project that contains your Visual Studio extension:
 
-[![NuGet package](https://img.shields.io/nuget/v/Library.svg)](https://nuget.org/packages/Library)
+[![NuGet package](https://img.shields.io/nuget/v/Microsoft.VisualStudio.SDK.Analyzers.svg)](https://www.nuget.org/packages/Microsoft.VisualStudio.SDK.Analyzers)
 
-## Usage
+```xml
+<PackageReference Include="Microsoft.VisualStudio.SDK.Analyzers" Version="*" PrivateAssets="all" />
+```
 
-TODO
+The package adds analyzers to the build. `PrivateAssets="all"` keeps the development-time tooling
+from becoming a runtime dependency of your extension.
+
+## Using the analyzers
+
+Build your extension normally. Diagnostics appear in the compiler output and Visual Studio Error List.
+Some rules include a code fix that can update the source automatically.
+
+Review the [complete analyzer list](../analyzers/index.md) for each rule's rationale, examples, and limitations.

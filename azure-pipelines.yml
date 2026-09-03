@@ -8,6 +8,7 @@ trigger:
   paths:
     exclude:
     - doc/
+    - docfx/
     - '*.md'
     - .vscode/
     - .github/

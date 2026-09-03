@@ -1,3 +1,7 @@
 items:
-- name: Docs
-  href: docs/
+- name: Getting started
+  href: docs/getting-started.md
+- name: Features
+  href: docs/features.md
+- name: Analyzers
+  href: analyzers/
