@@ -43,6 +43,27 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
         }
 
         /// <summary>
+        /// Describes the "Microsoft.VisualStudio.VisualStudioServices" type.
+        /// </summary>
+        internal static class VisualStudioServices
+        {
+            /// <summary>
+            /// Gets the simple name of the "Microsoft.VisualStudio.VisualStudioServices" type.
+            /// </summary>
+            internal const string TypeName = nameof(VisualStudioServices);
+
+            /// <summary>
+            /// Gets an array of the nesting namespaces for this type.
+            /// </summary>
+            internal static readonly IReadOnlyList<string> Namespace = Namespaces.MicrosoftVisualStudio;
+
+            /// <summary>
+            /// Gets the fully-qualified name of this type as a string.
+            /// </summary>
+            internal static string FullName { get; } = string.Join(".", Namespace) + "." + TypeName;
+        }
+
+        /// <summary>
         /// Describes the Microsoft.VisualStudio.OLE.Interop.IServiceProvider type.
         /// </summary>
         internal static class IOleServiceProvider

@@ -18,6 +18,13 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             nameof(Microsoft));
 
         /// <summary>
+        /// Gets an array for each element in the namespace Microsoft.VisualStudio.
+        /// </summary>
+        internal static readonly ImmutableArray<string> MicrosoftVisualStudio = ImmutableArray.Create(
+            nameof(Microsoft),
+            nameof(VisualStudio));
+
+        /// <summary>
         /// Gets an array for each element in the namespace Microsoft.VisualStudio.Shell.
         /// </summary>
         internal static readonly ImmutableArray<string> MicrosoftVisualStudioShell = ImmutableArray.Create(

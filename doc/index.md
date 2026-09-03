@@ -16,6 +16,7 @@ ID | Title | Category
 [VSSDK009](VSSDK009.md) | Use approved VsTaskRunContext values with VsTaskLibraryHelper | Reliability
 [VSSDK010](VSSDK010.md) | Remove unnecessary ProvideAutoLoad attribute | Performance
 [VSSDK011](VSSDK011.md) | Provide services asynchronously from AsyncPackage | Performance
+[VSSDK012](VSSDK012.md) | Use the latest VisualStudioServices version | Performance
 
 This analyzer package also depends on the [Microsoft.VisualStudio.Threading.Analyzers][2] package, which adds [many more analyzers][3].
 
