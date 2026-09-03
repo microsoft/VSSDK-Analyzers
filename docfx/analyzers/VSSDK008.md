@@ -153,7 +153,7 @@ class MyMEFComponent
         _lazyTextManager = new AsyncLazy<IVsTextManager>(async () =>
         {
             await joinableTaskContext.Factory.SwitchToMainThreadAsync();
-            return (IVsTextManager)_serviceProvider.GetService(typeof(SVsTextManager));
+            return (IVsTextManager)serviceProvider.GetService(typeof(SVsTextManager));
         }, joinableTaskContext.Factory);
     }
 }

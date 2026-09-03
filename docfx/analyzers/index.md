@@ -12,7 +12,7 @@ ID | Title | Category
 [VSSDK005](VSSDK005.md) | Use the JoinableTaskContext singleton | Reliability
 [VSSDK006](VSSDK006.md) | Check service exists | Reliability
 [VSSDK007](VSSDK007.md) | Avoid ThreadHelper for fire and forget tasks | Reliability
-[VSSDK008](VSSDK008.md) | Avoid UI thread in MEF Part construction | Reliability
+[VSSDK008](VSSDK008.md) | Avoid UI thread affinity in MEF Part construction | Reliability
 [VSSDK009](VSSDK009.md) | Use approved VsTaskRunContext values with VsTaskLibraryHelper | Reliability
 [VSSDK010](VSSDK010.md) | Remove unnecessary ProvideAutoLoad attribute | Performance
 [VSSDK012](VSSDK012.md) | Use the latest VisualStudioServices version | Performance
