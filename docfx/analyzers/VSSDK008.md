@@ -246,7 +246,7 @@ class MyMEFComponent
         });
 
         // False negative: Execution joins UI thread when getting value of AsyncLazy, yet analyzer does not flag this.
-        var value = _o.GetValue(); // This is an anti-pattern for demonstration purpopes only.
+        var value = _o.GetValue(); // This is an anti-pattern for demonstration purposes only.
     }
 }
 ```

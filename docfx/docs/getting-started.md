@@ -7,7 +7,7 @@ Install the analyzer package into the project that contains your Visual Studio e
 [![NuGet package](https://img.shields.io/nuget/v/Microsoft.VisualStudio.SDK.Analyzers.svg)](https://www.nuget.org/packages/Microsoft.VisualStudio.SDK.Analyzers)
 
 ```xml
-<PackageReference Include="Microsoft.VisualStudio.SDK.Analyzers" Version="*" PrivateAssets="all" />
+<PackageReference Include="Microsoft.VisualStudio.SDK.Analyzers" Version="17.*" PrivateAssets="all" />
 ```
 
 The package adds analyzers to the build. `PrivateAssets="all"` keeps the development-time tooling

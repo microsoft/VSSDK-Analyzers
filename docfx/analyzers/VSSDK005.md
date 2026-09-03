@@ -1,4 +1,4 @@
-# VSSDK005 Use the JoinableTaskContext singleton 
+# VSSDK005 Use the JoinableTaskContext singleton
 
 Code running within the Visual Studio process (and primary AppDomain)
 should avoid creating a new instance of [`JoinableTaskContext`][JTC],
