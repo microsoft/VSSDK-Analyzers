@@ -904,6 +904,97 @@ class Test : Package {
     }
 
     [Fact]
+    public async Task LocalAssigned_CheckedByConditionalExpression_GetService_ThenUsedAsync()
+    {
+        var test = /* lang=c#-test */ @"
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+
+class Test : Package {
+    private int GetServiceHashCode() {
+        var svc = this.GetService(typeof(SVsBuildManagerAccessor)) as IVsBuildManagerAccessor;
+        return svc != null ? svc.GetHashCode() : 0;
+    }
+}
+";
+        await Verify.VerifyAnalyzerAsync(test);
+    }
+
+    [Fact]
+    public async Task LocalAssigned_CheckedByConditionalExpressionWithLogicalAnd_GetService_ThenUsedAsync()
+    {
+        var test = /* lang=c#-test */ @"
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+
+class Test : Package {
+    private int GetServiceHashCode(bool enabled) {
+        var svc = this.GetService(typeof(SVsBuildManagerAccessor)) as IVsBuildManagerAccessor;
+        return svc != null && enabled ? svc.GetHashCode() : 0;
+    }
+}
+";
+        await Verify.VerifyAnalyzerAsync(test);
+    }
+
+    [Fact]
+    public async Task LocalAssigned_CheckedByConditionalExpressionWithLogicalOr_GetService_ThenUsedAsync()
+    {
+        var test = /* lang=c#-test */ @"
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+
+class Test : Package {
+    private int GetServiceHashCode(bool enabled) {
+        var svc = this.GetService(typeof(SVsBuildManagerAccessor)) as IVsBuildManagerAccessor;
+        return svc != null || enabled ? svc.GetHashCode() : 0;
+    }
+}
+";
+        DiagnosticResult expected = this.CreateDiagnostic(7, 19, 15, (7, 13, 3), (8, 41, 3));
+        await Verify.VerifyAnalyzerAsync(test, expected);
+    }
+
+    [Fact]
+    public async Task LocalAssigned_CheckedByConditionalExpression_ThenUsedWithoutCheckAsync()
+    {
+        var test = /* lang=c#-test */ @"
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+
+class Test : Package {
+    private void UseService() {
+        var svc = this.GetService(typeof(SVsBuildManagerAccessor)) as IVsBuildManagerAccessor;
+        _ = svc != null ? svc.GetHashCode() : 0;
+        svc.BeginDesignTimeBuild();
+    }
+}
+";
+        DiagnosticResult expected = this.CreateDiagnostic(7, 19, 15, (7, 13, 3), (9, 9, 3));
+        await Verify.VerifyAnalyzerAsync(test, expected);
+    }
+
+    [Fact]
+    public async Task LocalAssigned_CheckedByNegatedTypePattern_ThenUsedAsync()
+    {
+        var test = /* lang=c#-test */ @"
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+
+class Test : Package {
+    private void UseService() {
+        var svc = this.GetService(typeof(SVsBuildManagerAccessor)) as IVsBuildManagerAccessor;
+        if (svc is not object) {
+            svc.GetHashCode();
+        }
+    }
+}
+";
+        DiagnosticResult expected = this.CreateDiagnostic(7, 19, 15, (7, 13, 3), (9, 13, 3));
+        await Verify.VerifyAnalyzerAsync(test, expected);
+    }
+
+    [Fact]
     public async Task LocalAssigned_CheckedByIfIsNotNull_GetService_ThenUsedAsync()
     {
         var test = /* lang=c#-test */ @"

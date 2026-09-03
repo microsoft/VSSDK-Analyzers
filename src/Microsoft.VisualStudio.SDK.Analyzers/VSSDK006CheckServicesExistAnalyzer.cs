@@ -207,7 +207,10 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                         select access;
                     if (!containingBlockOrExpression.DescendantNodes().Any(n => this.IsNonNullCheck(n, symbol, semanticModel, cancellationToken)))
                     {
-                        return variableUses.Select(vu => vu.Expression.GetLocation()).ToImmutableArray();
+                        return variableUses
+                            .Where(vu => !this.IsDereferenceGuardedByConditionalExpression(vu, symbol, semanticModel, cancellationToken))
+                            .Select(vu => vu.Expression.GetLocation())
+                            .ToImmutableArray();
                     }
                 }
 
@@ -229,23 +232,99 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                 bool IsPatternMatchNullCheck(IsPatternExpressionSyntax o) => o.Pattern is ConstantPatternSyntax pattern
                                                                              && pattern.Expression.IsKind(SyntaxKind.NullLiteralExpression)
                                                                              && IsSymbol(o.Expression);
-                bool IsPatternMatchNotNullCheck(IsPatternExpressionSyntax o) => o.Pattern is UnaryPatternSyntax patternSyntax
+                bool IsPatternMatchNotNullCheck(IsPatternExpressionSyntax o) => o.Pattern is UnaryPatternSyntax unaryPattern
+                                                                                && unaryPattern.Pattern is ConstantPatternSyntax pattern
+                                                                                && pattern.Expression.IsKind(SyntaxKind.NullLiteralExpression)
                                                                                 && IsSymbol(o.Expression);
+                bool ContainsNonNullCheck(ExpressionSyntax expression) =>
+                    expression.DescendantNodesAndSelf().OfType<BinaryExpressionSyntax>().Any(
+                        o => IsEqualsOrExclamationEqualsCheck(o) || IsPatternMatchTypeCheck(o))
+                    || expression.DescendantNodesAndSelf().OfType<IsPatternExpressionSyntax>().Any(
+                        o => IsPatternMatchNullCheck(o) || IsPatternMatchNotNullCheck(o));
 
-                if (node is IfStatementSyntax ifStatement)
+                if (node is IfStatementSyntax ifStatement && ContainsNonNullCheck(ifStatement.Condition))
                 {
-                    if (ifStatement.Condition.DescendantNodesAndSelf().OfType<BinaryExpressionSyntax>().Any(
-                          o => IsEqualsOrExclamationEqualsCheck(o) || IsPatternMatchTypeCheck(o))
-                        || ifStatement.Condition.DescendantNodesAndSelf().OfType<IsPatternExpressionSyntax>().Any(
-                          o => IsPatternMatchNullCheck(o) || IsPatternMatchNotNullCheck(o)))
-                    {
-                        return true;
-                    }
+                    return true;
                 }
 
                 if (this.IsThrowingNullCheck(node, symbol, semanticModel, cancellationToken))
                 {
                     return true;
+                }
+
+                return false;
+            }
+
+            private bool IsDereferenceGuardedByConditionalExpression(MemberAccessExpressionSyntax dereference, ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
+            {
+                bool? GetConditionValueThatGuaranteesNonNull(ExpressionSyntax condition)
+                {
+                    while (condition is ParenthesizedExpressionSyntax parenthesizedExpression)
+                    {
+                        condition = parenthesizedExpression.Expression;
+                    }
+
+                    bool IsSymbol(SyntaxNode node) => SymbolEqualityComparer.Default.Equals(symbol, semanticModel.GetSymbolInfo(node, cancellationToken).Symbol);
+                    if (condition is BinaryExpressionSyntax binaryExpression)
+                    {
+                        if (binaryExpression.IsKind(SyntaxKind.LogicalAndExpression))
+                        {
+                            return GetConditionValueThatGuaranteesNonNull(binaryExpression.Left) == true
+                                || GetConditionValueThatGuaranteesNonNull(binaryExpression.Right) == true
+                                ? true
+                                : (bool?)null;
+                        }
+
+                        bool comparesWithNull = (binaryExpression.Left.IsKind(SyntaxKind.NullLiteralExpression) && IsSymbol(binaryExpression.Right))
+                            || (binaryExpression.Right.IsKind(SyntaxKind.NullLiteralExpression) && IsSymbol(binaryExpression.Left));
+                        if (comparesWithNull && binaryExpression.IsKind(SyntaxKind.EqualsExpression))
+                        {
+                            return false;
+                        }
+
+                        if (comparesWithNull && binaryExpression.IsKind(SyntaxKind.NotEqualsExpression))
+                        {
+                            return true;
+                        }
+
+                        if (binaryExpression.OperatorToken.IsKind(SyntaxKind.IsKeyword)
+                            && (binaryExpression.Right.IsKind(SyntaxKind.IdentifierName) || binaryExpression.Right.IsKind(SyntaxKind.PredefinedType))
+                            && IsSymbol(binaryExpression.Left))
+                        {
+                            return true;
+                        }
+                    }
+                    else if (condition is IsPatternExpressionSyntax patternExpression && IsSymbol(patternExpression.Expression))
+                    {
+                        if (patternExpression.Pattern is ConstantPatternSyntax constantPattern
+                            && constantPattern.Expression.IsKind(SyntaxKind.NullLiteralExpression))
+                        {
+                            return false;
+                        }
+
+                        if (patternExpression.Pattern is UnaryPatternSyntax unaryPattern
+                            && unaryPattern.Pattern is ConstantPatternSyntax negatedConstantPattern
+                            && negatedConstantPattern.Expression.IsKind(SyntaxKind.NullLiteralExpression))
+                        {
+                            return true;
+                        }
+                    }
+
+                    return null;
+                }
+
+                foreach (ConditionalExpressionSyntax conditionalExpression in dereference.Ancestors().OfType<ConditionalExpressionSyntax>())
+                {
+                    ExpressionSyntax? nonNullBranch = GetConditionValueThatGuaranteesNonNull(conditionalExpression.Condition) switch
+                    {
+                        true => conditionalExpression.WhenTrue,
+                        false => conditionalExpression.WhenFalse,
+                        null => null,
+                    };
+                    if (nonNullBranch?.Span.Contains(dereference.Span) == true)
+                    {
+                        return true;
+                    }
                 }
 
                 return false;
