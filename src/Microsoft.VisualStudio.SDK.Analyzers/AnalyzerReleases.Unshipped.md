@@ -13,3 +13,4 @@ VSSDK006 | Reliability | Warning | VSSDK006CheckServicesExistAnalyzer
 VSSDK007 | Reliability | Warning | VSSDK007ThreadHelperJTFRunAsync
 VSSDK008 | Reliability | Warning | VSSDK008ThreadAffinitizedMEFConstruction
 VSSDK009 | Reliability | Error | VSSDK009UseUIThreadVsTaskRunContextAnalyzer
+VSSDK010 | Performance | Warning | VSSDK010RemoveUnnecessaryProvideAutoLoadAttributeAnalyzer
