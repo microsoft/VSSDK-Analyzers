@@ -1,0 +1,25 @@
+items:
+- name: Analyzer rules
+  href: index.md
+- name: VSSDK001 Derive from AsyncPackage
+  href: VSSDK001.md
+- name: VSSDK002 PackageRegistration matches Package
+  href: VSSDK002.md
+- name: VSSDK003 Support async tool windows
+  href: VSSDK003.md
+- name: VSSDK004 Use BackgroundLoad
+  href: VSSDK004.md
+- name: VSSDK005 Use the JoinableTaskContext singleton
+  href: VSSDK005.md
+- name: VSSDK006 Check service exists
+  href: VSSDK006.md
+- name: VSSDK007 Avoid ThreadHelper for fire and forget tasks
+  href: VSSDK007.md
+- name: VSSDK008 Avoid UI thread affinity in MEF Part construction
+  href: VSSDK008.md
+- name: VSSDK009 Use approved VsTaskRunContext values
+  href: VSSDK009.md
+- name: VSSDK010 Remove unnecessary ProvideAutoLoad attribute
+  href: VSSDK010.md
+- name: VSSDK012 Use the latest VisualStudioServices version
+  href: VSSDK012.md

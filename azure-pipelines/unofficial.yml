@@ -7,6 +7,7 @@ trigger:
   paths:
     exclude:
     - doc/
+    - docfx/
     - '*.md'
     - .vscode/
     - azure-pipelines/release.yml
