@@ -67,8 +67,7 @@ public class VSSDK010RemoveUnnecessaryProvideAutoLoadAttributeAnalyzer : Diagnos
                 asyncPackageType is not null &&
                 provideAutoLoadAttributeType is not null &&
                 initializeMethod is not null &&
-                initializeAsyncMethod is not null &&
-                onAfterPackageLoadedAsyncMethod is not null)
+                initializeAsyncMethod is not null)
             {
                 start.RegisterSymbolAction(
                     Utils.DebuggableWrapper(symbolContext => AnalyzeNamedType(
@@ -91,7 +90,7 @@ public class VSSDK010RemoveUnnecessaryProvideAutoLoadAttributeAnalyzer : Diagnos
         INamedTypeSymbol provideAutoLoadAttributeType,
         IMethodSymbol initializeMethod,
         IMethodSymbol initializeAsyncMethod,
-        IMethodSymbol onAfterPackageLoadedAsyncMethod)
+        IMethodSymbol? onAfterPackageLoadedAsyncMethod)
     {
         var type = (INamedTypeSymbol)context.Symbol;
         if (type.TypeKind != TypeKind.Class || type.IsAbstract || !Utils.IsDerivedFrom(type, packageType))
@@ -118,7 +117,9 @@ public class VSSDK010RemoveUnnecessaryProvideAutoLoadAttributeAnalyzer : Diagnos
         }
 
         if (OverridesMethod(type, methodToOverride) ||
-            (Utils.IsEqualToOrDerivedFrom(type, asyncPackageType) && OverridesMethod(type, onAfterPackageLoadedAsyncMethod)))
+            (Utils.IsEqualToOrDerivedFrom(type, asyncPackageType) &&
+                onAfterPackageLoadedAsyncMethod is not null &&
+                OverridesMethod(type, onAfterPackageLoadedAsyncMethod)))
         {
             return;
         }
