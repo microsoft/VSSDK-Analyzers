@@ -1,11 +1,11 @@
 # VSSDK010 Remove unnecessary `ProvideAutoLoad` attribute
 
 Automatically loading a package has a performance cost. A package that only registers services, code expansions,
-or other declarative contributions does not need to load unless it overrides `Package.Initialize` or
-`AsyncPackage.InitializeAsync`.
+or other declarative contributions does not need to load unless it overrides `Package.Initialize`,
+`AsyncPackage.InitializeAsync`, or `AsyncPackage.OnAfterPackageLoadedAsync`.
 
 This analyzer reports each `ProvideAutoLoad` attribute on a package when neither the package nor an intermediate
-base class overrides the applicable initialization method.
+base class overrides an applicable initialization method.
 
 ## Example of a pattern that is flagged by this analyzer
 
@@ -34,4 +34,5 @@ class MyPackage : AsyncPackage
 ```
 
 If the package needs to run initialization code, override `Initialize` or `InitializeAsync` as appropriate instead
-of removing `ProvideAutoLoad`.
+of removing `ProvideAutoLoad`. An `AsyncPackage` may also override `OnAfterPackageLoadedAsync` for operations with
+side effects that should run soon after package loading rather than as a strict part of initialization.

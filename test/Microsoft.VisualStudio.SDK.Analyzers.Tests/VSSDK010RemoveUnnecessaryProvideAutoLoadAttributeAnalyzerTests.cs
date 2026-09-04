@@ -100,6 +100,27 @@ class Test : AsyncPackage
     }
 
     [Fact]
+    public async Task AsyncPackageWithOnAfterPackageLoadedAsyncOverrideProducesNoDiagnosticAsync()
+    {
+        var test = /* lang=c#-test */ @"
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.VisualStudio.Shell;
+
+[ProvideAutoLoad(""{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"", PackageAutoLoadFlags.BackgroundLoad)]
+class Test : AsyncPackage
+{
+    protected override Task OnAfterPackageLoadedAsync(CancellationToken cancellationToken)
+    {
+        return base.OnAfterPackageLoadedAsync(cancellationToken);
+    }
+}
+";
+
+        await Verify.VerifyAnalyzerAsync(test);
+    }
+
+    [Fact]
     public async Task InheritedInitializeAsyncOverrideProducesNoDiagnosticAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -113,6 +134,31 @@ abstract class BasePackage : AsyncPackage
     protected override Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
     {
         return base.InitializeAsync(cancellationToken, progress);
+    }
+}
+
+[ProvideAutoLoad(""{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"", PackageAutoLoadFlags.BackgroundLoad)]
+class Test : BasePackage
+{
+}
+";
+
+        await Verify.VerifyAnalyzerAsync(test);
+    }
+
+    [Fact]
+    public async Task InheritedOnAfterPackageLoadedAsyncOverrideProducesNoDiagnosticAsync()
+    {
+        var test = /* lang=c#-test */ @"
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.VisualStudio.Shell;
+
+abstract class BasePackage : AsyncPackage
+{
+    protected override Task OnAfterPackageLoadedAsync(CancellationToken cancellationToken)
+    {
+        return base.OnAfterPackageLoadedAsync(cancellationToken);
     }
 }
 

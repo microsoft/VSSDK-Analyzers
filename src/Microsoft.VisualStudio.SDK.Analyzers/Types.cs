@@ -203,6 +203,11 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             internal const string InitializeAsync = "InitializeAsync";
 
             /// <summary>
+            /// The name of the OnAfterPackageLoadedAsync method.
+            /// </summary>
+            internal const string OnAfterPackageLoadedAsync = "OnAfterPackageLoadedAsync";
+
+            /// <summary>
             /// The name of the GetServiceAsync method.
             /// </summary>
             internal const string GetServiceAsync = "GetServiceAsync";

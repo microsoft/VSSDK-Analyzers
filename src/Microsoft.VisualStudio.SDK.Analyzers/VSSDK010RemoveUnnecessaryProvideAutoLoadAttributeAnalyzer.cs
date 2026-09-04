@@ -59,12 +59,16 @@ public class VSSDK010RemoveUnnecessaryProvideAutoLoadAttributeAnalyzer : Diagnos
             IMethodSymbol? initializeAsyncMethod = asyncPackageType?.GetMembers(Types.AsyncPackage.InitializeAsync)
                 .OfType<IMethodSymbol>()
                 .FirstOrDefault(method => method.Parameters.Length == 2);
+            IMethodSymbol? onAfterPackageLoadedAsyncMethod = asyncPackageType?.GetMembers(Types.AsyncPackage.OnAfterPackageLoadedAsync)
+                .OfType<IMethodSymbol>()
+                .FirstOrDefault(method => method.Parameters.Length == 1);
 
             if (packageType is not null &&
                 asyncPackageType is not null &&
                 provideAutoLoadAttributeType is not null &&
                 initializeMethod is not null &&
-                initializeAsyncMethod is not null)
+                initializeAsyncMethod is not null &&
+                onAfterPackageLoadedAsyncMethod is not null)
             {
                 start.RegisterSymbolAction(
                     Utils.DebuggableWrapper(symbolContext => AnalyzeNamedType(
@@ -73,7 +77,8 @@ public class VSSDK010RemoveUnnecessaryProvideAutoLoadAttributeAnalyzer : Diagnos
                         asyncPackageType,
                         provideAutoLoadAttributeType,
                         initializeMethod,
-                        initializeAsyncMethod)),
+                        initializeAsyncMethod,
+                        onAfterPackageLoadedAsyncMethod)),
                     SymbolKind.NamedType);
             }
         });
@@ -85,7 +90,8 @@ public class VSSDK010RemoveUnnecessaryProvideAutoLoadAttributeAnalyzer : Diagnos
         INamedTypeSymbol asyncPackageType,
         INamedTypeSymbol provideAutoLoadAttributeType,
         IMethodSymbol initializeMethod,
-        IMethodSymbol initializeAsyncMethod)
+        IMethodSymbol initializeAsyncMethod,
+        IMethodSymbol onAfterPackageLoadedAsyncMethod)
     {
         var type = (INamedTypeSymbol)context.Symbol;
         if (type.TypeKind != TypeKind.Class || type.IsAbstract || !Utils.IsDerivedFrom(type, packageType))
@@ -111,7 +117,8 @@ public class VSSDK010RemoveUnnecessaryProvideAutoLoadAttributeAnalyzer : Diagnos
             methodToOverride = initializeMethod;
         }
 
-        if (OverridesMethod(type, methodToOverride))
+        if (OverridesMethod(type, methodToOverride) ||
+            (Utils.IsEqualToOrDerivedFrom(type, asyncPackageType) && OverridesMethod(type, onAfterPackageLoadedAsyncMethod)))
         {
             return;
         }
