@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Microsoft.VisualStudio.SDK.Analyzers;
-using System.Threading.Tasks;
 using Xunit;
 
 public class AdditionalFilesParsingTests

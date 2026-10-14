@@ -1,10 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Threading.Tasks;
 using Verify = CSharpCodeFixVerifier<
     Microsoft.VisualStudio.SDK.Analyzers.VSSDK001DeriveFromAsyncPackageAnalyzer,
     Microsoft.VisualStudio.SDK.Analyzers.VSSDK001DeriveFromAsyncPackageCodeFix>;
-using System.Threading.Tasks;
 
 public class VSSDK001DeriveFromAsyncPackageCodeFixTests
 {
