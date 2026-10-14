@@ -2,14 +2,13 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Threading.Tasks;
-using Xunit;
 using Verify = CSharpCodeFixVerifier<
     Microsoft.VisualStudio.SDK.Analyzers.VSSDK001DeriveFromAsyncPackageAnalyzer,
     Microsoft.VisualStudio.SDK.Analyzers.VSSDK001DeriveFromAsyncPackageCodeFix>;
 
 public class VSSDK001DeriveFromAsyncPackageAnalyzerTests
 {
-    [Fact]
+    [Test]
     public async Task AsyncPackageDerivedClassProducesNoDiagnosticAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -22,7 +21,7 @@ class Test : AsyncPackage {
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task NoBaseTypeProducesNoDiagnosticAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -33,7 +32,7 @@ class Test {
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task PackageDerivedClassProducesDiagnosticAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -47,7 +46,7 @@ class Test : Package {
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
-    [Fact]
+    [Test]
     public async Task PackageDerivedClassWithInterfacesProducesDiagnosticAsync()
     {
         var test = /* lang=c#-test */ @"

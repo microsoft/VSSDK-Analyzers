@@ -3,14 +3,13 @@
 
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.Testing;
-using Xunit;
 using Verify = CSharpCodeFixVerifier<
     Microsoft.VisualStudio.SDK.Analyzers.VSSDK007ThreadHelperJTFRunAsync,
     Microsoft.CodeAnalysis.Testing.EmptyCodeFixProvider>;
 
 public class VSSDK007ThreadHelperJTFRunAsyncTests
 {
-    [Fact]
+    [Test]
     public async Task RunAsync_Dropped_Warning()
     {
         var test = /* lang=c#-test */ @"
@@ -33,7 +32,7 @@ namespace ConsoleApplication1
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
-    [Fact]
+    [Test]
     public async Task RunAsync_Forget_Warning()
     {
         var test = /* lang=c#-test */ @"
@@ -57,7 +56,7 @@ namespace ConsoleApplication1
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
-    [Fact]
+    [Test]
     public async Task RunAsync_FileAndForget_Warning()
     {
         var test = /* lang=c#-test */ @"
@@ -81,7 +80,7 @@ namespace ConsoleApplication1
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
-    [Fact]
+    [Test]
     public async Task RunAsync_Awaited_NoWarning()
     {
         var test = /* lang=c#-test */ @"
@@ -106,7 +105,7 @@ namespace ConsoleApplication1
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task RunAsync_Joined_NoWarning()
     {
         var test = /* lang=c#-test */ @"
@@ -131,7 +130,7 @@ namespace ConsoleApplication1
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task RunAsync_AssignedButNotJoined_Warning()
     {
         var test = /* lang=c#-test */ @"
@@ -212,7 +211,7 @@ namespace ConsoleApplication1
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
-    [Fact]
+    [Test]
     public async Task RunAsync_AssignedAndJoined_NoWarning()
     {
         var test = /* lang=c#-test */ @"
@@ -256,7 +255,7 @@ namespace ConsoleApplication1
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task RunAsync_JoinedElsewhere_NoWarning()
     {
         var test = /* lang=c#-test */ @"
@@ -366,7 +365,7 @@ namespace ConsoleApplication1
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task RunAsync_Dropped_NotThreadHelper_NoWarning()
     {
         var test = /* lang=c#-test */ @"
@@ -405,7 +404,7 @@ namespace ConsoleApplication1
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task RunAsync_DifferentType_NoWarning()
     {
         var test = /* lang=c#-test */ @"
@@ -441,7 +440,7 @@ namespace ConsoleApplication1
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task RunAsync_AssignedToField()
     {
         string test = """

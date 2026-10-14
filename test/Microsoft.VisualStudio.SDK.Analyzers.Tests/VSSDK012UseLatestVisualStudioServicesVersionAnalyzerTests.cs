@@ -3,14 +3,13 @@
 
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.Testing;
-using Xunit;
 using Verify = CSharpCodeFixVerifier<
     Microsoft.VisualStudio.SDK.Analyzers.VSSDK012UseLatestVisualStudioServicesVersionAnalyzer,
     Microsoft.CodeAnalysis.Testing.EmptyCodeFixProvider>;
 
 public class VSSDK012UseLatestVisualStudioServicesVersionAnalyzerTests
 {
-    [Fact]
+    [Test]
     public async Task OlderVersionProducesDiagnosticAsync()
     {
         var test = /* lang=c#-test */ """
@@ -46,7 +45,7 @@ public class VSSDK012UseLatestVisualStudioServicesVersionAnalyzerTests
         await VerifyAnalyzerAsync(test, Verify.Diagnostic().WithLocation(0).WithArguments("VS2019_9", "VS2019_10"));
     }
 
-    [Fact]
+    [Test]
     public async Task VersionFromOlderVisualStudioReleaseProducesDiagnosticAsync()
     {
         var test = /* lang=c#-test */ """
@@ -73,7 +72,7 @@ public class VSSDK012UseLatestVisualStudioServicesVersionAnalyzerTests
         await VerifyAnalyzerAsync(test, Verify.Diagnostic().WithLocation(0).WithArguments("VS2019_11", "VS2022"));
     }
 
-    [Fact]
+    [Test]
     public async Task LatestVersionProducesNoDiagnosticAsync()
     {
         var test = /* lang=c#-test */ """
@@ -100,7 +99,7 @@ public class VSSDK012UseLatestVisualStudioServicesVersionAnalyzerTests
         await VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task OnlyAvailableVersionProducesNoDiagnosticAsync()
     {
         var test = /* lang=c#-test */ """
@@ -126,7 +125,7 @@ public class VSSDK012UseLatestVisualStudioServicesVersionAnalyzerTests
         await VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task NonVersionedMemberProducesNoDiagnosticAsync()
     {
         var test = /* lang=c#-test */ """
@@ -153,7 +152,7 @@ public class VSSDK012UseLatestVisualStudioServicesVersionAnalyzerTests
         await VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task NameOfOlderVersionProducesNoDiagnosticAsync()
     {
         var test = /* lang=c#-test */ """
@@ -180,7 +179,7 @@ public class VSSDK012UseLatestVisualStudioServicesVersionAnalyzerTests
         await VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task UnrelatedTypeProducesNoDiagnosticAsync()
     {
         var test = /* lang=c#-test */ """

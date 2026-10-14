@@ -3,14 +3,13 @@
 
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.Testing;
-using Xunit;
 using Verify = CSharpCodeFixVerifier<
     Microsoft.VisualStudio.SDK.Analyzers.VSSDK006CheckServicesExistAnalyzer,
     Microsoft.VisualStudio.SDK.Analyzers.VSSDK006CheckServicesExistCodeFix>;
 
 public class VSSDK006CheckServicesExistAnalyzerTests
 {
-    [Fact]
+    [Test]
     public async Task LocalAssigned_GetService_ThenUsedAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -45,7 +44,7 @@ class Test : Package {
         await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
-    [Fact]
+    [Test]
     public async Task LocalAssigned_OleInterop_QueryService_Guid_ThenUsedAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -78,7 +77,7 @@ class Test : Package {
         await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
-    [Fact]
+    [Test]
     public async Task LocalAssigned_OleInterop_QueryService_Generic_ThenUsedAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -111,7 +110,7 @@ class Test : Package {
         await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
-    [Fact]
+    [Test]
     public async Task LocalAssigned_GetService_ThenUsed_WithNullConditionalAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -130,7 +129,7 @@ class Test : Package {
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task LocalAssigned_IServiceProvider_GetService_ThenUsedAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -163,7 +162,7 @@ class Test {
         await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
-    [Fact]
+    [Test]
     public async Task LocalDeclarationAssignedWithDirectCast_GetService_ThenUsedAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -198,7 +197,7 @@ class Test : Package {
         await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
-    [Fact]
+    [Test]
     public async Task LocalDeclarationAssignedWithAsCast_GetServiceAsync_ThenUsedAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -239,7 +238,7 @@ class Test : AsyncPackage {
         await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
-    [Fact]
+    [Test]
     public async Task LocalDeclarationAssignedWithAsCast_GetService_InAsyncPackage_ThenUsedAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -280,7 +279,7 @@ class Test : AsyncPackage {
         await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
-    [Fact]
+    [Test]
     public async Task LocalDeclarationAssignedWithAsCast_GetService_InAsyncPackage_ThenUsed_TwiceAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -332,7 +331,7 @@ class Test : AsyncPackage {
         await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
-    [Fact]
+    [Test]
     public async Task LocalAssignedWithAsCast_GetServiceAsync_ThenUsedAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -375,7 +374,7 @@ class Test : AsyncPackage {
         await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
-    [Fact]
+    [Test]
     public async Task LocalAssignedWithDirectCast_GetService_ThenUsedAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -412,7 +411,7 @@ class Test : Package {
         await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
-    [Fact]
+    [Test]
     public async Task FieldAssigned_GetService_ThenUsedAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -449,7 +448,7 @@ class Test : Package {
         await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
-    [Fact]
+    [Test]
     public async Task FieldAssigned_GetService_ThenUsedElsewhereAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -492,7 +491,7 @@ class Test : Package {
         await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
-    [Fact]
+    [Test]
     public async Task FieldAssigned_GetServiceAsync_ThenUsedElsewhereAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -541,7 +540,7 @@ class Test : AsyncPackage {
         await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
-    [Fact]
+    [Test]
     public async Task FieldAssigned_GetServiceAsync_WithConfigureAwait_ThenUsedElsewhereAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -590,7 +589,7 @@ class Test : AsyncPackage {
         await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
-    [Fact]
+    [Test]
     public async Task FieldAssigned_GetService_ThenUsedElsewhereWithIfCheckAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -615,7 +614,7 @@ class Test : Package {
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task FieldAssigned_GetService_ThenUsedElsewhereWithIfEqualCheckAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -641,7 +640,7 @@ class Test : Package {
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task FieldAssigned_GetService_ThenUsedElsewhereWithIfIsNullCheckAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -667,7 +666,7 @@ class Test : Package {
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task FieldAssigned_GetService_ThenUsedElsewhereWithIfIsObjectCheckAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -692,7 +691,7 @@ class Test : Package {
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task FieldAssigned_GetService_ThenUsedElsewhereWithIfIsExpectedTypeCheckAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -717,7 +716,7 @@ class Test : Package {
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task PropertyAssigned_GetService_ThenUsedWithinClassAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -760,7 +759,7 @@ class Test : Package {
         await Verify.VerifyCodeFixAsync(test, expected, fix);
     }
 
-    [Fact]
+    [Test]
     public async Task GetService_DirectlyUsedAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -779,7 +778,7 @@ class Test : Package {
         await Verify.VerifyCodeFixAsync(test, expected, test);
     }
 
-    [Fact]
+    [Test]
     public async Task GetService_DirectlyUsed_WithConditionalMemberAccessAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -797,7 +796,7 @@ class Test : Package {
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task GetServiceAsync_DirectlyUsedAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -819,7 +818,7 @@ class Test : AsyncPackage {
         await Verify.VerifyCodeFixAsync(test, expected, test);
     }
 
-    [Fact]
+    [Test]
     public async Task GetServiceAsync_WithConfigureAwait_DirectlyUsedAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -841,7 +840,7 @@ class Test : AsyncPackage {
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
-    [Fact]
+    [Test]
     public async Task GetServiceAsync_WithConfigureAwait()
     {
         var test = /* lang=c#-test */ @"
@@ -862,7 +861,7 @@ class Test : AsyncPackage {
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task LocalAssigned_CheckedByThrow_GetService_ThenUsedAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -882,7 +881,7 @@ class Test : Package {
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task LocalAssigned_CheckedByIf_GetService_ThenUsedAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -903,7 +902,7 @@ class Test : Package {
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task LocalAssigned_CheckedByConditionalExpression_GetService_ThenUsedAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -920,7 +919,7 @@ class Test : Package {
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task LocalAssigned_CheckedByConditionalExpressionWithLogicalAnd_GetService_ThenUsedAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -937,7 +936,7 @@ class Test : Package {
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task LocalAssigned_CheckedByConditionalExpressionWithLogicalOr_GetService_ThenUsedAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -955,7 +954,7 @@ class Test : Package {
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
-    [Fact]
+    [Test]
     public async Task LocalAssigned_CheckedByConditionalExpression_ThenUsedWithoutCheckAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -974,7 +973,7 @@ class Test : Package {
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
-    [Fact]
+    [Test]
     public async Task LocalAssigned_CheckedByNegatedTypePattern_ThenUsedAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -994,7 +993,7 @@ class Test : Package {
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
-    [Fact]
+    [Test]
     public async Task LocalAssigned_CheckedByIfIsNotNull_GetService_ThenUsedAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -1015,7 +1014,7 @@ class Test : Package {
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task FieldAssigned_Checked_GetService_ThenUsedAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -1036,7 +1035,7 @@ class Test : Package {
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task PartialClass()
     {
         var test1 = /* lang=c#-test */ @"
@@ -1065,10 +1064,10 @@ partial class Test {
 ";
         var test = new Verify.Test { TestState = { Sources = { test1, test2 } } };
         test.ExpectedDiagnostics.Add(this.CreateDiagnostic(10, 20, 15, (10, 9, 8), (11, 9, 3)));
-        await test.RunAsync(TestContext.Current.CancellationToken);
+        await test.RunAsync();
     }
 
-    [Fact]
+    [Test]
     public async Task PartialWithMemberThatChecksOtherField()
     {
         var test1 = /* lang=c#-test */ @"
@@ -1095,7 +1094,7 @@ internal partial class Host {
 }
 ";
         var test = new Verify.Test { TestState = { Sources = { test1, test2 } } };
-        await test.RunAsync(TestContext.Current.CancellationToken);
+        await test.RunAsync();
     }
 
     private DiagnosticResult CreateDiagnostic(int line, int column, int length, params (int Line, int Column, int Length)[] additionalLocations)

@@ -1,14 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Xunit;
 using Verify = CSharpCodeFixVerifier<
     Microsoft.VisualStudio.SDK.Analyzers.VSSDK001DeriveFromAsyncPackageAnalyzer,
     Microsoft.VisualStudio.SDK.Analyzers.VSSDK001DeriveFromAsyncPackageCodeFix>;
+using System.Threading.Tasks;
 
 public class VSSDK001DeriveFromAsyncPackageCodeFixTests
 {
-    [Fact]
+    [Test]
     public async Task BaseTypeChangesToAsyncPackageAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -28,7 +28,7 @@ class Test : AsyncPackage
         await Verify.VerifyCodeFixAsync(test, withFix);
     }
 
-    [Fact]
+    [Test]
     public async Task PackageRegistrationUpdated_NewArgumentAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -50,7 +50,7 @@ class Test : AsyncPackage
         await Verify.VerifyCodeFixAsync(test, withFix);
     }
 
-    [Fact]
+    [Test]
     public async Task PackageRegistrationUpdated_ExistingArgumentAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -72,7 +72,7 @@ class Test : AsyncPackage
         await Verify.VerifyCodeFixAsync(test, withFix);
     }
 
-    [Fact]
+    [Test]
     public async Task BaseTypeChangesToAsyncPackage_WithInterfacesAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -100,7 +100,7 @@ class Test : AsyncPackage, IDisposable
         await Verify.VerifyCodeFixAsync(test, withFix);
     }
 
-    [Fact]
+    [Test]
     public async Task BaseTypeChangesToAsyncPackage_NoUsingsAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -118,7 +118,7 @@ class Test : AsyncPackage
         await Verify.VerifyCodeFixAsync(test, withFix);
     }
 
-    [Fact]
+    [Test]
     public async Task BaseTypeChangesToAsyncPackage_NoUsings_AndInitializeMethod()
     {
         var test = /* lang=c#-test */ @"
@@ -151,7 +151,7 @@ class Test : AsyncPackage
         await Verify.VerifyCodeFixAsync(test, withFix);
     }
 
-    [Fact]
+    [Test]
     public async Task BaseTypeChangesToAsyncPackage_InPartiallyMatchingNamespaceAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -175,7 +175,7 @@ namespace Microsoft.VisualStudio
         await Verify.VerifyCodeFixAsync(test, withFix);
     }
 
-    [Fact]
+    [Test]
     public async Task BaseTypeChangesToAsyncPackage_InPartiallyMatchingNamespace_UsingsInsideNamespace()
     {
         var test = /* lang=c#-test */ @"
@@ -204,7 +204,7 @@ namespace Microsoft.VisualStudio
         await Verify.VerifyCodeFixAsync(test, withFix);
     }
 
-    [Fact]
+    [Test]
     public async Task InitializeOverride_BecomesAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -255,7 +255,7 @@ namespace NS
         await Verify.VerifyCodeFixAsync(test, withFix);
     }
 
-    [Fact]
+    [Test]
     public async Task InitializeOverride_AlreadyDefinesTaskUsing()
     {
         var test = /* lang=c#-test */ @"
@@ -292,7 +292,7 @@ class Test : AsyncPackage
         await Verify.VerifyCodeFixAsync(test, withFix);
     }
 
-    [Fact]
+    [Test]
     public async Task InitializeOverride_MissingBaseInitializeCall()
     {
         var test = /* lang=c#-test */ @"
@@ -327,7 +327,7 @@ class Test : AsyncPackage
         await Verify.VerifyCodeFixAsync(test, withFix);
     }
 
-    [Fact]
+    [Test]
     public async Task InitializeOverride_GetServiceCallsUpdatedAsync()
     {
         var test = /* lang=c#-test */ @"

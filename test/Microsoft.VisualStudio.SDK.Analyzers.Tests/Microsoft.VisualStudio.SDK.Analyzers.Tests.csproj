@@ -16,7 +16,8 @@
     <PackageReference Include="Microsoft.VisualStudio.Validation" PrivateAssets="all" />
     <PackageReference Include="System.ValueTuple" />
     <PackageReference Include="xunit.assert" ExcludeAssets="compile" />
-    <PackageReference Include="xunit.v3.mtp-v2" />
+    <PackageReference Include="TUnit.Engine" />
+    <PackageReference Include="xunit.v3.assert" />
 
     <!-- Avoid dependencies on earlier insecure Newtownsoft.Json -->
     <PackageReference Include="Newtonsoft.Json" />

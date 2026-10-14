@@ -2,14 +2,13 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Threading.Tasks;
-using Xunit;
 using Verify = CSharpCodeFixVerifier<
     Microsoft.VisualStudio.SDK.Analyzers.VSSDK005UseJoinableTaskContextSingletonAnalyzer,
     Microsoft.CodeAnalysis.Testing.EmptyCodeFixProvider>;
 
 public class VSSDK005UseJoinableTaskContextSingletonAnalyzerTests
 {
-    [Fact]
+    [Test]
     public async Task InstantiatingInMethod_ProducesDiagnosticAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -25,7 +24,7 @@ class Test {
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
-    [Fact]
+    [Test]
     public async Task InstantiatingInField_ProducesDiagnosticAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -39,7 +38,7 @@ class Test {
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
-    [Fact]
+    [Test]
     public async Task InstantiatingSimilarlyNamedType_ProducesNoDiagnosticAsync()
     {
         var test = /* lang=c#-test */ @"
