@@ -1,14 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Xunit;
+using System.Threading.Tasks;
 using Verify = CSharpCodeFixVerifier<
     Microsoft.VisualStudio.SDK.Analyzers.VSSDK002PackageRegistrationMatchesBaseTypeAnalyzer,
     Microsoft.VisualStudio.SDK.Analyzers.VSSDK002PackageRegistrationMatchesBaseTypeCodeFix>;
 
 public class VSSDK002PackageRegistrationMatchesBaseTypeAnalyzerTests
 {
-    [Fact]
+    [Test]
     public async Task AsyncPackageWithNoAttributeProducesNoDiagnosticAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -21,7 +21,7 @@ class Test : AsyncPackage {
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task PackageRegistrationWithNoBaseTypeAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -35,7 +35,7 @@ class Test {
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task PackageRegistrationWithIrrelevantAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -51,7 +51,7 @@ class Test : IDisposable {
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task AsyncPackageMatchProducesNoDiagnosticAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -65,7 +65,7 @@ class Test : AsyncPackage {
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task PackageMatchProducesNoDiagnosticAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -79,7 +79,7 @@ class MyCoolPackage : Package {
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task AsyncPackageImplicitMismatchProducesDiagnosticAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -100,7 +100,7 @@ class Test : AsyncPackage {
         await Verify.VerifyCodeFixAsync(test, withFix);
     }
 
-    [Fact]
+    [Test]
     public async Task AsyncPackageImplicitMismatchViaIntermediateClass_ProducesDiagnosticAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -125,7 +125,7 @@ class Test : Middle {
         await Verify.VerifyCodeFixAsync(test, withFix);
     }
 
-    [Fact]
+    [Test]
     public async Task PackageMismatchViaIntermediateClass_ProducesDiagnosticAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -150,7 +150,7 @@ class MyCoolPackage : Middle {
         await Verify.VerifyCodeFixAsync(test, withFix);
     }
 
-    [Fact]
+    [Test]
     public async Task AsyncPackageExplicitMismatchProducesDiagnosticAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -171,7 +171,7 @@ class Test : AsyncPackage {
         await Verify.VerifyCodeFixAsync(test, withFix);
     }
 
-    [Fact]
+    [Test]
     public async Task PackageMismatchProducesDiagnosticAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -192,7 +192,7 @@ class MyCoolPackage : Package {
         await Verify.VerifyCodeFixAsync(test, withFix);
     }
 
-    [Fact]
+    [Test]
     public async Task PackageMismatchProducesDiagnostic_ReverseArgumentOrderAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -213,7 +213,7 @@ class MyCoolPackage : Package {
         await Verify.VerifyCodeFixAsync(test, withFix);
     }
 
-    [Fact]
+    [Test]
     public async Task PackageMismatchProducesDiagnostic_AcrossPartialClassAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -238,7 +238,7 @@ partial class MyCoolPackage { }
         await Verify.VerifyCodeFixAsync(test, withFix);
     }
 
-    [Fact]
+    [Test]
     public async Task PackageMatchViaIntermediateClass_ProducesNoDiagnosticAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -253,7 +253,7 @@ class Test : Middle {
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task AsyncPackageMatchViaIntermediateClass_ProducesNoDiagnosticAsync()
     {
         var test = /* lang=c#-test */ @"

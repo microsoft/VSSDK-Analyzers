@@ -2,14 +2,13 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Threading.Tasks;
-using Xunit;
 using Verify = CSharpCodeFixVerifier<
     Microsoft.VisualStudio.SDK.Analyzers.VSSDK003SupportAsyncToolWindowAnalyzer,
     Microsoft.CodeAnalysis.Testing.EmptyCodeFixProvider>;
 
 public class VSSDK003SupportAsyncToolWindowAnalyzerTests
 {
-    [Fact]
+    [Test]
     public async Task SyncToolWindow_NonAsyncPackage_ProducesDiagnosticAsync()
     {
         var package = /* lang=c#-test */ @"
@@ -42,10 +41,10 @@ public class ToolWindow1 : ToolWindowPane
             {
                 Sources = { package, toolWindow },
             },
-        }.RunAsync(TestContext.Current.CancellationToken);
+        }.RunAsync();
     }
 
-    [Fact]
+    [Test]
     public async Task SyncToolWindow_AsyncPackage_ProducesDiagnosticAsync()
     {
         var package = /* lang=c#-test */ @"
@@ -79,10 +78,10 @@ public class ToolWindow1 : ToolWindowPane
                 Sources = { package, toolWindow },
             },
             ExpectedDiagnostics = { Verify.Diagnostic().WithSpan(4, 27, 4, 38) },
-        }.RunAsync(TestContext.Current.CancellationToken);
+        }.RunAsync();
     }
 
-    [Fact]
+    [Test]
     public async Task AsyncToolWindow_ProducesNoDiagnosticAsync()
     {
         var package = /* lang=c#-test */ @"
@@ -151,10 +150,10 @@ public class ToolWindow1 : ToolWindowPane
             {
                 Sources = { package, toolWindow },
             },
-        }.RunAsync(TestContext.Current.CancellationToken);
+        }.RunAsync();
     }
 
-    [Fact]
+    [Test]
     public async Task RTWCompatibleAsyncToolWindow_ProducesNoDiagnosticAsync()
     {
         var package = /* lang=c#-test */ @"
@@ -223,10 +222,10 @@ public class ToolWindow1 : ToolWindowPane
             {
                 Sources = { package, toolWindow },
             },
-        }.RunAsync(TestContext.Current.CancellationToken);
+        }.RunAsync();
     }
 
-    [Fact]
+    [Test]
     public async Task NoPackageAttributesAsync()
     {
         var package = /* lang=c#-test */ @"
@@ -237,7 +236,7 @@ public class ProtocolPackage : Microsoft.VisualStudio.Shell.AsyncPackage
         await Verify.VerifyAnalyzerAsync(package);
     }
 
-    [Fact]
+    [Test]
     public async Task OverriddenGetAsyncToolWindowFactory_ToolWindowWithParameterlessConstructor_ProducesNoDiagnosticAsync()
     {
         var package = /* lang=c#-test */ @"
@@ -296,6 +295,6 @@ public class ToolWindow1
             {
                 Sources = { package, toolWindow },
             },
-        }.RunAsync(TestContext.Current.CancellationToken);
+        }.RunAsync();
     }
 }

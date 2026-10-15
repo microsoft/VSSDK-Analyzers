@@ -3,14 +3,13 @@
 
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.Testing;
-using Xunit;
 using Verify = CSharpCodeFixVerifier<
     Microsoft.VisualStudio.SDK.Analyzers.VSSDK009UseUIThreadVsTaskRunContextAnalyzer,
     Microsoft.CodeAnalysis.Testing.EmptyCodeFixProvider>;
 
 public class VSSDK009UseUIThreadVsTaskRunContextAnalyzerTests
 {
-    [Fact]
+    [Test]
     public async Task StartOnIdleWithBackgroundThreadPriorityProducesDiagnosticAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -30,7 +29,7 @@ class Test
         await Verify.VerifyAnalyzerAsync(test, Verify.Diagnostic().WithLocation(0).WithArguments("StartOnIdle"));
     }
 
-    [Fact]
+    [Test]
     public async Task RunAsyncWithBackgroundThreadPriorityProducesDiagnosticAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -50,7 +49,7 @@ class Test
         await Verify.VerifyAnalyzerAsync(test, Verify.Diagnostic().WithLocation(0).WithArguments("RunAsync"));
     }
 
-    [Fact]
+    [Test]
     public async Task WithPriorityWithCurrentContextProducesDiagnosticAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -69,7 +68,7 @@ class Test
         await Verify.VerifyAnalyzerAsync(test, Verify.Diagnostic().WithLocation(0).WithArguments("WithPriority"));
     }
 
-    [Fact]
+    [Test]
     public async Task WithPriorityWithUIThreadSendProducesDiagnosticAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -88,7 +87,7 @@ class Test
         await Verify.VerifyAnalyzerAsync(test, Verify.Diagnostic().WithLocation(0).WithArguments("WithPriority"));
     }
 
-    [Fact]
+    [Test]
     public async Task StartOnIdleWithAllowedPriorityProducesNoDiagnosticAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -108,7 +107,7 @@ class Test
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task RunAsyncWithAllowedPriorityProducesNoDiagnosticAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -128,7 +127,7 @@ class Test
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task StaticStartOnIdleWithCurrentContextProducesDiagnosticAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -148,7 +147,7 @@ class Test
         await Verify.VerifyAnalyzerAsync(test, Verify.Diagnostic().WithLocation(0).WithArguments("StartOnIdle"));
     }
 
-    [Fact]
+    [Test]
     public async Task StartOnIdleWithVariablePriorityProducesNoDiagnosticAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -168,7 +167,7 @@ class Test
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task WithPriorityWithUIThreadPriorityProducesNoDiagnosticAsync()
     {
         var test = /* lang=c#-test */ @"

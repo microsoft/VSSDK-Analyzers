@@ -2,14 +2,13 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Threading.Tasks;
-using Xunit;
 using Verify = CSharpCodeFixVerifier<
     Microsoft.VisualStudio.SDK.Analyzers.VSSDK010RemoveUnnecessaryProvideAutoLoadAttributeAnalyzer,
     Microsoft.CodeAnalysis.Testing.EmptyCodeFixProvider>;
 
 public class VSSDK010RemoveUnnecessaryProvideAutoLoadAttributeAnalyzerTests
 {
-    [Fact]
+    [Test]
     public async Task PackageWithoutInitializeOverrideProducesDiagnosticAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -24,7 +23,7 @@ class Test : Package
         await Verify.VerifyAnalyzerAsync(test, Verify.Diagnostic().WithLocation(0).WithArguments("Initialize"));
     }
 
-    [Fact]
+    [Test]
     public async Task AsyncPackageWithoutInitializeAsyncOverrideProducesDiagnosticAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -39,7 +38,7 @@ class Test : AsyncPackage
         await Verify.VerifyAnalyzerAsync(test, Verify.Diagnostic().WithLocation(0).WithArguments("InitializeAsync"));
     }
 
-    [Fact]
+    [Test]
     public async Task OlderAsyncPackageWithoutOnAfterPackageLoadedAsyncProducesDiagnosticAsync()
     {
         var testCode = /* lang=c#-test */ @"
@@ -88,10 +87,10 @@ class Test : Microsoft.VisualStudio.Shell.AsyncPackage
             TestCode = testCode,
         };
         test.ExpectedDiagnostics.Add(Verify.Diagnostic().WithLocation(0).WithArguments("InitializeAsync"));
-        await test.RunAsync(TestContext.Current.CancellationToken);
+        await test.RunAsync();
     }
 
-    [Fact]
+    [Test]
     public async Task MultipleProvideAutoLoadAttributesProduceMultipleDiagnosticsAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -110,7 +109,7 @@ class Test : Package
             Verify.Diagnostic().WithLocation(1).WithArguments("Initialize"));
     }
 
-    [Fact]
+    [Test]
     public async Task PackageWithInitializeOverrideProducesNoDiagnosticAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -129,7 +128,7 @@ class Test : Package
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task AsyncPackageWithInitializeAsyncOverrideProducesNoDiagnosticAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -151,7 +150,7 @@ class Test : AsyncPackage
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task AsyncPackageWithOnAfterPackageLoadedAsyncOverrideProducesNoDiagnosticAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -172,7 +171,7 @@ class Test : AsyncPackage
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task InheritedInitializeAsyncOverrideProducesNoDiagnosticAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -198,7 +197,7 @@ class Test : BasePackage
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task InheritedOnAfterPackageLoadedAsyncOverrideProducesNoDiagnosticAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -223,7 +222,7 @@ class Test : BasePackage
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task ProvideAutoLoadOnAbstractBasePackageProducesNoDiagnosticAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -246,7 +245,7 @@ class Test : BasePackage
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task UnrelatedInitializeMethodStillProducesDiagnosticAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -264,7 +263,7 @@ class Test : Package
         await Verify.VerifyAnalyzerAsync(test, Verify.Diagnostic().WithLocation(0).WithArguments("Initialize"));
     }
 
-    [Fact]
+    [Test]
     public async Task ProvideAutoLoadOnNonPackageProducesNoDiagnosticAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -279,7 +278,7 @@ class Test
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task PackageWithoutProvideAutoLoadProducesNoDiagnosticAsync()
     {
         var test = /* lang=c#-test */ @"

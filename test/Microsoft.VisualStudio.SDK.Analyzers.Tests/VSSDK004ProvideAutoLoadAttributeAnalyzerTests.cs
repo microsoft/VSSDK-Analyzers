@@ -3,14 +3,13 @@
 
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.Testing;
-using Xunit;
 using Verify = CSharpCodeFixVerifier<
     Microsoft.VisualStudio.SDK.Analyzers.VSSDK004ProvideAutoLoadAttributeAnalyzer,
     Microsoft.CodeAnalysis.Testing.EmptyCodeFixProvider>;
 
 public class VSSDK004ProvideAutoLoadAttributeAnalyzerTests
 {
-    [Fact]
+    [Test]
     public async Task NoPackageBaseClassProvidesNoDiagnosticsAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -23,7 +22,7 @@ class Test {
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task NoProvideAutoLoadProducesNoDiagnosticsAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -35,7 +34,7 @@ class Test : AsyncPackage {
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task BasicProvideAutoLoadProducesDiagnosticsAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -49,7 +48,7 @@ class Test : AsyncPackage {
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
-    [Fact]
+    [Test]
     public async Task ProvideAutoLoadWithFlagsButNoBackgroundLoadProducesDiagnosticsAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -63,7 +62,7 @@ class Test : AsyncPackage {
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
-    [Fact]
+    [Test]
     public async Task MultipleProvideAutoLoadProducesMultipleDiagnosticsAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -82,7 +81,7 @@ class Test : AsyncPackage {
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
-    [Fact]
+    [Test]
     public async Task ProvideAutoLoadWithNamedFlagsButNoBackgroundLoadProducesDiagnosticsAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -96,7 +95,7 @@ class Test : AsyncPackage {
         await Verify.VerifyAnalyzerAsync(test, expected);
     }
 
-    [Fact]
+    [Test]
     public async Task ProvideAutoLoadWithSkipFlagProducesNoDiagnosticsAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -109,7 +108,7 @@ class Test : Package {
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task ProvideAutoLoadWithBackgroundLoadFlagProducesNoDiagnosticsAsync()
     {
         var test = /* lang=c#-test */ @"
@@ -122,7 +121,7 @@ class Test : AsyncPackage {
         await Verify.VerifyAnalyzerAsync(test);
     }
 
-    [Fact]
+    [Test]
     public async Task ProvideAutoLoadOnPackageWithBackgroundLoadFlagProducesDiagnosticsAsync()
     {
         var test = /* lang=c#-test */ @"

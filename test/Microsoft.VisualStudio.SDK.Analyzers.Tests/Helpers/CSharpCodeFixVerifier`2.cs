@@ -3,7 +3,6 @@
 
 using System.Collections.Immutable;
 using System.Net;
-using System.Reflection;
 using Microsoft;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
@@ -84,13 +83,13 @@ public static class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
 
             const string additionalFilePrefix = "AdditionalFiles.";
             this.TestState.AdditionalFiles.AddRange(
-                from resourceName in Assembly.GetExecutingAssembly().GetManifestResourceNames()
+                from resourceName in System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceNames()
                 where resourceName.StartsWith(additionalFilePrefix, StringComparison.Ordinal)
-                let content = ReadManifestResource(Assembly.GetExecutingAssembly(), resourceName)
+                let content = ReadManifestResource(System.Reflection.Assembly.GetExecutingAssembly(), resourceName)
                 select (filename: resourceName.Substring(additionalFilePrefix.Length), SourceText.From(content)));
         }
 
-        private static string ReadManifestResource(Assembly assembly, string resourceName)
+        private static string ReadManifestResource(System.Reflection.Assembly assembly, string resourceName)
         {
             using var reader = new StreamReader(assembly.GetManifestResourceStream(resourceName) ?? throw Assumes.Fail("Resource not found."));
             return reader.ReadToEnd();

@@ -9,11 +9,10 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
 using Microsoft.VisualStudio.SDK.Analyzers;
-using Xunit;
 
 public class MultiAnalyzerTests
 {
-    [Fact]
+    [Test]
     public async Task BasicPackageAsync()
     {
         var test = @"
@@ -33,10 +32,10 @@ class Test : AsyncPackage {
         await new CSharpTest
         {
             TestCode = test,
-        }.RunAsync(TestContext.Current.CancellationToken);
+        }.RunAsync();
     }
 
-    [Fact]
+    [Test]
     public async Task NoVSSDKAsync()
     {
         var test = @"
@@ -50,7 +49,7 @@ class Test {
         await new CSharpTest(includeVisualStudioSdk: false)
         {
             TestCode = test,
-        }.RunAsync(TestContext.Current.CancellationToken);
+        }.RunAsync();
     }
 
     internal class CSharpTest : CSharpCodeFixVerifier<VSSDK001DeriveFromAsyncPackageAnalyzer, EmptyCodeFixProvider>.Test

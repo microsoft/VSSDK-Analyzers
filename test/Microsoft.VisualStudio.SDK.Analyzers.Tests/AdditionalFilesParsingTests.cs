@@ -6,7 +6,7 @@ using Xunit;
 
 public class AdditionalFilesParsingTests
 {
-    [Fact]
+    [Test]
     public void TryParseNegatableTypeOrMemberReference_ParsesValidLine()
     {
         bool success = AdditionalFilesParsing.TryParseNegatableTypeOrMemberReference("![My.Namespace.Widget]::Initialize", out bool negated, out ReadOnlyMemory<char> typeName, out string? memberName);
@@ -17,7 +17,7 @@ public class AdditionalFilesParsingTests
         Assert.Equal("Initialize", memberName);
     }
 
-    [Fact]
+    [Test]
     public void TryParseNegatableTypeOrMemberReference_RejectsMalformedLine()
     {
         string malformed = "![[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[";
@@ -27,7 +27,7 @@ public class AdditionalFilesParsingTests
         Assert.False(success);
     }
 
-    [Fact]
+    [Test]
     public void TryParseMemberReference_ParsesValidLine()
     {
         bool success = AdditionalFilesParsing.TryParseMemberReference("[My.Namespace.Widget]::Initialize", out ReadOnlyMemory<char> typeName, out string? memberName);
@@ -37,7 +37,7 @@ public class AdditionalFilesParsingTests
         Assert.Equal("Initialize", memberName);
     }
 
-    [Fact]
+    [Test]
     public void TryParseNegatableTypeOrMemberReference_ParsesTypeOnlyWithTrailingWhitespace()
     {
         bool success = AdditionalFilesParsing.TryParseNegatableTypeOrMemberReference("[My.Namespace.Widget]   \t", out bool negated, out ReadOnlyMemory<char> typeName, out string? memberName);
@@ -48,12 +48,12 @@ public class AdditionalFilesParsingTests
         Assert.Null(memberName);
     }
 
-    [Theory]
-    [InlineData("[My.Namespace.Widget]::")]
-    [InlineData("!![My.Namespace.Widget]::Initialize")]
-    [InlineData("[My.Namespace.Widget] ::Initialize")]
-    [InlineData("[My.Namespace.Widget]:Initialize")]
-    [InlineData("[My.Namespace.Widget]:::Initialize")]
+    [Test]
+    [Arguments("[My.Namespace.Widget]::")]
+    [Arguments("!![My.Namespace.Widget]::Initialize")]
+    [Arguments("[My.Namespace.Widget] ::Initialize")]
+    [Arguments("[My.Namespace.Widget]:Initialize")]
+    [Arguments("[My.Namespace.Widget]:::Initialize")]
     public void TryParseNegatableTypeOrMemberReference_RejectsMalformedCases(string input)
     {
         bool success = AdditionalFilesParsing.TryParseNegatableTypeOrMemberReference(input, out _, out _, out _);
@@ -61,10 +61,10 @@ public class AdditionalFilesParsingTests
         Assert.False(success);
     }
 
-    [Theory]
-    [InlineData("[My.Namespace.Widget]")]
-    [InlineData("[My.Namespace.Widget]::Initialize extra")]
-    [InlineData("[My.Namespace.Widget]:::Initialize")]
+    [Test]
+    [Arguments("[My.Namespace.Widget]")]
+    [Arguments("[My.Namespace.Widget]::Initialize extra")]
+    [Arguments("[My.Namespace.Widget]:::Initialize")]
     public void TryParseMemberReference_RejectsMalformedCases(string input)
     {
         bool success = AdditionalFilesParsing.TryParseMemberReference(input, out _, out _);
