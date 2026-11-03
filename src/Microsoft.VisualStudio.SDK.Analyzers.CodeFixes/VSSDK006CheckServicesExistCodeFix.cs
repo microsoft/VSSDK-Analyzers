@@ -46,10 +46,13 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
             SyntaxNode? node = root.FindNode(diagnostic.AdditionalLocations[0].SourceSpan, getInnermostNodeForTie: true);
             if (node != null)
             {
-                SyntaxNode? presentArgument = node is VariableDeclaratorSyntax declaratorSyntax ? SyntaxFactory.IdentifierName(declaratorSyntax.Identifier)
-                    : node is NameSyntax ? node
-                    : node is MemberAccessExpressionSyntax ? node
-                    : null;
+                SyntaxNode? presentArgument = node is VariableDeclaratorSyntax declaratorSyntax
+                    ? SyntaxFactory.IdentifierName(declaratorSyntax.Identifier)
+                    : node is NameSyntax
+                        ? node
+                        : node is MemberAccessExpressionSyntax
+                            ? node
+                            : null;
 
                 if (presentArgument != null)
                 {

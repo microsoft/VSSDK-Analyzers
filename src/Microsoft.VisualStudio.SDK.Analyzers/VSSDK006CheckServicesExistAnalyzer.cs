@@ -271,8 +271,8 @@ namespace Microsoft.VisualStudio.SDK.Analyzers
                         {
                             return GetConditionValueThatGuaranteesNonNull(binaryExpression.Left) == true
                                 || GetConditionValueThatGuaranteesNonNull(binaryExpression.Right) == true
-                                ? true
-                                : (bool?)null;
+                                    ? true
+                                    : (bool?)null;
                         }
 
                         bool comparesWithNull = (binaryExpression.Left.IsKind(SyntaxKind.NullLiteralExpression) && IsSymbol(binaryExpression.Right))

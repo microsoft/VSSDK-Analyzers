@@ -4,9 +4,9 @@
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
-    <MicrosoftTestingPlatformVersion>2.5.1</MicrosoftTestingPlatformVersion>
+    <MicrosoftTestingPlatformVersion>2.5.2</MicrosoftTestingPlatformVersion>
 
-    <MicroBuildVersion>2.0.257</MicroBuildVersion>
+    <MicroBuildVersion>2.0.272</MicroBuildVersion>
     <CodeAnalysisVersion>5.9.0</CodeAnalysisVersion>
     <CodefixTestingVersion>1.1.2</CodefixTestingVersion>
   </PropertyGroup>
@@ -33,8 +33,8 @@
     <PackageVersion Include="System.Collections.Immutable" Version="10.0.10" Condition="'$(IsTestProject)'!='true'" />
     <PackageVersion Include="System.ValueTuple" Version="4.6.2" />
     <PackageVersion Include="xunit.assert" Version="2.9.3" />
-    <PackageVersion Include="TUnit.Engine" Version="1.65.68" />
-    <PackageVersion Include="xunit.v3.assert" Version="4.0.1" />
+    <PackageVersion Include="TUnit.Engine" Version="1.76.28" />
+    <PackageVersion Include="xunit.v3.assert" Version="4.0.2" />
   </ItemGroup>
   <ItemGroup Label="Library.Template">
     <PackageVersion Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.12.0" />
@@ -55,6 +55,6 @@
     <!-- The condition works around https://github.com/dotnet/sdk/issues/44951 -->
     <GlobalPackageReference Include="Nerdbank.GitVersioning" Version="3.10.94" Condition="!('$(TF_BUILD)'=='true' and '$(dotnetformat)'=='true')" />
     <GlobalPackageReference Include="PolySharp" Version="1.16.0" />
-    <GlobalPackageReference Include="StyleCop.Analyzers.Unstable" Version="1.2.0.556" />
+    <GlobalPackageReference Include="StyleCop.Analyzers" Version="1.3.151-beta" />
   </ItemGroup>
 </Project>
