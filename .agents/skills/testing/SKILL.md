@@ -6,7 +6,7 @@ user-invocable: false
 
 **IMPORTANT**: This repository uses TUnit with Microsoft.Testing.Platform (MTP v2). Traditional `--filter` syntax does NOT work. Use the options below instead.
 
-* There should generally be one test project (under the `test` directory) per shipping project (under the `src` directory). Test projects are named after the project being tested with a `.Tests` suffix.
+* The test project is `test\Microsoft.VisualStudio.SDK.Analyzers.Tests`, covering both the analyzer and code-fix projects.
 * Tests use TUnit with Microsoft.Testing.Platform (MTP v2), while retaining xUnit assertions. Traditional VSTest `--filter` syntax does NOT work.
 
 ## Running Tests
@@ -20,7 +20,12 @@ The commands below will *not* automatically exclude unstable tests, but you may 
 dotnet test --no-build -c Release
 ```
 
-To run a specific test project, change to that project's directory first; the commands below then target it without hard-coding its path.
+**Exclude tests marked unstable**:
+```bash
+dotnet test --no-build -c Release -- --treenode-filter '/*/*/*/*[TestCategory!=FailsInCloudTest]'
+```
+
+To run the test project, change to its directory first; the commands below then target it.
 
 **Run tests for a specific test project** (within that test project's directory):
 ```bash
