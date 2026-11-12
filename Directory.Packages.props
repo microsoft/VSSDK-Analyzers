@@ -28,7 +28,9 @@
     <PackageVersion Include="Microsoft.VisualStudio.Shell.15.0" Version="18.12.1603" />
     <PackageVersion Include="Microsoft.VisualStudio.Shell.Framework" Version="18.12.1603" />
     <PackageVersion Include="Microsoft.VisualStudio.Threading" Version="18.12.1" />
-    <PackageVersion Include="Microsoft.VisualStudio.Validation" Version="17.13.22" />
+    <!-- The SDK 18 test dependencies need Validation 18; keep the shipping code fix's baseline. -->
+    <PackageVersion Include="Microsoft.VisualStudio.Validation" Version="17.13.22" Condition="'$(IsTestProject)'!='true'" />
+    <PackageVersion Include="Microsoft.VisualStudio.Validation" Version="18.7.19" Condition="'$(IsTestProject)'=='true'" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageVersion Include="System.Collections.Immutable" Version="10.0.14" Condition="'$(IsTestProject)'!='true'" />
     <PackageVersion Include="System.ValueTuple" Version="4.6.2" />
