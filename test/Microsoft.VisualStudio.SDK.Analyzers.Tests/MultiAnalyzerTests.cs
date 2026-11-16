@@ -8,7 +8,9 @@ using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
+using Microsoft.CodeAnalysis.Text;
 using Microsoft.VisualStudio.SDK.Analyzers;
+using Microsoft.VisualStudio.Shell;
 
 public class MultiAnalyzerTests
 {
@@ -49,6 +51,16 @@ class Test {
         await new CSharpTest(includeVisualStudioSdk: false)
         {
             TestCode = test,
+            ExpectedDiagnostics =
+            {
+                new DiagnosticResult(new DiagnosticDescriptor(
+                    VSSDK013UseOnlyVisualStudioSdkSurfaceAnalyzer.MissingSurfaceId,
+                    "Provide the Visual Studio SDK surface",
+                    "No non-empty Visual Studio SDK surface AdditionalFile was provided with VsSdkSurface metadata",
+                    "Reliability",
+                    DiagnosticSeverity.Warning,
+                    isEnabledByDefault: true)).WithNoLocation(),
+            },
         }.RunAsync();
     }
 
@@ -57,6 +69,23 @@ class Test {
         internal CSharpTest(bool includeVisualStudioSdk = true)
             : base(includeVisualStudioSdk)
         {
+            if (includeVisualStudioSdk)
+            {
+                this.TestState.AdditionalFiles.Add((
+                    "Microsoft.VisualStudio.SDK.surface.txt",
+                    SourceText.From(string.Join(
+                        Environment.NewLine,
+                        new[]
+                        {
+                            typeof(AsyncPackage).Assembly.GetName().Name,
+                            typeof(ServiceProgressData).Assembly.GetName().Name,
+                        }.Distinct(StringComparer.OrdinalIgnoreCase)))));
+                this.TestState.AnalyzerConfigFiles.Add(("/.globalconfig", SourceText.From(
+                    """
+                    is_global = true
+                    build_metadata.AdditionalFiles.VsSdkSurface = Microsoft.VisualStudio.SDK
+                    """)));
+            }
         }
 
         protected override IEnumerable<DiagnosticAnalyzer> GetDiagnosticAnalyzers()

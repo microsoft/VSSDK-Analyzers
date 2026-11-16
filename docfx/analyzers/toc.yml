@@ -23,3 +23,11 @@ items:
   href: VSSDK010.md
 - name: VSSDK012 Use the latest VisualStudioServices version
   href: VSSDK012.md
+- name: VSSDK013 Use APIs in the Visual Studio SDK surface
+  href: VSSDK013.md
+- name: VSSDK014 Provide the Visual Studio SDK surface
+  href: VSSDK014.md
+- name: VSSDK015 Use reflection with APIs in the Visual Studio SDK surface
+  href: VSSDK015.md
+- name: VSSDK016 Avoid reflection-based member lookup on Visual Studio SDK types
+  href: VSSDK016.md
