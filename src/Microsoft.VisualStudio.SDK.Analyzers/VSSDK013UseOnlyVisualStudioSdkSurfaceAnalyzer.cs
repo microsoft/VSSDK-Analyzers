@@ -105,7 +105,12 @@ public sealed class VSSDK013UseOnlyVisualStudioSdkSurfaceAnalyzer : DiagnosticAn
             ImmutableHashSet<string> allowedAssemblies = ReadSurfaceAssemblies(start.Options, start.CancellationToken);
             if (allowedAssemblies.Count == 0)
             {
-                start.RegisterCompilationEndAction(end => end.ReportDiagnostic(Diagnostic.Create(MissingSurfaceDescriptor, Location.None)));
+                if (start.Options.AnalyzerConfigOptionsProvider.GlobalOptions.TryGetValue("build_property.VsSdkSurfaceExpected", out string? surfaceExpected) &&
+                    string.Equals(surfaceExpected, "true", StringComparison.OrdinalIgnoreCase))
+                {
+                    start.RegisterCompilationEndAction(end => end.ReportDiagnostic(Diagnostic.Create(MissingSurfaceDescriptor, Location.None)));
+                }
+
                 return;
             }
 

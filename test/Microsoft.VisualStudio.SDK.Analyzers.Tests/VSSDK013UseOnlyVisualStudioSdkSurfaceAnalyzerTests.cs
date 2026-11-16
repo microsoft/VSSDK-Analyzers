@@ -14,7 +14,10 @@ using Verify = CSharpCodeFixVerifier<
 public class VSSDK013UseOnlyVisualStudioSdkSurfaceAnalyzerTests
 {
     [Test]
-    public async Task APIOutsideSurfaceProducesDiagnosticAsync()
+    [Arguments(null)]
+    [Arguments("false")]
+    [Arguments("true")]
+    public async Task APIOutsideSurfaceProducesDiagnosticAsync(string? surfaceExpected)
     {
         var test = new Verify.Test
         {
@@ -28,6 +31,11 @@ public class VSSDK013UseOnlyVisualStudioSdkSurfaceAnalyzerTests
                 """,
         };
         AddSurface(test, "Microsoft.VisualStudio.Shell.Interop");
+        if (surfaceExpected is not null)
+        {
+            SetSurfaceExpected(test, surfaceExpected);
+        }
+
         test.ExpectedDiagnostics.Add(
             new DiagnosticResult(new DiagnosticDescriptor(
                 VSSDK013UseOnlyVisualStudioSdkSurfaceAnalyzer.Id,
@@ -62,12 +70,32 @@ public class VSSDK013UseOnlyVisualStudioSdkSurfaceAnalyzerTests
     }
 
     [Test]
-    public async Task MissingSurfaceProducesConfigurationDiagnosticAsync()
+    [Arguments(null)]
+    [Arguments("false")]
+    public async Task MissingSurfaceWithoutOptInProducesNoDiagnosticAsync(string? surfaceExpected)
     {
         var test = new Verify.Test(includeVisualStudioSdk: false)
         {
             TestCode = "class Test { }",
         };
+        if (surfaceExpected is not null)
+        {
+            SetSurfaceExpected(test, surfaceExpected);
+        }
+
+        await test.RunAsync();
+    }
+
+    [Test]
+    [Arguments("true")]
+    [Arguments("True")]
+    public async Task MissingExpectedSurfaceProducesConfigurationDiagnosticAsync(string surfaceExpected)
+    {
+        var test = new Verify.Test(includeVisualStudioSdk: false)
+        {
+            TestCode = "class Test { }",
+        };
+        SetSurfaceExpected(test, surfaceExpected);
         test.ExpectedDiagnostics.Add(new DiagnosticResult(new DiagnosticDescriptor(
             VSSDK013UseOnlyVisualStudioSdkSurfaceAnalyzer.MissingSurfaceId,
             "Provide the Visual Studio SDK surface",
@@ -224,6 +252,15 @@ public class VSSDK013UseOnlyVisualStudioSdkSurfaceAnalyzerTests
             .WithArguments("Microsoft.VisualStudio.Shell.Package"));
 
         await test.RunAsync();
+    }
+
+    private static void SetSurfaceExpected(Verify.Test test, string value)
+    {
+        test.TestState.AnalyzerConfigFiles.Add(("/SurfaceExpected.globalconfig", SourceText.From(
+            $"""
+            is_global = true
+            build_property.VsSdkSurfaceExpected = {value}
+            """)));
     }
 
     private static void AddSurface(Verify.Test test, string content)

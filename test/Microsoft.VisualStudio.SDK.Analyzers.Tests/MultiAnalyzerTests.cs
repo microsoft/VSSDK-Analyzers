@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
 using Microsoft.CodeAnalysis.Text;
@@ -51,16 +50,6 @@ class Test {
         await new CSharpTest(includeVisualStudioSdk: false)
         {
             TestCode = test,
-            ExpectedDiagnostics =
-            {
-                new DiagnosticResult(new DiagnosticDescriptor(
-                    VSSDK013UseOnlyVisualStudioSdkSurfaceAnalyzer.MissingSurfaceId,
-                    "Provide the Visual Studio SDK surface",
-                    "No non-empty Visual Studio SDK surface AdditionalFile was provided with VsSdkSurface metadata",
-                    "Reliability",
-                    DiagnosticSeverity.Warning,
-                    isEnabledByDefault: true)).WithNoLocation(),
-            },
         }.RunAsync();
     }
 
