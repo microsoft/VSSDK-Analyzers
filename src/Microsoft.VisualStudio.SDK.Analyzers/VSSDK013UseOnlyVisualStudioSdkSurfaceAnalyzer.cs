@@ -37,7 +37,7 @@ public sealed class VSSDK013UseOnlyVisualStudioSdkSurfaceAnalyzer : DiagnosticAn
     public const string ReflectionTypeNameId = "VSSDK015";
 
     /// <summary>
-    /// The diagnostic ID for reflection-based member lookup on Visual Studio SDK types.
+    /// The diagnostic ID for reflection-based lookup of non-public Visual Studio SDK members.
     /// </summary>
     public const string ReflectionMemberLookupId = "VSSDK016";
 
@@ -76,9 +76,9 @@ public sealed class VSSDK013UseOnlyVisualStudioSdkSurfaceAnalyzer : DiagnosticAn
 
     private static readonly DiagnosticDescriptor ReflectionMemberLookupDescriptor = new(
         id: ReflectionMemberLookupId,
-        title: "Avoid reflection-based member lookup on Visual Studio SDK types",
-        messageFormat: "Reflection-based member lookup on Visual Studio type '{0}' can break when the SDK changes",
-        description: "Avoid looking up Visual Studio SDK members by name or including non-public members.",
+        title: "Avoid reflection on non-public Visual Studio SDK members",
+        messageFormat: "Reflection-based lookup of non-public members on Visual Studio type '{0}' can break when the SDK changes",
+        description: "Avoid looking up non-public members of Visual Studio SDK types.",
         helpLinkUri: Utils.GetHelpLink(ReflectionMemberLookupId),
         category: "Reliability",
         defaultSeverity: DiagnosticSeverity.Warning,
@@ -210,7 +210,7 @@ public sealed class VSSDK013UseOnlyVisualStudioSdkSurfaceAnalyzer : DiagnosticAn
         }
 
         if (!IsReflectionMemberLookup(method) ||
-            (!HasNonPublicFlag(invocation) && !HasConstantStringArgument(invocation)) ||
+            !HasNonPublicFlag(invocation) ||
             !TryGetReflectedType(invocation.Instance, out ITypeSymbol? reflectedType) ||
             !IsVisualStudioSdkType(reflectedType, context.Compilation.Assembly, allowedAssemblies))
         {
@@ -239,11 +239,6 @@ public sealed class VSSDK013UseOnlyVisualStudioSdkSurfaceAnalyzer : DiagnosticAn
         }
 
         return false;
-    }
-
-    private static bool HasConstantStringArgument(IInvocationOperation invocation)
-    {
-        return invocation.Arguments.Any(argument => argument.Value.ConstantValue is { HasValue: true, Value: string });
     }
 
     private static bool IsTypeNameLookup(IMethodSymbol method)
@@ -275,6 +270,11 @@ public sealed class VSSDK013UseOnlyVisualStudioSdkSurfaceAnalyzer : DiagnosticAn
     {
         foreach (IArgumentOperation argument in invocation.Arguments)
         {
+            if (argument.Parameter?.Type.ToDisplayString() != "System.Reflection.BindingFlags")
+            {
+                continue;
+            }
+
             object? constantValue = argument.Value.ConstantValue.HasValue ? argument.Value.ConstantValue.Value : null;
             if ((constantValue is int integerFlags && (integerFlags & (int)BindingFlags.NonPublic) != 0) ||
                 (constantValue is BindingFlags flags && (flags & BindingFlags.NonPublic) != 0))

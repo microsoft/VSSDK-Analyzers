@@ -29,5 +29,5 @@ items:
   href: VSSDK014.md
 - name: VSSDK015 Use reflection with APIs in the Visual Studio SDK surface
   href: VSSDK015.md
-- name: VSSDK016 Avoid reflection-based member lookup on Visual Studio SDK types
+- name: VSSDK016 Avoid reflection on non-public Visual Studio SDK members
   href: VSSDK016.md

@@ -1,7 +1,7 @@
-# VSSDK016 Avoid reflection-based member lookup on Visual Studio SDK types
+# VSSDK016 Avoid reflection on non-public Visual Studio SDK members
 
-Reflection-based member lookup can depend on member names and non-public implementation details that may change between SDK versions.
+Non-public implementation details may change between SDK versions.
 
-This analyzer reports `System.Type` member lookups by name and lookups using `BindingFlags.NonPublic` when the `Type` came directly from `typeof` on an SDK-surface type.
+This analyzer reports `System.Type` member lookups when the `Type` came directly from `typeof` on an SDK-surface type and a constant `BindingFlags` argument includes `NonPublic`. Public-only lookups, including overloads without `BindingFlags`, do not produce this warning.
 
 Use supported SDK APIs instead. VSSDK016 is a warning and has no automatic code fix.

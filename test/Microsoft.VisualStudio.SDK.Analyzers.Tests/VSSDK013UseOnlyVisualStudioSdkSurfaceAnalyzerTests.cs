@@ -143,23 +143,62 @@ public class VSSDK013UseOnlyVisualStudioSdkSurfaceAnalyzerTests
     }
 
     [Test]
-    public async Task ReflectionMemberLookupOnSdkTypeProducesDiagnosticAsync()
+    public async Task NamedNonPublicMemberLookupsOnSdkTypeProduceDiagnosticsAsync()
     {
         var test = new Verify.Test
         {
             TestCode = /* lang=c#-test */ """
+                using System.Reflection;
                 using Microsoft.VisualStudio.Shell;
 
                 class Test
                 {
-                    object? Member = {|#0:typeof(Package).GetMethod("PrivateMethod")|};
+                    const BindingFlags PrivateMembers = BindingFlags.NonPublic | BindingFlags.Instance;
+                    object? Method = {|#0:typeof(Package).GetMethod("PrivateMethod", PrivateMembers)|};
+                    object? Property = {|#1:typeof(Package).GetProperty("PrivateProperty", PrivateMembers)|};
+                    object? Field = {|#2:typeof(Package).GetField("PrivateField", PrivateMembers)|};
+                    object? Member = {|#3:typeof(Package).GetMember("PrivateMethod", MemberTypes.Method, PrivateMembers)|};
                 }
                 """,
         };
         AddSurface(test, typeof(Package).Assembly.GetName().Name!);
-        test.ExpectedDiagnostics.Add(ReflectionMemberLookupDiagnostic()
-            .WithLocation(0)
-            .WithArguments("Microsoft.VisualStudio.Shell.Package"));
+        for (int i = 0; i < 4; i++)
+        {
+            test.ExpectedDiagnostics.Add(ReflectionMemberLookupDiagnostic()
+                .WithLocation(i)
+                .WithArguments("Microsoft.VisualStudio.Shell.Package"));
+        }
+
+        await test.RunAsync();
+    }
+
+    [Test]
+    public async Task PublicReflectionMemberLookupsOnSdkTypeProduceNoDiagnosticAsync()
+    {
+        var test = new Verify.Test
+        {
+            TestCode = /* lang=c#-test */ """
+                using System.Reflection;
+                using Microsoft.VisualStudio.Shell;
+
+                class Test
+                {
+                    void Lookup()
+                    {
+                        typeof(Package).GetMethod("ToString");
+                        typeof(Package).GetMethod("PrivateMethod");
+                        typeof(Package).GetProperty("Property");
+                        typeof(Package).GetField("Field");
+                        typeof(Package).GetMember("Member");
+                        typeof(Package).GetMethod("ToString", BindingFlags.Public | BindingFlags.Instance);
+                        typeof(Package).GetProperty("Property", BindingFlags.Public | BindingFlags.Instance);
+                        typeof(Package).GetField("Field", BindingFlags.Public | BindingFlags.Instance);
+                        typeof(Package).GetMember("Member", MemberTypes.TypeInfo, BindingFlags.Public | BindingFlags.Instance);
+                    }
+                }
+                """,
+        };
+        AddSurface(test, typeof(Package).Assembly.GetName().Name!);
 
         await test.RunAsync();
     }
@@ -212,8 +251,8 @@ public class VSSDK013UseOnlyVisualStudioSdkSurfaceAnalyzerTests
     {
         return new DiagnosticResult(new DiagnosticDescriptor(
             VSSDK013UseOnlyVisualStudioSdkSurfaceAnalyzer.ReflectionMemberLookupId,
-            "Avoid reflection-based member lookup on Visual Studio SDK types",
-            "Reflection-based member lookup on Visual Studio type '{0}' can break when the SDK changes",
+            "Avoid reflection on non-public Visual Studio SDK members",
+            "Reflection-based lookup of non-public members on Visual Studio type '{0}' can break when the SDK changes",
             "Reliability",
             DiagnosticSeverity.Warning,
             isEnabledByDefault: true));
