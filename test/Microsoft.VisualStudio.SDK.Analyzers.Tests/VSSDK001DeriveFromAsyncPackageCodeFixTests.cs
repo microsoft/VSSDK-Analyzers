@@ -1,7 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Collections.Immutable;
 using System.Threading.Tasks;
+using Microsoft.CodeAnalysis.Testing;
 using Verify = CSharpCodeFixVerifier<
     Microsoft.VisualStudio.SDK.Analyzers.VSSDK001DeriveFromAsyncPackageAnalyzer,
     Microsoft.VisualStudio.SDK.Analyzers.VSSDK001DeriveFromAsyncPackageCodeFix>;
@@ -26,6 +28,30 @@ class Test : AsyncPackage
 }
 ";
         await Verify.VerifyCodeFixAsync(test, withFix);
+    }
+
+    [Test]
+    public async Task BaseTypeChangesToAsyncPackageWithVisualStudio18SdkAsync()
+    {
+        var source = /* lang=c#-test */ @"
+using Microsoft.VisualStudio.Shell;
+
+class Test : [|Package|]
+{
+}
+";
+        var fixedSource = /* lang=c#-test */ @"
+using Microsoft.VisualStudio.Shell;
+
+class Test : AsyncPackage
+{
+}
+";
+
+        var test = new Verify.Test { TestCode = source, FixedCode = fixedSource };
+        test.ReferenceAssemblies = test.ReferenceAssemblies.WithPackages(
+            ImmutableArray.Create(new PackageIdentity("Microsoft.VisualStudio.Shell.15.0", "18.12.1603")));
+        await test.RunAsync();
     }
 
     [Test]
