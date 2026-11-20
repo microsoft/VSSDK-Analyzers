@@ -4,5 +4,6 @@
     <AdditionalFiles Include="$(MSBuildThisFileDirectory)AdditionalFiles\**">
       <Visible>false</Visible>
     </AdditionalFiles>
+    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="VsSdkSurface" />
   </ItemGroup>
 </Project>

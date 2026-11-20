@@ -23,3 +23,7 @@ items:
   href: VSSDK010.md
 - name: VSSDK012 Use the latest VisualStudioServices version
   href: VSSDK012.md
+- name: VSSDK013 Avoid APIs outside the Visual Studio SDK surface
+  href: VSSDK013.md
+- name: VSSDK015 Avoid unsupported reflection on Visual Studio APIs
+  href: VSSDK015.md
