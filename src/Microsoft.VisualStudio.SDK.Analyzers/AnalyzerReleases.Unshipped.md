@@ -15,7 +15,5 @@ VSSDK008 | Reliability | Warning | VSSDK008ThreadAffinitizedMEFConstruction
 VSSDK009 | Reliability | Error | VSSDK009UseUIThreadVsTaskRunContextAnalyzer
 VSSDK010 | Performance | Warning | VSSDK010RemoveUnnecessaryProvideAutoLoadAttributeAnalyzer
 VSSDK012 | Performance | Info | VSSDK012UseLatestVisualStudioServicesVersionAnalyzer
-VSSDK013 | Reliability | Warning | VSSDK013UseOnlyVisualStudioSdkSurfaceAnalyzer
-VSSDK014 | Reliability | Warning | VSSDK013UseOnlyVisualStudioSdkSurfaceAnalyzer
-VSSDK015 | Reliability | Warning | VSSDK013UseOnlyVisualStudioSdkSurfaceAnalyzer
-VSSDK016 | Reliability | Warning | VSSDK013UseOnlyVisualStudioSdkSurfaceAnalyzer
+VSSDK013 | Reliability | Warning | VisualStudioSdkSurfaceAnalyzer
+VSSDK015 | Reliability | Warning | VisualStudioSdkSurfaceAnalyzer

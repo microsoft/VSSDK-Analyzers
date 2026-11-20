@@ -16,10 +16,8 @@ ID | Title | Category
 [VSSDK009](VSSDK009.md) | Use approved VsTaskRunContext values with VsTaskLibraryHelper | Reliability
 [VSSDK010](VSSDK010.md) | Remove unnecessary ProvideAutoLoad attribute | Performance
 [VSSDK012](VSSDK012.md) | Use the latest VisualStudioServices version | Performance
-[VSSDK013](VSSDK013.md) | Use APIs in the Visual Studio SDK surface | Reliability
-[VSSDK014](VSSDK014.md) | Provide the Visual Studio SDK surface | Reliability
-[VSSDK015](VSSDK015.md) | Use reflection with APIs in the Visual Studio SDK surface | Reliability
-[VSSDK016](VSSDK016.md) | Avoid reflection on non-public Visual Studio SDK members | Reliability
+[VSSDK013](VSSDK013.md) | Avoid APIs outside the Visual Studio SDK surface | Reliability
+[VSSDK015](VSSDK015.md) | Avoid unsupported reflection on Visual Studio APIs | Reliability
 
 This analyzer package also depends on the [Microsoft.VisualStudio.Threading.Analyzers][2] package, which adds [many more analyzers][3].
 

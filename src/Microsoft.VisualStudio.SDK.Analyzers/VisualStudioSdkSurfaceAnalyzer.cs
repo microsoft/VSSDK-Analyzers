@@ -19,7 +19,7 @@ namespace Microsoft.VisualStudio.SDK.Analyzers;
 /// Reports Visual Studio API references outside the SDK package surface provided to the analyzer.
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed class VSSDK013UseOnlyVisualStudioSdkSurfaceAnalyzer : DiagnosticAnalyzer
+public sealed class VisualStudioSdkSurfaceAnalyzer : DiagnosticAnalyzer
 {
     /// <summary>
     /// The diagnostic ID for references outside the provided Visual Studio SDK surface.
@@ -27,65 +27,34 @@ public sealed class VSSDK013UseOnlyVisualStudioSdkSurfaceAnalyzer : DiagnosticAn
     public const string Id = "VSSDK013";
 
     /// <summary>
-    /// The diagnostic ID for a missing or empty Visual Studio SDK surface input.
-    /// </summary>
-    public const string MissingSurfaceId = "VSSDK014";
-
-    /// <summary>
-    /// The diagnostic ID for reflection strings that name APIs outside the provided surface.
+    /// The diagnostic ID for unsupported reflection on Visual Studio APIs.
     /// </summary>
     public const string ReflectionTypeNameId = "VSSDK015";
-
-    /// <summary>
-    /// The diagnostic ID for reflection-based lookup of non-public Visual Studio SDK members.
-    /// </summary>
-    public const string ReflectionMemberLookupId = "VSSDK016";
 
     private const string SurfaceMetadataKey = "build_metadata.AdditionalFiles.VsSdkSurface";
 
     private static readonly DiagnosticDescriptor Descriptor = new(
         id: Id,
-        title: "Use APIs in the Visual Studio SDK surface",
-        messageFormat: "Visual Studio API '{0}' is in assembly '{1}', which is not included in the referenced SDK package surface",
+        title: "Avoid APIs outside the Visual Studio SDK surface",
+        messageFormat: "Avoid Visual Studio API '{0}' from assembly '{1}', which is outside the referenced SDK package surface",
         description: "Use Visual Studio APIs included in the SDK package surface referenced by the project.",
         helpLinkUri: Utils.GetHelpLink(Id),
         category: "Reliability",
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true);
 
-    private static readonly DiagnosticDescriptor MissingSurfaceDescriptor = new(
-        id: MissingSurfaceId,
-        title: "Provide the Visual Studio SDK surface",
-        messageFormat: "No non-empty Visual Studio SDK surface AdditionalFile was provided with VsSdkSurface metadata",
-        description: "The Visual Studio SDK package must provide its surface list as a tagged AdditionalFile for API compatibility analysis.",
-        helpLinkUri: Utils.GetHelpLink(MissingSurfaceId),
-        category: "Reliability",
-        defaultSeverity: DiagnosticSeverity.Warning,
-        isEnabledByDefault: true,
-        customTags: new[] { WellKnownDiagnosticTags.CompilationEnd });
-
-    private static readonly DiagnosticDescriptor ReflectionTypeNameDescriptor = new(
+    private static readonly DiagnosticDescriptor ReflectionDescriptor = new(
         id: ReflectionTypeNameId,
-        title: "Use reflection with APIs in the Visual Studio SDK surface",
-        messageFormat: "Reflection string '{0}' names an assembly or type outside the referenced SDK package surface",
-        description: "Avoid loading Visual Studio assemblies and types that are not included in the SDK package surface referenced by the project.",
+        title: "Avoid unsupported reflection on Visual Studio APIs",
+        messageFormat: "Avoid unsupported reflection on Visual Studio API '{0}'",
+        description: "Avoid reflection on Visual Studio assemblies and types outside the referenced SDK package surface and on non-public SDK members.",
         helpLinkUri: Utils.GetHelpLink(ReflectionTypeNameId),
         category: "Reliability",
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true);
 
-    private static readonly DiagnosticDescriptor ReflectionMemberLookupDescriptor = new(
-        id: ReflectionMemberLookupId,
-        title: "Avoid reflection on non-public Visual Studio SDK members",
-        messageFormat: "Reflection-based lookup of non-public members on Visual Studio type '{0}' can break when the SDK changes",
-        description: "Avoid looking up non-public members of Visual Studio SDK types.",
-        helpLinkUri: Utils.GetHelpLink(ReflectionMemberLookupId),
-        category: "Reliability",
-        defaultSeverity: DiagnosticSeverity.Warning,
-        isEnabledByDefault: true);
-
     private static readonly ImmutableArray<DiagnosticDescriptor> ReusableSupportedDiagnostics =
-        ImmutableArray.Create(Descriptor, MissingSurfaceDescriptor, ReflectionTypeNameDescriptor, ReflectionMemberLookupDescriptor);
+        ImmutableArray.Create(Descriptor, ReflectionDescriptor);
 
     /// <inheritdoc />
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ReusableSupportedDiagnostics;
@@ -105,12 +74,6 @@ public sealed class VSSDK013UseOnlyVisualStudioSdkSurfaceAnalyzer : DiagnosticAn
             ImmutableHashSet<string> allowedAssemblies = ReadSurfaceAssemblies(start.Options, start.CancellationToken);
             if (allowedAssemblies.Count == 0)
             {
-                if (start.Options.AnalyzerConfigOptionsProvider.GlobalOptions.TryGetValue("build_property.VsSdkSurfaceExpected", out string? surfaceExpected) &&
-                    string.Equals(surfaceExpected, "true", StringComparison.OrdinalIgnoreCase))
-                {
-                    start.RegisterCompilationEndAction(end => end.ReportDiagnostic(Diagnostic.Create(MissingSurfaceDescriptor, Location.None)));
-                }
-
                 return;
             }
 
@@ -205,12 +168,12 @@ public sealed class VSSDK013UseOnlyVisualStudioSdkSurfaceAnalyzer : DiagnosticAn
             {
                 if (NamesTypeOutsideSurface(stringValue, context.Compilation, allowedAssemblies))
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(ReflectionTypeNameDescriptor, stringArgument.Value.Syntax.GetLocation(), stringValue));
+                    context.ReportDiagnostic(Diagnostic.Create(ReflectionDescriptor, stringArgument.Value.Syntax.GetLocation(), stringValue));
                 }
             }
             else if (IsAssemblyLoad(method) && NamesAssemblyOutsideSurface(stringValue, allowedAssemblies))
             {
-                context.ReportDiagnostic(Diagnostic.Create(ReflectionTypeNameDescriptor, stringArgument.Value.Syntax.GetLocation(), stringValue));
+                context.ReportDiagnostic(Diagnostic.Create(ReflectionDescriptor, stringArgument.Value.Syntax.GetLocation(), stringValue));
             }
         }
 
@@ -223,7 +186,7 @@ public sealed class VSSDK013UseOnlyVisualStudioSdkSurfaceAnalyzer : DiagnosticAn
         }
 
         context.ReportDiagnostic(Diagnostic.Create(
-            ReflectionMemberLookupDescriptor,
+            ReflectionDescriptor,
             invocation.Syntax.GetLocation(),
             reflectedType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat)));
     }
@@ -268,7 +231,7 @@ public sealed class VSSDK013UseOnlyVisualStudioSdkSurfaceAnalyzer : DiagnosticAn
 
         return method.Name is "GetMethod" or "GetMethods" or "GetProperty" or "GetProperties" or
             "GetField" or "GetFields" or "GetMember" or "GetMembers" or "GetConstructor" or "GetConstructors" or
-            "InvokeMember";
+            "GetEvent" or "GetEvents" or "GetNestedType" or "GetNestedTypes" or "FindMembers" or "InvokeMember";
     }
 
     private static bool HasNonPublicFlag(IInvocationOperation invocation)
@@ -313,12 +276,8 @@ public sealed class VSSDK013UseOnlyVisualStudioSdkSurfaceAnalyzer : DiagnosticAn
         IAssemblySymbol sourceAssembly,
         ImmutableHashSet<string> allowedAssemblies)
     {
-        while (type is IArrayTypeSymbol arrayType)
-        {
-            type = arrayType.ElementType;
-        }
-
-        return type.ContainingAssembly is IAssemblySymbol containingAssembly &&
+        return type is INamedTypeSymbol &&
+            type.ContainingAssembly is IAssemblySymbol containingAssembly &&
             !SymbolEqualityComparer.Default.Equals(containingAssembly, sourceAssembly) &&
             IsVisualStudioNamespace(type.ContainingNamespace) &&
             allowedAssemblies.Contains(containingAssembly.Identity.Name);
@@ -331,20 +290,76 @@ public sealed class VSSDK013UseOnlyVisualStudioSdkSurfaceAnalyzer : DiagnosticAn
     {
         int assemblySeparator = FindTopLevelComma(value);
         string typeName = (assemblySeparator < 0 ? value : value.Substring(0, assemblySeparator)).Trim();
-        if (!typeName.StartsWith("Microsoft.VisualStudio.", StringComparison.Ordinal))
+        int argumentsStart = typeName.IndexOf('[');
+        int typeNameEnd = typeName.IndexOfAny(new[] { '[', '*', '&' });
+        string metadataName = typeNameEnd < 0 ? typeName : typeName.Substring(0, typeNameEnd);
+        if (metadataName.StartsWith("Microsoft.VisualStudio.", StringComparison.Ordinal))
         {
-            return false;
+            if (assemblySeparator >= 0)
+            {
+                string assemblyDisplayName = value.Substring(assemblySeparator + 1).Trim();
+                string assemblyName = assemblyDisplayName.Split(',')[0].Trim();
+                if (!allowedAssemblies.Contains(assemblyName))
+                {
+                    return true;
+                }
+            }
+            else if (compilation.GetTypeByMetadataName(metadataName) is INamedTypeSymbol type &&
+                !allowedAssemblies.Contains(type.ContainingAssembly.Identity.Name))
+            {
+                return true;
+            }
         }
 
-        if (assemblySeparator >= 0)
+        if (argumentsStart >= 0)
         {
-            string assemblyDisplayName = value.Substring(assemblySeparator + 1).Trim();
-            string assemblyName = assemblyDisplayName.Split(',')[0].Trim();
-            return assemblyName.Length == 0 || !allowedAssemblies.Contains(assemblyName);
+            int argumentsEnd = FindClosingBracket(typeName, argumentsStart);
+            if (argumentsEnd >= 0)
+            {
+                string arguments = typeName.Substring(argumentsStart + 1, argumentsEnd - argumentsStart - 1);
+                while (arguments.Length > 0)
+                {
+                    int separator = FindTopLevelComma(arguments);
+                    string argument = (separator < 0 ? arguments : arguments.Substring(0, separator)).Trim();
+                    if (argument.StartsWith("[", StringComparison.Ordinal) && argument.EndsWith("]", StringComparison.Ordinal))
+                    {
+                        // Assembly-qualified generic arguments have their own brackets around assembly metadata.
+                        argument = argument.Substring(1, argument.Length - 2);
+                    }
+
+                    if (NamesTypeOutsideSurface(argument, compilation, allowedAssemblies))
+                    {
+                        return true;
+                    }
+
+                    arguments = separator < 0 ? string.Empty : arguments.Substring(separator + 1);
+                }
+            }
         }
 
-        INamedTypeSymbol? type = compilation.GetTypeByMetadataName(typeName);
-        return type is null || type.ContainingAssembly is null || !allowedAssemblies.Contains(type.ContainingAssembly.Identity.Name);
+        return false;
+    }
+
+    private static int FindClosingBracket(string value, int openingBracket)
+    {
+        int depth = 0;
+        for (int i = openingBracket; i < value.Length; i++)
+        {
+            if (value[i] == '\\')
+            {
+                i++;
+            }
+            else if (value[i] == '[')
+            {
+                depth++;
+            }
+            else if (value[i] == ']' && --depth == 0)
+            {
+                return i;
+            }
+        }
+
+        return -1;
     }
 
     private static int FindTopLevelComma(string value)
@@ -352,7 +367,11 @@ public sealed class VSSDK013UseOnlyVisualStudioSdkSurfaceAnalyzer : DiagnosticAn
         int bracketDepth = 0;
         for (int i = 0; i < value.Length; i++)
         {
-            if (value[i] == '[')
+            if (value[i] == '\\')
+            {
+                i++;
+            }
+            else if (value[i] == '[')
             {
                 bracketDepth++;
             }

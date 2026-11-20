@@ -1,9 +1,11 @@
-# VSSDK013 Use APIs in the Visual Studio SDK surface
+# VSSDK013 Avoid APIs outside the Visual Studio SDK surface
 
 Visual Studio APIs outside the packages referenced by an extension can change independently of the SDK and may cause compatibility problems.
 
-This analyzer reports references to `Microsoft.VisualStudio.*` APIs whose assembly is not included in the surface list provided by the referenced SDK packages. The SDK package supplies the list as an `AdditionalFile` tagged with `VsSdkSurface` metadata.
+This analyzer reports direct references to `Microsoft.VisualStudio.*` APIs whose assembly is not part of the SDK package surface referenced by your project.
 
-The list contains one assembly simple name per line. Blank lines and lines beginning with `#` are ignored. When the analyzer receives no non-empty tagged list, it skips surface checks and reports VSSDK014 only if the compiler-visible MSBuild property `VsSdkSurfaceExpected` is `true`. Supplied tagged lists are analyzed regardless of that property.
+Use a supported API from your referenced SDK packages instead. If the API belongs to another supported SDK package, add a reference to that package. Do not reference implementation assemblies from the Visual Studio installation to bypass this warning.
 
-Use an API included in the referenced SDK package surface. VSSDK013 is a warning and has no automatic code fix.
+The SDK packages provide the information used by this check. When that information is unavailable, the analyzer skips these checks without a warning. [VSSDK015](VSSDK015.md) covers unsupported reflection lookups separately.
+
+VSSDK013 is a warning and has no automatic code fix.
