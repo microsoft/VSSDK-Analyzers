@@ -1,7 +1,3 @@
----
-_layout: landing
----
-
 # Microsoft.VisualStudio.SDK.Analyzers
 
 Roslyn analyzers and code fixes for Visual Studio extension authors.
